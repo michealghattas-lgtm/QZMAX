@@ -219,8 +219,8 @@ authPromise.then(() => {
   function playerPath(code,pid){ return 'rooms/' + code + '/players/' + pid; }
   function answersPath(code,qi){ return 'rooms/' + code + '/answers/' + qi; }
   function answerPath(code,qi,pid){ return 'rooms/' + code + '/answers/' + qi + '/' + pid; }
-  function savedQuizPath(id){ return 'savedQuizzes/' + id; }
-  const SAVED_QUIZZES_PATH = 'savedQuizzes';
+  function savedQuizPath(id){ return SAVED_QUIZZES_PATH + '/' + id; }
+  const SAVED_QUIZZES_PATH = 'savedQuizzes/' + currentUserUid;
   const CURRENT_ROOM_PATH = 'currentRoom';
 
   function looksUsableUrl(u){
