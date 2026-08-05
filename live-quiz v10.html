@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Live Quiz</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+html, body{
+  margin:0; padding:0;
+  background:#0B0D12;
+  height:100%;
+  overscroll-behavior:none;
+}
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --void:#0B0D12;
+  --surface:#161A23;
+  --surface-2:#1E2330;
+  --line:#2A3040;
+  --ink:#F4F5F7;
+  --muted:#8A90A2;
+  --signal:#FFB800;
+  --signal-ink:#3A2C00;
+  --correct:#35D493;
+  --wrong:#FF5470;
+  --radius:16px;
+}
+*{box-sizing:border-box;}
+#quiz-root{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:17px;
+  background:var(--void);
+  color:var(--ink);
+  min-height:100vh;
+  min-height:100dvh;
+  width:100%;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+}
+#quiz-root .num, .ring-num, .code-text, .score-num, .points-num{
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
+}
+.screen{display:none; flex:1; flex-direction:column; padding:28px; animation:fadeIn .35s ease;}
+.screen.active{display:flex;}
+@media (prefers-reduced-motion: reduce){ .screen{animation:none;} }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+h1,h2,h3{font-family:'Space Grotesk',system-ui,sans-serif; margin:0; letter-spacing:-0.01em;}
+p{margin:0; color:var(--muted); line-height:1.5;}
+
+.btn{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:17px;
+  border:none; border-radius:12px; padding:14px 22px; cursor:pointer;
+  transition:transform .12s ease, opacity .12s ease;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--signal); color:var(--signal-ink);}
+.btn:disabled{opacity:.35; cursor:not-allowed;}
+.btn-ghost{background:var(--surface-2); color:var(--ink); border:1px solid var(--line);}
+.btn-danger{background:transparent; color:var(--wrong); border:1px solid rgba(255,84,112,.35);}
+.btn-block{width:100%;}
+
+input[type=text], input[type=password]{
+  font-family:'Inter',sans-serif; font-size:18px; color:var(--ink);
+  background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+  padding:14px 16px; width:100%; outline:none;
+}
+input[type=text]:focus, input[type=password]:focus{border-color:var(--signal);}
+input[type=text]::placeholder, input[type=password]::placeholder{color:var(--muted);}
+label{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600;}
+
+.eyebrow{font-size:13px; text-transform:uppercase; letter-spacing:.12em; color:var(--signal); font-weight:700;}
+.center-stage{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center;}
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;}
+.chip{background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:9px 16px; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px;}
+.code-text{font-size:22px; letter-spacing:.12em; color:var(--signal);}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px;}
+
+.ring-wrap{position:relative; width:120px; height:120px;}
+.ring-wrap svg{transform:rotate(-90deg);}
+.ring-bg{fill:none; stroke:var(--surface-2); stroke-width:8;}
+.ring-fg{fill:none; stroke:var(--signal); stroke-width:8; stroke-linecap:round; transition:stroke .2s ease;}
+.ring-num{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:38px; font-weight:700;}
+
+.opt-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:640px;}
+.opt-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px; text-align:left; display:flex; gap:14px; align-items:center; font-size:19px; font-weight:600; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+.opt-card:active{transform:scale(.98);}
+.opt-letter{width:36px; height:36px; font-size:17px; border-radius:8px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; color:var(--muted); flex-shrink:0;}
+.opt-card.selected{border-color:var(--signal); background:rgba(255,184,0,.08);}
+.opt-card.correct{border-color:var(--correct); background:rgba(53,212,147,.12);}
+.opt-card.correct .opt-letter{background:var(--correct); color:var(--void);}
+.opt-card.wrong{border-color:var(--wrong); background:rgba(255,84,112,.12);}
+.opt-card.wrong .opt-letter{background:var(--wrong); color:var(--void);}
+.opt-card.disabled{pointer-events:none; opacity:.55;}
+.opt-card.selected .opt-letter{background:var(--signal); color:var(--signal-ink);}
+
+.bar-row{display:flex; align-items:center; gap:10px; width:100%; max-width:520px; font-size:16px;}
+.bar-track{flex:1; height:14px; background:var(--surface-2); border-radius:8px; overflow:hidden;}
+.bar-fill{height:100%; background:var(--signal); border-radius:8px; transition:width .5s ease;}
+.bar-fill.correct{background:var(--correct);}
+
+.lb-row{display:flex; align-items:center; gap:14px; width:100%; max-width:520px; padding:13px 16px; background:var(--surface); border:1px solid var(--line); border-radius:12px; font-size:17px;}
+.lb-rank{font-family:'Space Grotesk'; font-weight:700; color:var(--muted); width:22px;}
+.lb-name{flex:1; font-weight:600; text-align:left;}
+.lb-score{font-family:'Space Grotesk'; font-weight:700; color:var(--signal);}
+.lb-row.me{border-color:var(--signal);}
+
+.qform-row{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+.opt-input-row{display:flex; gap:8px; align-items:center; margin-bottom:8px;}
+.correct-toggle{width:34px; height:34px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--muted); font-weight:700; cursor:pointer; flex-shrink:0;}
+.correct-toggle.on{background:var(--correct); color:var(--void); border-color:var(--correct);}
+.qlist-item{display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--surface); border:1px solid var(--line); border-radius:10px; margin-bottom:8px; font-size:14px;}
+.qlist-item.editing{border-color:var(--signal); background:rgba(255,184,0,.08);}
+.qlist-item .qtxt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:75%;}
+.small-x{background:none; border:none; color:var(--wrong); cursor:pointer; font-size:16px;}
+
+.err-msg{color:var(--wrong); font-size:14px; min-height:16px;}
+.role-btn{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:24px; text-align:left; cursor:pointer; width:100%; margin-bottom:14px;}
+.role-btn h3{color:#FFFFFF;}
+.role-btn:hover{border-color:var(--signal);}
+.scroll-y{overflow-y:auto; flex:1;}
+.badge-correct{color:var(--correct); font-weight:700;}
+.badge-wrong{color:var(--wrong); font-weight:700;}
+.podium{display:flex; align-items:flex-end; gap:14px; margin:20px 0;}
+.podium-col{display:flex; flex-direction:column; align-items:center; gap:8px;}
+.podium-bar{width:70px; border-radius:8px 8px 0 0; background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700;}
+.podium-bar.gold{background:var(--signal); color:var(--signal-ink); height:110px;}
+.podium-bar.silver{background:#C7CBD6; color:var(--void); height:80px;}
+.podium-bar.bronze{background:#C08552; color:var(--void); height:60px;}
+</style>
+</head>
+<body>
+
+<div id="quiz-root">
+  <div id="screen-role" class="screen active"></div>
+  <div id="screen-host-setup" class="screen"></div>
+  <div id="screen-host-question" class="screen"></div>
+  <div id="screen-host-reveal" class="screen"></div>
+  <div id="screen-host-leaderboard" class="screen"></div>
+  <div id="screen-host-final" class="screen"></div>
+  <div id="screen-player-join" class="screen"></div>
+  <div id="screen-player-lobby" class="screen"></div>
+  <div id="screen-player-question" class="screen"></div>
+  <div id="screen-player-reveal" class="screen"></div>
+  <div id="screen-player-leaderboard" class="screen"></div>
+  <div id="screen-player-final" class="screen"></div>
+  <div id="screen-player-ended" class="screen"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  // KEEP YOUR ACTUAL API KEY HERE
+  apiKey: "AIzaSyC_aPS2yxVt802ZrrPqcDA7dyF5vfK_xI4",
+  authDomain: "live-quiz-app-ef8bc.firebaseapp.com",
+  databaseURL: "https://live-quiz-app-ef8bc-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "live-quiz-app-ef8bc",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+let currentUserUid = null;
+
+const authPromise = new Promise((resolve) => {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUserUid = user.uid;
+      resolve();
+    } else {
+      signInAnonymously(auth).catch((error) => console.error("Auth failed:", error));
+    }
+  });
+});
+
+authPromise.then(() => {
+  const $ = id => document.getElementById(id);
+
+  async function fbGet(path){
+    try{
+      const snapshot = await get(ref(db, path));
+      return snapshot.exists() ? snapshot.val() : null;
+    }catch(e){ console.error('firebase get failed', path, e); return null; }
+  }
+  async function fbSet(path, value){
+    try{
+      await set(ref(db, path), value);
+      return true;
+    }catch(e){ console.error('firebase set failed', path, e); return false; }
+  }
+  async function fbDelete(path){
+    try{
+      await remove(ref(db, path));
+      return true;
+    }catch(e){ console.error('firebase delete failed', path, e); return false; }
+  }
+
+  function genCode(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let s = '';
+    for(let i=0;i<5;i++) s += chars[Math.floor(Math.random()*chars.length)];
+    return s;
+  }
+  function genId(){
+    return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+  }
+  function roomPath(code){ return 'rooms/' + code; }
+  function statePath(code){ return 'rooms/' + code + '/state'; }
+  function playersPath(code){ return 'rooms/' + code + '/players'; }
+  function playerPath(code,pid){ return 'rooms/' + code + '/players/' + pid; }
+  function answersPath(code,qi){ return 'rooms/' + code + '/answers/' + qi; }
+  function answerPath(code,qi,pid){ return 'rooms/' + code + '/answers/' + qi + '/' + pid; }
+  function savedQuizPath(id){ return 'savedQuizzes/' + id; }
+  const SAVED_QUIZZES_PATH = 'savedQuizzes';
+  const CURRENT_ROOM_PATH = 'currentRoom';
+
+  function looksUsableUrl(u){
+    if(!u) return false;
+    if(!/^https?:\/\//i.test(u)) return false;
+    if(u.indexOf('srcdoc')>=0) return false;
+    return true;
+  }
+  function buildJoinUrl(code){
+    const base = looksUsableUrl(S.baseUrl) ? S.baseUrl
+               : looksUsableUrl(window.location.href) ? window.location.href
+               : null;
+    if(base){
+      try{
+        const url = new URL(base);
+        url.searchParams.set('join', code);
+        return url.toString();
+      }catch(e){ }
+    }
+    return code; 
+  }
+  function getJoinCodeFromUrl(){
+    try{
+      const params = new URLSearchParams(window.location.search);
+      return (params.get('join')||'').toUpperCase();
+    }catch(e){ return ''; }
+  }
+  function renderJoinQR(elId, code, attempt){
+    const el = $(elId);
+    if(!el) return;
+    if(typeof QRCode === 'undefined'){
+      if((attempt||0) < 15){ setTimeout(()=>renderJoinQR(elId, code, (attempt||0)+1), 300); }
+      else { el.textContent = code; el.style.fontWeight = '700'; el.style.color = '#0B0D12'; }
+      return;
+    }
+    el.innerHTML = '';
+    new QRCode(el, { text: buildJoinUrl(code), width:88, height:88, colorDark:'#0B0D12', colorLight:'#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  }
+
+  const S = {
+    code:null, pid:null, name:'', baseUrl:'',
+    hostRevealing:false,
+    hostTimerHandle:null, hostPollHandle:null,
+    playerTimerHandle:null, playerPollHandle:null,
+    lastPhaseKey:null, questionsDraft:[],
+    formOpts:[{text:'',correct:true},{text:'',correct:false}],
+    editingQuestionIndex:null, loadedQuizId:null, viewingArchive:false, hadRoom:false,
+  };
+  const MAX_OPTIONS = 8;
+
+  function showScreen(id){
+    document.querySelectorAll('#quiz-root .screen').forEach(s=>s.classList.remove('active'));
+    $(id).classList.add('active');
+  }
+
+  function ringSvg(prefix){
+    return '<div class="ring-wrap"><svg width="120" height="120" viewBox="0 0 120 120">'+
+      '<circle class="ring-bg" cx="60" cy="60" r="54"></circle>'+
+      '<circle id="'+prefix+'-fg" class="ring-fg" cx="60" cy="60" r="54" '+
+      'stroke-dasharray="339.29" stroke-dashoffset="0"></circle></svg>'+
+      '<div id="'+prefix+'-num" class="ring-num">0</div></div>';
+  }
+  function updateRing(prefix, remaining, total){
+    const frac = Math.max(0, Math.min(1, remaining/total));
+    const circ = 339.29;
+    const fg = $(prefix+'-fg');
+    if(fg){ fg.style.strokeDashoffset = circ*(1-frac); fg.style.stroke = frac < 0.3 ? 'var(--wrong)' : 'var(--signal)'; }
+    const num = $(prefix+'-num');
+    if(num) num.textContent = Math.max(0, Math.ceil(remaining));
+  }
+
+  function buildRoleScreen(){
+    $('screen-role').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Live Quiz</div>'+
+        '<h1 style="font-size:36px;">Play together, right now</h1>'+
+        '<p style="max-width:380px;">Host a round from this screen, or join one on your phone with a room code.</p>'+
+        '<div style="width:100%; max-width:360px; margin-top:12px;">'+
+          '<button class="role-btn" id="btn-be-host"><h3 style="font-size:21px;">Host a quiz</h3><p>Write questions and run the game on this device.</p></button>'+
+          '<button class="role-btn" id="btn-be-player"><h3 style="font-size:21px;">Join a quiz</h3><p>Enter a room code from your phone.</p></button>'+
+        '</div>'+
+      '</div>';
+    $('btn-be-host').onclick = buildHostPinScreen;
+    $('btn-be-player').onclick = ()=>{ buildPlayerJoin(); showScreen('screen-player-join'); };
+  }
+
+  const HOST_PIN = '220981';
+  const HOST_SESSION_KEY = 'quizHostRoomCode';
+
+  function lsGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+  function lsSet(key,val){ try{ localStorage.setItem(key,val); }catch(e){ } }
+  function lsRemove(key){ try{ localStorage.removeItem(key); }catch(e){ } }
+
+  async function tryResumeHostSession(){
+    const saved = lsGet(HOST_SESSION_KEY);
+    if(!saved) return false;
+    const st = await fbGet(statePath(saved));
+    if(!st){ lsRemove(HOST_SESSION_KEY); return false; }
+    S.code = saved;
+    S.questionsDraft = st.questions || [];
+    S.loadedQuizId = null;
+    S.editingQuestionIndex = null;
+    S.viewingArchive = false;
+    if(st.status === 'setup'){
+      buildHostSetup();
+      showScreen('screen-host-setup');
+      startHostSetupPoll();
+    } else if(st.status === 'question'){
+      enterHostQuestion(st);
+    } else if(st.status === 'reveal'){
+      const q = st.questions[st.currentIndex];
+      buildHostReveal(st, st.optionCounts || new Array(q.options.length).fill(0));
+    } else if(st.status === 'leaderboard'){
+      buildHostLeaderboard(st, await fetchAllPlayers(S.code));
+    } else if(st.status === 'final'){
+      buildHostFinal(st, await fetchAllPlayers(S.code));
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  function buildHostPinScreen(){
+    $('screen-role').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Host access</div>'+
+        '<h2 style="font-size:24px;">Enter the host PIN</h2>'+
+        '<p>Only the organizer should have this.</p>'+
+        '<div style="width:100%; max-width:280px; display:flex; flex-direction:column; gap:12px;">'+
+          '<input type="password" id="host-pin-input" placeholder="PIN" inputmode="numeric">'+
+          '<div class="err-msg" id="host-pin-err"></div>'+
+          '<button class="btn btn-primary btn-block" id="host-pin-submit">Continue</button>'+
+          '<button class="btn btn-ghost btn-block" id="host-pin-back">Back</button>'+
+        '</div>'+
+      '</div>';
+    const submit = async ()=>{
+      const val = $('host-pin-input').value.trim();
+      if(val === HOST_PIN){
+        const resumed = await tryResumeHostSession();
+        if(!resumed) await startHostFlow();
+      } else {
+        $('host-pin-err').textContent = 'Incorrect PIN.';
+        $('host-pin-input').value = '';
+        $('host-pin-input').focus();
+      }
+    };
+    $('host-pin-submit').onclick = submit;
+    $('host-pin-input').addEventListener('keydown', (e)=>{ if(e.key==='Enter') submit(); });
+    $('host-pin-back').onclick = buildRoleScreen;
+    $('host-pin-input').focus();
+  }
+
+  async function startHostFlow(){
+    const code = genCode();
+    S.code = code;
+    S.questionsDraft = [];
+    S.loadedQuizId = null;
+    S.editingQuestionIndex = null;
+    S.viewingArchive = false;
+    const state = { code, status:'setup', hostUid: currentUserUid, questions:[], currentIndex:-1, questionStartedAt:null, createdAt:Date.now() };
+    await fbSet(statePath(code), state);
+    await fbSet(CURRENT_ROOM_PATH, { code, updatedAt:Date.now() });
+    lsSet(HOST_SESSION_KEY, code);
+    buildHostSetup();
+    showScreen('screen-host-setup');
+    startHostSetupPoll();
+  }
+
+  function buildHostSetup(){
+    $('screen-host-setup').innerHTML =
+      '<div class="topbar">'+
+        '<div class="chip">Room code <span class="code-text">'+S.code+'</span></div>'+
+        '<div class="chip" id="host-setup-playercount">0 joined</div>'+
+      '</div>'+
+      '<div class="card" style="margin-bottom:16px;">'+
+        '<div style="display:flex; align-items:center; gap:18px;">'+
+          '<div id="qr-host-setup" style="background:#fff; padding:8px; border-radius:10px; width:104px; height:104px; display:flex; align-items:center; justify-content:center; flex-shrink:0;"></div>'+
+          '<div>'+
+            '<div class="eyebrow">Scan to join</div>'+
+            '<div class="code-text" style="font-size:28px;">'+S.code+'</div>'+
+            '<button class="btn btn-ghost" id="btn-copy-link" style="margin-top:8px; padding:8px 14px; font-size:13px;">Copy join link</button>'+
+          '</div>'+
+        '</div>'+
+        '<div style="margin-top:14px; border-top:1px solid var(--line); padding-top:12px;">'+
+          '<label>Quiz link (auto-detected — only set this if the QR/link below isn\'t working)</label>'+
+          '<div style="display:flex; gap:8px; margin-top:6px;">'+
+            '<input type="text" id="host-link-input" placeholder="https://claude.ai/public/artifacts/..." value="'+escapeHtml(S.baseUrl||'')+'">'+
+            '<button class="btn btn-ghost" id="btn-set-link" style="padding:10px 16px; font-size:13px; flex-shrink:0;">Set link</button>'+
+          '</div>'+
+          '<div class="err-msg" id="host-link-msg"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card" style="margin-bottom:16px;">'+
+        '<div class="eyebrow" style="margin-bottom:8px;">Generate questions with AI</div>'+
+        '<div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">'+
+          '<div class="qform-row" style="flex:2; min-width:200px;"><label>Topic / instructions</label><input type="text" id="ai-topic" placeholder="e.g. 90s pop music, medium difficulty"></div>'+
+          '<div class="qform-row" style="max-width:110px;"><label>Questions</label><input type="text" id="ai-count" value="5"></div>'+
+          '<div class="qform-row" style="max-width:130px;"><label>Options each</label><input type="text" id="ai-opts-per-q" value="4"></div>'+
+        '</div>'+
+        '<button class="btn btn-primary btn-block" id="ai-generate">Generate questions</button>'+
+        '<div class="err-msg" id="ai-msg"></div>'+
+      '</div>'+
+      '<div style="display:flex; gap:20px; flex:1; min-height:0;">'+
+        '<div style="flex:1; display:flex; flex-direction:column; min-height:0;">'+
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">'+
+            '<h3 id="qf-heading" style="margin:0;">Add a question</h3>'+
+            '<button class="btn btn-ghost" id="qf-cancel-edit" type="button" style="display:none; padding:6px 12px; font-size:12px;">Cancel edit</button>'+
+          '</div>'+
+          '<div class="card">'+
+            '<div class="qform-row"><label>Question</label><input type="text" id="qf-text" placeholder="e.g. What year did the game begin?"></div>'+
+            '<div class="qform-row"><label>Answer options — tap the check to mark the correct one</label>'+
+              '<div id="qf-options"></div>'+
+              '<button class="btn btn-ghost" id="qf-add-option" type="button" style="align-self:flex-start; padding:8px 14px; font-size:13px;">+ Add option</button>'+
+            '</div>'+
+            '<div style="display:flex; gap:14px;">'+
+              '<div class="qform-row" style="max-width:160px;"><label>Time limit (sec)</label><input type="text" id="qf-time" value="20"></div>'+
+              '<div class="qform-row" style="max-width:160px;"><label>Points</label><input type="text" id="qf-points" value="1000"></div>'+
+            '</div>'+
+            '<div class="qform-row"><label>Explanation (optional) — shown after the answer is revealed</label><input type="text" id="qf-explanation" placeholder="e.g. The event took place in 1998 because..."></div>'+
+            '<div class="err-msg" id="qf-err"></div>'+
+            '<button class="btn btn-primary btn-block" id="qf-add">Add question</button>'+
+          '</div>'+
+        '</div>'+
+        '<div style="flex:1; display:flex; flex-direction:column; min-height:0;">'+
+          '<div class="card" style="margin-bottom:14px;">'+
+            '<div style="display:flex; justify-content:space-between; align-items:center;">'+
+              '<label>Saved quizzes</label>'+
+              '<button id="qf-toggle-archive" style="background:none; border:none; color:var(--muted); font-size:12px; text-decoration:underline; cursor:pointer;">View archive</button>'+
+            '</div>'+
+            '<div style="display:flex; gap:8px; margin-top:8px;">'+
+              '<select id="qf-saved-select" style="flex:1; background:var(--surface-2); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:10px; font-family:Inter,sans-serif;"></select>'+
+              '<button class="btn btn-ghost" id="qf-load-saved">Load</button>'+
+              '<button class="btn btn-danger" id="qf-delete-saved">Archive</button>'+
+            '</div>'+
+          '</div>'+
+          '<h3 style="margin-bottom:10px;">Question queue</h3>'+
+          '<div id="host-qlist" class="scroll-y"></div>'+
+          '<div style="display:flex; gap:8px; margin-top:12px;">'+
+            '<input type="text" id="qf-save-name" placeholder="Name this quiz to save it">'+
+            '<button class="btn btn-ghost" id="qf-save-quiz">Save</button>'+
+          '</div>'+
+          '<button id="qf-save-as-new" style="display:none; background:none; border:none; color:var(--muted); font-size:12px; text-decoration:underline; cursor:pointer; margin-top:6px; align-self:flex-start;">Save as a new copy instead</button>'+
+          '<div class="err-msg" id="qf-save-msg"></div>'+
+          '<button class="btn btn-primary btn-block" id="btn-start-quiz" disabled style="margin-top:12px;">Start quiz</button>'+
+        '</div>'+
+      '</div>';
+
+    renderJoinQR('qr-host-setup', S.code);
+    if(buildJoinUrl(S.code) === S.code){
+      $('host-link-msg').style.color = 'var(--wrong)';
+      $('host-link-msg').textContent = 'Could not detect this page\'s link — paste it in above so the QR/link work.';
+    }
+    $('btn-set-link').onclick = ()=>{
+      const val = $('host-link-input').value.trim();
+      if(!looksUsableUrl(val)){
+        $('host-link-msg').style.color = 'var(--wrong)';
+        $('host-link-msg').textContent = 'Enter a full https:// link.';
+        return;
+      }
+      S.baseUrl = val;
+      renderJoinQR('qr-host-setup', S.code);
+      $('host-link-msg').style.color = 'var(--correct)';
+      $('host-link-msg').textContent = 'Saved — the QR code and join link now use this address.';
+    };
+    $('btn-copy-link').onclick = async ()=>{
+      if(buildJoinUrl(S.code) === S.code){
+        $('host-link-msg').style.color = 'var(--wrong)';
+        $('host-link-msg').textContent = 'No usable link detected — players can still type the room code manually.';
+      }
+      const link = buildJoinUrl(S.code);
+      const btn = $('btn-copy-link');
+      try{
+        await navigator.clipboard.writeText(link);
+      }catch(e){
+        try{
+          const ta = document.createElement('textarea');
+          ta.value = link; ta.style.position='fixed'; ta.style.opacity='0';
+          document.body.appendChild(ta); ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }catch(e2){}
+      }
+      btn.textContent = 'Copied!';
+      setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
+    };
+
+    $('ai-generate').onclick = async ()=>{
+      const topic = $('ai-topic').value.trim();
+      const count = Math.max(1, Math.min(20, parseInt($('ai-count').value,10) || 5));
+      const optsPerQ = Math.max(2, Math.min(8, parseInt($('ai-opts-per-q').value,10) || 4));
+      
+      if(!topic){ $('ai-msg').style.color='var(--wrong)'; $('ai-msg').textContent = 'Describe a topic for the questions.'; return; }
+      
+      const btn = $('ai-generate');
+      btn.disabled = true;
+      btn.textContent = 'Generating…';
+      $('ai-msg').style.color = 'var(--muted)';
+      $('ai-msg').textContent = '';
+      
+      try{
+        const generated = await generateQuestionsWithAI(topic, count, optsPerQ);
+        S.questionsDraft = S.questionsDraft.concat(generated);
+        renderHostQList();
+        pushQuestionsToState();
+        $('ai-msg').style.color = 'var(--correct)';
+        $('ai-msg').textContent = 'Added '+generated.length+' question(s) — review them in the queue before starting.';
+      }catch(err){
+        $('ai-msg').style.color = 'var(--wrong)';
+        $('ai-msg').textContent = err.message || 'Something went wrong generating questions.';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Generate questions';
+    };
+
+    renderOptionInputs();
+    $('qf-add-option').onclick = ()=>{
+      if(S.formOpts.length>=MAX_OPTIONS) return;
+      S.formOpts.push({text:'', correct:false});
+      renderOptionInputs();
+    };
+
+    $('qf-add').onclick = ()=>{
+      const text = $('qf-text').value.trim();
+      const opts = S.formOpts.map(o=>o.text.trim());
+      const correctIdx = S.formOpts.findIndex(o=>o.correct);
+      const timeLimit = parseInt($('qf-time').value,10) || 20;
+      const points = parseInt($('qf-points').value,10) || 1000;
+      const explanation = $('qf-explanation').value.trim();
+      if(!text || opts.some(o=>o.length===0)){
+        $('qf-err').textContent = 'Fill in the question and all of its options.';
+        return;
+      }
+      $('qf-err').textContent = '';
+      const question = { q:text, options:opts, correct:correctIdx, timeLimit, points, explanation, excluded:false };
+      if(S.editingQuestionIndex !== null){
+        S.questionsDraft[S.editingQuestionIndex] = question;
+      } else {
+        S.questionsDraft.push(question);
+      }
+      cancelEditQuestion();
+      renderHostQList();
+      pushQuestionsToState();
+    };
+    $('qf-cancel-edit').onclick = cancelEditQuestion;
+    renderHostQList();
+    $('btn-start-quiz').onclick = beginQuiz;
+
+    let pendingPermanentDeleteKey = null;
+
+    $('qf-toggle-archive').onclick = async ()=>{
+      S.viewingArchive = !S.viewingArchive;
+      pendingPermanentDeleteKey = null;
+      $('qf-save-msg').textContent = '';
+      await refreshSavedQuizList();
+    };
+
+    $('qf-saved-select').addEventListener('change', ()=>{
+      pendingPermanentDeleteKey = null;
+      const delBtn = $('qf-delete-saved');
+      if(delBtn && S.viewingArchive) delBtn.textContent = 'Delete permanently';
+    });
+
+    $('qf-load-saved').onclick = async ()=>{
+      const key = $('qf-saved-select').value;
+      if(!key) return;
+      if(S.viewingArchive){
+        const data = await fbGet(savedQuizPath(key));
+        if(!data) return;
+        data.archived = false;
+        await fbSet(savedQuizPath(key), data);
+        S.viewingArchive = false;
+        pendingPermanentDeleteKey = null;
+        await refreshSavedQuizList();
+        $('qf-save-msg').style.color = 'var(--correct)';
+        $('qf-save-msg').textContent = 'Restored "'+data.name+'" — back in your saved quizzes.';
+        return;
+      }
+      const data = await fbGet(savedQuizPath(key));
+      if(!data) return;
+      const replaced = S.questionsDraft.length;
+      S.questionsDraft = JSON.parse(JSON.stringify(data.questions||[]));
+      S.loadedQuizId = key;
+      cancelEditQuestion();
+      renderHostQList();
+      pushQuestionsToState();
+      $('qf-save-name').value = data.name;
+      updateSaveButtonMode();
+      $('qf-save-msg').style.color = 'var(--correct)';
+      $('qf-save-msg').textContent = 'Loaded "'+data.name+'" — editing this saved quiz.'+(replaced?' Replaced '+replaced+' question(s) in your queue.':'');
+    };
+    $('qf-delete-saved').onclick = async ()=>{
+      const key = $('qf-saved-select').value;
+      if(!key) return;
+      if(S.viewingArchive){
+        if(pendingPermanentDeleteKey !== key){
+          pendingPermanentDeleteKey = key;
+          $('qf-delete-saved').textContent = 'Click again to confirm';
+          $('qf-save-msg').style.color = 'var(--wrong)';
+          $('qf-save-msg').textContent = 'This permanently deletes it — click "Click again to confirm" to proceed.';
+          return;
+        }
+        await fbDelete(savedQuizPath(key));
+        pendingPermanentDeleteKey = null;
+        $('qf-delete-saved').textContent = 'Delete permanently';
+        if(S.loadedQuizId === key){ S.loadedQuizId = null; updateSaveButtonMode(); }
+        await refreshSavedQuizList();
+        $('qf-save-msg').style.color = 'var(--wrong)';
+        $('qf-save-msg').textContent = 'Permanently deleted.';
+        return;
+      }
+      const data = await fbGet(savedQuizPath(key));
+      if(!data) return;
+      data.archived = true;
+      data.archivedAt = Date.now();
+      await fbSet(savedQuizPath(key), data);
+      if(S.loadedQuizId === key){ S.loadedQuizId = null; updateSaveButtonMode(); }
+      await refreshSavedQuizList();
+      $('qf-save-msg').style.color = 'var(--correct)';
+      $('qf-save-msg').textContent = 'Archived "'+data.name+'" — find it under "View archive" to restore or delete for good.';
+    };
+    $('qf-save-quiz').onclick = async ()=>{
+      const name = $('qf-save-name').value.trim();
+      if(!name){ $('qf-save-msg').style.color = 'var(--wrong)'; $('qf-save-msg').textContent = 'Give your quiz a name first.'; return; }
+      if(S.questionsDraft.length===0){ $('qf-save-msg').style.color = 'var(--wrong)'; $('qf-save-msg').textContent = 'Add at least one question before saving.'; return; }
+      const id = S.loadedQuizId || genId();
+      await fbSet(savedQuizPath(id), { name, questions: S.questionsDraft, savedAt: Date.now(), archived:false, ownerUid: currentUserUid });
+      S.loadedQuizId = id;
+      updateSaveButtonMode();
+      $('qf-save-msg').style.color = 'var(--correct)';
+      $('qf-save-msg').textContent = (S.loadedQuizId ? 'Updated "' : 'Saved "')+name+'".';
+      await refreshSavedQuizList();
+    };
+    $('qf-save-as-new').onclick = async ()=>{
+      const name = $('qf-save-name').value.trim();
+      if(!name){ $('qf-save-msg').style.color = 'var(--wrong)'; $('qf-save-msg').textContent = 'Give your quiz a name first.'; return; }
+      if(S.questionsDraft.length===0){ $('qf-save-msg').style.color = 'var(--wrong)'; $('qf-save-msg').textContent = 'Add at least one question before saving.'; return; }
+      await fbSet(savedQuizPath(genId()), { name, questions: S.questionsDraft, savedAt: Date.now(), ownerUid: currentUserUid });
+      S.loadedQuizId = null;
+      updateSaveButtonMode();
+      $('qf-save-msg').style.color = 'var(--correct)';
+      $('qf-save-msg').textContent = 'Saved "'+name+'" as a new quiz.';
+      await refreshSavedQuizList();
+    };
+    updateSaveButtonMode();
+    refreshSavedQuizList();
+  }
+
+  function updateSaveButtonMode(){
+    const saveBtn = $('qf-save-quiz');
+    const asNewBtn = $('qf-save-as-new');
+    if(!saveBtn) return;
+    if(S.loadedQuizId){
+      saveBtn.textContent = 'Update saved quiz';
+      if(asNewBtn) asNewBtn.style.display = '';
+    } else {
+      saveBtn.textContent = 'Save';
+      if(asNewBtn) asNewBtn.style.display = 'none';
+    }
+  }
+
+  function startEditQuestion(i){
+    const q = S.questionsDraft[i];
+    if(!q) return;
+    S.editingQuestionIndex = i;
+    $('qf-text').value = q.q;
+    $('qf-time').value = q.timeLimit;
+    $('qf-points').value = q.points;
+    $('qf-explanation').value = q.explanation || '';
+    S.formOpts = q.options.map((opt,idx)=>({ text:opt, correct: idx===q.correct }));
+    renderOptionInputs();
+    $('qf-heading').textContent = 'Edit question';
+    $('qf-add').textContent = 'Save changes';
+    $('qf-cancel-edit').style.display = '';
+    $('qf-err').textContent = '';
+    $('qf-text').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
+  function cancelEditQuestion(){
+    S.editingQuestionIndex = null;
+    $('qf-text').value = '';
+    $('qf-time').value = '20';
+    $('qf-points').value = '1000';
+    $('qf-explanation').value = '';
+    S.formOpts = [{text:'',correct:true},{text:'',correct:false}];
+    renderOptionInputs();
+    $('qf-heading').textContent = 'Add a question';
+    $('qf-add').textContent = 'Add question';
+    $('qf-cancel-edit').style.display = 'none';
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function generateQuestionsWithAI(topic, count, optsPerQ){
+    let res;
+    try {
+      res = await fetch('/.netlify/functions/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic, count, optsPerQ })
+      });
+    } catch(e) {
+      throw new Error('Could not reach the server — check your connection.');
+    }
+    
+    let items;
+    try { 
+      items = await res.json(); 
+    } catch(e) { 
+      throw new Error('Could not read the server response — try again.'); 
+    }
+    
+    if(!res.ok){
+      throw new Error(items.error || 'Server error generating questions.');
+    }
+
+    if(!Array.isArray(items) || items.length===0) {
+      throw new Error('No usable questions returned — try a different topic.');
+    }
+
+    const questions = [];
+    for(const item of items){
+      if(!item || typeof item.question !== 'string') continue;
+      if(!Array.isArray(item.options) || item.options.length < 2) continue;
+      const opts = item.options.map(o=>String(o).trim()).filter(o=>o);
+      if(opts.length < 2) continue;
+      let correctIdx = parseInt(item.correctIndex,10);
+      if(isNaN(correctIdx) || correctIdx < 0 || correctIdx >= opts.length) correctIdx = 0;
+      questions.push({
+        q: item.question.trim(),
+        options: opts,
+        correct: correctIdx,
+        timeLimit: 20,
+        points: 1000,
+        explanation: typeof item.explanation === 'string' ? item.explanation.trim() : '',
+        excluded: false
+      });
+    }
+    if(questions.length===0) throw new Error('Response didn\'t match the expected format — try again.');
+    return questions;
+  }
+
+  async function refreshSavedQuizList(){
+    const sel = $('qf-saved-select');
+    if(!sel) return;
+    const obj = await fbGet(SAVED_QUIZZES_PATH);
+    const showArchived = S.viewingArchive;
+    const items = obj ? Object.keys(obj)
+      .filter(id => !!obj[id].archived === showArchived)
+      .map(id=>({ key:id, name:obj[id].name, count:(obj[id].questions||[]).length, savedAt:obj[id].savedAt||0 }))
+      : [];
+    if(items.length===0){
+      sel.innerHTML = '<option value="">'+(showArchived ? 'No archived quizzes' : 'No saved quizzes yet')+'</option>';
+    } else {
+      items.sort((a,b)=>b.savedAt-a.savedAt);
+      sel.innerHTML = items.map(it=>
+        '<option value="'+escapeHtml(it.key)+'">'+escapeHtml(it.name)+' ('+it.count+' question'+(it.count===1?'':'s')+')</option>'
+      ).join('');
+    }
+    const loadBtn = $('qf-load-saved');
+    const archBtn = $('qf-delete-saved');
+    const toggleBtn = $('qf-toggle-archive');
+    if(loadBtn) loadBtn.textContent = showArchived ? 'Restore' : 'Load';
+    if(archBtn) archBtn.textContent = showArchived ? 'Delete permanently' : 'Archive';
+    if(toggleBtn) toggleBtn.textContent = showArchived ? '← Back to active' : 'View archive';
+  }
+
+  function renderOptionInputs(){
+    const container = $('qf-options');
+    if(!container) return;
+    container.innerHTML = '';
+    S.formOpts.forEach((opt,i)=>{
+      const row = document.createElement('div');
+      row.className = 'opt-input-row';
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'correct-toggle' + (opt.correct ? ' on' : '');
+      toggle.textContent = String.fromCharCode(65+i);
+      toggle.title = 'Mark as correct answer';
+      toggle.onclick = ()=>{
+        S.formOpts.forEach(o=>o.correct=false);
+        opt.correct = true;
+        renderOptionInputs();
+      };
+
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.placeholder = 'Option ' + String.fromCharCode(65+i);
+      inp.value = opt.text || '';
+      inp.oninput = ()=>{ opt.text = inp.value; };
+
+      row.appendChild(toggle);
+      row.appendChild(inp);
+
+      if(S.formOpts.length > 2){
+        const rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'small-x';
+        rm.textContent = '✕';
+        rm.title = 'Remove option';
+        rm.onclick = ()=>{
+          S.formOpts.splice(i,1);
+          if(!S.formOpts.some(o=>o.correct)) S.formOpts[0].correct = true;
+          renderOptionInputs();
+        };
+        row.appendChild(rm);
+      }
+      container.appendChild(row);
+    });
+    const addBtn = $('qf-add-option');
+    if(addBtn) addBtn.disabled = S.formOpts.length >= MAX_OPTIONS;
+  }
+
+  function renderHostQList(){
+    const list = $('host-qlist');
+    if(!list) return;
+    if(S.questionsDraft.length===0){
+      list.innerHTML = '<p>No questions yet. Add at least one to start.</p>';
+    } else {
+      list.innerHTML = S.questionsDraft.map((qq,i)=>
+        '<div class="qlist-item'+(i===S.editingQuestionIndex?' editing':'')+'"><span class="qtxt">'+(i+1)+'. '+escapeHtml(qq.q)+'</span>'+
+        '<span class="chip" style="padding:4px 10px; font-size:12px; margin-right:8px;">'+qq.points+' pts</span>'+
+        '<button class="small-edit" data-i="'+i+'" title="Edit question" style="background:none; border:none; color:var(--signal); cursor:pointer; font-size:15px; margin-right:6px;">✎</button>'+
+        '<button class="small-x" data-i="'+i+'" title="Delete question">✕</button></div>'
+      ).join('');
+      list.querySelectorAll('.small-edit').forEach(btn=>{
+        btn.onclick = ()=>{ startEditQuestion(parseInt(btn.dataset.i,10)); };
+      });
+      list.querySelectorAll('.small-x').forEach(btn=>{
+        btn.onclick = ()=>{
+          const idx = parseInt(btn.dataset.i,10);
+          S.questionsDraft.splice(idx,1);
+          if(S.editingQuestionIndex === idx){ cancelEditQuestion(); }
+          else if(S.editingQuestionIndex !== null && idx < S.editingQuestionIndex){ S.editingQuestionIndex--; }
+          renderHostQList();
+          pushQuestionsToState();
+        };
+      });
+    }
+    const startBtn = $('btn-start-quiz');
+    if(startBtn) startBtn.disabled = S.questionsDraft.length===0;
+  }
+
+  async function pushQuestionsToState(){
+    const st = await fbGet(statePath(S.code));
+    if(!st) return;
+    st.questions = S.questionsDraft;
+    await fbSet(statePath(S.code), st);
+  }
+
+  function startHostSetupPoll(){
+    clearInterval(S.hostPollHandle);
+    S.hostPollHandle = setInterval(async ()=>{
+      const players = await fbGet(playersPath(S.code));
+      const el = $('host-setup-playercount');
+      if(el) el.textContent = (players ? Object.keys(players).length : 0) + ' joined';
+    }, 2500);
+  }
+
+  async function beginQuiz(){
+    clearInterval(S.hostPollHandle);
+    const st = await fbGet(statePath(S.code));
+    if(!st) return;
+    st.status = 'question';
+    st.currentIndex = 0;
+    st.questionStartedAt = Date.now();
+    st.optionCounts = null; st.totalAnswered = 0;
+    await fbSet(statePath(S.code), st);
+    enterHostQuestion(st);
+  }
+
+  function enterHostQuestion(st){
+    S.hostRevealing = false;
+    const q = st.questions[st.currentIndex];
+    $('screen-host-question').innerHTML =
+      '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div>'+
+      '<div class="chip">Question '+(st.currentIndex+1)+' / '+st.questions.length+'</div></div>'+
+      '<div class="center-stage">'+
+        ringSvg('host-ring')+
+        '<h2 style="font-size:30px; max-width:640px;">'+q.q+'</h2>'+
+        '<div class="opt-grid">'+
+          q.options.map((o,i)=>'<div class="opt-card"><span class="opt-letter">'+String.fromCharCode(65+i)+'</span>'+o+'</div>').join('')+
+        '</div>'+
+        '<div class="chip" id="host-q-answered">0 answered</div>'+
+      '</div>';
+    showScreen('screen-host-question');
+
+    clearInterval(S.hostTimerHandle);
+    S.hostTimerHandle = setInterval(()=>{
+      const remaining = q.timeLimit - (Date.now()-st.questionStartedAt)/1000;
+      updateRing('host-ring', remaining, q.timeLimit);
+      if(remaining<=0 && !S.hostRevealing){
+        scheduleReveal(st, 'Time\'s up! Locking in final answers…', 1200);
+      }
+    }, 150);
+
+    clearInterval(S.hostPollHandle);
+    S.hostPollHandle = setInterval(async ()=>{
+      if(S.hostRevealing) return;
+      const [answersObj, playersObj] = await Promise.all([
+        fbGet(answersPath(S.code, st.currentIndex)),
+        fbGet(playersPath(S.code))
+      ]);
+      const answeredCount = answersObj ? Object.keys(answersObj).length : 0;
+      const playerCount = playersObj ? Object.keys(playersObj).length : 0;
+      const el = $('host-q-answered');
+      if(el) el.textContent = answeredCount + ' of ' + playerCount + ' answered';
+      if(playerCount>0 && answeredCount>=playerCount && !S.hostRevealing){
+        scheduleReveal(st, 'Everyone\'s answered! Locking in…', 800);
+      }
+    }, 900);
+  }
+
+  function scheduleReveal(st, message, delayMs){
+    S.hostRevealing = true;
+    clearInterval(S.hostTimerHandle);
+    clearInterval(S.hostPollHandle);
+    const el = $('host-q-answered');
+    if(el) el.textContent = message;
+    setTimeout(()=>{ hostGoToReveal(st); }, delayMs);
+  }
+
+  async function hostGoToReveal(st){
+    const qi = st.currentIndex;
+    const q = st.questions[qi];
+    const [answersObj, playersObj] = await Promise.all([
+      fbGet(answersPath(S.code, qi)),
+      fbGet(playersPath(S.code))
+    ]);
+    const answers = answersObj || {};
+    const players = playersObj || {};
+
+    const optionCounts = new Array(q.options.length).fill(0);
+    for(const pid in answers){
+      const a = answers[pid];
+      if(a && typeof a.answerIndex === 'number' && a.answerIndex>=0 && a.answerIndex<optionCounts.length) optionCounts[a.answerIndex]++;
+    }
+
+    for(const pid in players){
+      const player = players[pid];
+      const a = answers[pid];
+      let points = 0, correct = false;
+      if(a && typeof a.answerIndex === 'number'){
+        correct = a.answerIndex === q.correct;
+        if(correct){
+          const frac = Math.max(0, Math.min(1, 1 - (a.timeMs/1000)/q.timeLimit));
+          const base = q.points || 1000;
+          points = Math.round(base/2 + (base/2)*frac);
+        }
+        a.pointsAwarded = points;
+        a.wasCorrect = correct;
+      }
+      player.score = (player.score||0) + points;
+      player.lastPoints = points;
+      player.lastCorrect = correct;
+    }
+    await Promise.all([
+      fbSet(playersPath(S.code), players),
+      fbSet(answersPath(S.code, qi), answers)
+    ]);
+
+    const st2 = await fbGet(statePath(S.code));
+    st2.status = 'reveal';
+    st2.optionCounts = optionCounts;
+    st2.totalAnswered = Object.keys(answers).length;
+    await fbSet(statePath(S.code), st2);
+    buildHostReveal(st2, optionCounts);
+  }
+
+  async function recalcQuestionScore(qi, newCorrectIndex){
+    const st = await fbGet(statePath(S.code));
+    if(!st) return null;
+    const q = st.questions[qi];
+    if(!q) return null;
+    const [answersObj, playersObj] = await Promise.all([
+      fbGet(answersPath(S.code, qi)),
+      fbGet(playersPath(S.code))
+    ]);
+    const answers = answersObj || {};
+    const players = playersObj || {};
+    for(const pid in players){
+      const player = players[pid];
+      const a = answers[pid];
+      const oldPoints = (a && typeof a.pointsAwarded === 'number') ? a.pointsAwarded : 0;
+      let newPoints = 0, correct = false;
+      if(a && typeof a.answerIndex === 'number'){
+        correct = a.answerIndex === newCorrectIndex;
+        if(correct){
+          const frac = Math.max(0, Math.min(1, 1 - (a.timeMs/1000)/q.timeLimit));
+          const base = q.points || 1000;
+          newPoints = Math.round(base/2 + (base/2)*frac);
+        }
+        a.pointsAwarded = newPoints;
+        a.wasCorrect = correct;
+      }
+      if(!q.excluded){
+        player.score = Math.max(0, (player.score||0) - oldPoints + newPoints);
+      }
+      if(qi === st.currentIndex){ player.lastPoints = newPoints; player.lastCorrect = correct; }
+    }
+    q.correct = newCorrectIndex;
+    await Promise.all([
+      fbSet(playersPath(S.code), players),
+      fbSet(answersPath(S.code, qi), answers)
+    ]);
+    await fbSet(statePath(S.code), st);
+    return st;
+  }
+
+  async function toggleExcludeQuestion(qi, exclude){
+    const st = await fbGet(statePath(S.code));
+    if(!st) return null;
+    const q = st.questions[qi];
+    if(!q) return null;
+    const [answersObj, playersObj] = await Promise.all([
+      fbGet(answersPath(S.code, qi)),
+      fbGet(playersPath(S.code))
+    ]);
+    const answers = answersObj || {};
+    const players = playersObj || {};
+    for(const pid in players){
+      const player = players[pid];
+      const a = answers[pid];
+      const pts = (a && typeof a.pointsAwarded === 'number') ? a.pointsAwarded : 0;
+      if(pts===0) continue;
+      player.score = Math.max(0, (player.score||0) + (exclude ? -pts : pts));
+    }
+    q.excluded = exclude;
+    await fbSet(playersPath(S.code), players);
+    await fbSet(statePath(S.code), st);
+    return st;
+  }
+
+  function buildQuestionReviewPanel(st, qi){
+    const q = st.questions[qi];
+    if(!q) return '';
+    return '<div style="margin-top:24px; width:100%; max-width:520px; text-align:left;">'+
+      '<div class="eyebrow" style="margin-bottom:8px;">Fix the last question</div>'+
+      '<div class="card" style="margin-bottom:10px;">'+
+        '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">'+
+          '<span style="font-weight:600; font-size:14px;">Q'+(qi+1)+'. '+escapeHtml(q.q)+'</span>'+
+          (q.excluded ? '<span class="chip" style="font-size:11px; flex-shrink:0;">Excluded</span>' : '')+
+        '</div>'+
+        '<div style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;">'+
+          q.options.map((o,i)=>'<button class="correct-toggle qr-fix-btn'+(i===q.correct?' on':'')+'" data-qi="'+qi+'" data-i="'+i+'" title="Mark \''+escapeHtml(o)+'\' as correct">'+String.fromCharCode(65+i)+'</button>').join('')+
+        '</div>'+
+        '<button class="btn btn-ghost qr-exclude-btn" data-qi="'+qi+'" style="margin-top:8px; padding:6px 12px; font-size:12px;">'+(q.excluded?'Restore to scoring':'Exclude from scoring')+'</button>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function wireQuestionReviewPanel(container, refreshFn){
+    container.querySelectorAll('.qr-fix-btn').forEach(btn=>{
+      btn.onclick = async ()=>{
+        if(btn.classList.contains('on')) return;
+        container.querySelectorAll('.qr-fix-btn, .qr-exclude-btn').forEach(b=>b.disabled=true);
+        const qi = parseInt(btn.dataset.qi,10);
+        const i = parseInt(btn.dataset.i,10);
+        await recalcQuestionScore(qi, i);
+        await refreshFn();
+      };
+    });
+    container.querySelectorAll('.qr-exclude-btn').forEach(btn=>{
+      btn.onclick = async ()=>{
+        container.querySelectorAll('.qr-fix-btn, .qr-exclude-btn').forEach(b=>b.disabled=true);
+        const qi = parseInt(btn.dataset.qi,10);
+        const st = await fbGet(statePath(S.code));
+        const wasExcluded = !!(st && st.questions[qi] && st.questions[qi].excluded);
+        await toggleExcludeQuestion(qi, !wasExcluded);
+        await refreshFn();
+      };
+    });
+  }
+
+  function buildHostReveal(st, optionCounts){
+    const q = st.questions[st.currentIndex];
+    const maxCount = Math.max(1, ...optionCounts);
+    $('screen-host-reveal').innerHTML =
+      '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div></div>'+
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Correct answer</div>'+
+        '<h2 style="font-size:27px; max-width:640px;">'+q.q+'</h2>'+
+        '<div style="width:100%; max-width:520px; display:flex; flex-direction:column; gap:10px;">'+
+          q.options.map((o,i)=>{
+            const isCorrect = i===q.correct;
+            return '<div class="bar-row"><span class="opt-letter" style="'+(isCorrect?'background:var(--correct);color:var(--void);':'')+'">'+String.fromCharCode(65+i)+'</span>'+
+              '<span style="width:120px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">'+o+'</span>'+
+              '<div class="bar-track"><div class="bar-fill'+(isCorrect?' correct':'')+'" style="width:'+(optionCounts[i]/maxCount*100)+'%"></div></div>'+
+              '<span style="width:26px;">'+optionCounts[i]+'</span></div>';
+          }).join('')+
+        '</div>'+
+        (q.explanation ? '<div class="card" style="width:100%; max-width:520px; text-align:left;"><div class="eyebrow" style="margin-bottom:4px;">Why</div><p style="color:var(--ink);">'+escapeHtml(q.explanation)+'</p></div>' : '')+
+        '<button class="btn btn-primary" id="btn-to-leaderboard">Show leaderboard</button>'+
+        buildQuestionReviewPanel(st, st.currentIndex)+
+      '</div>';
+    showScreen('screen-host-reveal');
+    $('btn-to-leaderboard').onclick = ()=>hostGoToLeaderboard(st);
+    wireQuestionReviewPanel($('screen-host-reveal'), async ()=>{
+      const freshSt = await fbGet(statePath(S.code));
+      buildHostReveal(freshSt, freshSt.optionCounts || optionCounts);
+    });
+  }
+
+  async function hostGoToLeaderboard(st){
+    const st2 = await fbGet(statePath(S.code));
+    st2.status = 'leaderboard';
+    await fbSet(statePath(S.code), st2);
+    const players = await fetchAllPlayers(S.code);
+    buildHostLeaderboard(st2, players);
+  }
+
+  async function fetchAllPlayers(code){
+    const obj = await fbGet(playersPath(code));
+    const players = obj ? Object.values(obj) : [];
+    players.sort((a,b)=>(b.score||0)-(a.score||0));
+    return players;
+  }
+
+  function buildHostLeaderboard(st, players){
+    const isLast = st.currentIndex >= st.questions.length-1;
+    $('screen-host-leaderboard').innerHTML =
+      '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div></div>'+
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Leaderboard</div>'+
+        '<div style="display:flex; flex-direction:column; gap:8px; width:100%; max-width:520px;">'+
+          (players.length===0 ? '<p>No players yet.</p>' : players.slice(0,5).map((p,i)=>
+            '<div class="lb-row"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+p.name+'</span><span class="lb-score">'+p.score+'</span></div>'
+          ).join(''))+
+        '</div>'+
+        '<button class="btn btn-primary" id="btn-host-next">'+(isLast?'Show final results':'Next question')+'</button>'+
+        buildQuestionReviewPanel(st, st.currentIndex)+
+      '</div>';
+    showScreen('screen-host-leaderboard');
+    $('btn-host-next').onclick = ()=> isLast ? hostGoToFinal(st) : hostNextQuestion(st);
+    wireQuestionReviewPanel($('screen-host-leaderboard'), async ()=>{
+      const freshSt = await fbGet(statePath(S.code));
+      const freshPlayers = await fetchAllPlayers(S.code);
+      buildHostLeaderboard(freshSt, freshPlayers);
+    });
+  }
+
+  async function hostNextQuestion(st){
+    const st2 = await fbGet(statePath(S.code));
+    st2.status = 'question';
+    st2.currentIndex += 1;
+    st2.questionStartedAt = Date.now();
+    await fbSet(statePath(S.code), st2);
+    enterHostQuestion(st2);
+  }
+
+  async function hostGoToFinal(st){
+    const st2 = await fbGet(statePath(S.code));
+    st2.status = 'final';
+    await fbSet(statePath(S.code), st2);
+    const players = await fetchAllPlayers(S.code);
+    buildHostFinal(st2, players);
+  }
+
+  function buildHostFinal(st, players){
+    const top3 = players.slice(0,3);
+    const order = top3.length===3 ? [top3[1],top3[0],top3[2]] : top3;
+    const cls = ['silver','gold','bronze'];
+    $('screen-host-final').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Final results</div>'+
+        '<h1 style="font-size:31px;">Nice game!</h1>'+
+        '<div class="podium">'+
+          order.map((p,i)=> p ? '<div class="podium-col"><div>'+p.name+'</div><div class="podium-bar '+(top3.length===3?cls[i]:'gold')+'">'+p.score+'</div></div>' : '').join('')+
+        '</div>'+
+        '<div style="display:flex; flex-direction:column; gap:8px; width:100%; max-width:520px;">'+
+          players.slice(0,5).map((p,i)=>'<div class="lb-row"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+p.name+'</span><span class="lb-score">'+p.score+'</span></div>').join('')+
+        '</div>'+
+        '<button class="btn btn-ghost" id="btn-new-quiz">Reset &amp; start a new quiz</button>'+
+        buildQuestionReviewPanel(st, st.questions.length-1)+
+      '</div>';
+    showScreen('screen-host-final');
+    wireQuestionReviewPanel($('screen-host-final'), async ()=>{
+      const freshSt = await fbGet(statePath(S.code));
+      const freshPlayers = await fetchAllPlayers(S.code);
+      buildHostFinal(freshSt, freshPlayers);
+    });
+    $('btn-new-quiz').onclick = async ()=>{
+      const btn = $('btn-new-quiz');
+      btn.disabled = true;
+      btn.textContent = 'Resetting…';
+      const code = S.code;
+      await fbDelete(roomPath(code));
+      const cur = await fbGet(CURRENT_ROOM_PATH);
+      if(cur && cur.code === code){ await fbDelete(CURRENT_ROOM_PATH); }
+      lsRemove(HOST_SESSION_KEY);
+      buildRoleScreen();
+      showScreen('screen-role');
+    };
+  }
+
+  function buildPlayerJoin(){
+    $('screen-player-join').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Join a quiz</div>'+
+        '<h2 style="font-size:27px;">Enter the room code</h2>'+
+        '<div style="width:100%; max-width:320px; display:flex; flex-direction:column; gap:14px;">'+
+          '<div><label>Your name</label><input type="text" id="pj-name" placeholder="e.g. Sam" maxlength="18"></div>'+
+          '<div><label>Room code</label><input type="text" id="pj-code" placeholder="e.g. AB12C" maxlength="5" style="text-transform:uppercase;"></div>'+
+          '<div class="err-msg" id="pj-err"></div>'+
+          '<button class="btn btn-primary btn-block" id="pj-submit">Join</button>'+
+        '</div>'+
+        '<button id="pj-host-link" style="background:none; border:none; color:var(--muted); font-size:12px; text-decoration:underline; cursor:pointer; margin-top:6px;">Hosting the event? Tap here</button>'+
+      '</div>';
+    $('pj-submit').onclick = playerAttemptJoin;
+    $('pj-host-link').onclick = ()=>{ showScreen('screen-role'); buildHostPinScreen(); };
+  }
+
+  async function playerAttemptJoin(){
+    const name = $('pj-name').value.trim();
+    const code = $('pj-code').value.trim().toUpperCase();
+    if(!name || !code){ $('pj-err').textContent = 'Enter your name and the room code.'; return; }
+    $('pj-submit').disabled = true;
+    const st = await fbGet(statePath(code));
+    if(!st){ $('pj-err').textContent = 'No room found with that code.'; $('pj-submit').disabled = false; return; }
+    S.code = code; S.name = name; S.pid = genId();
+    await fbSet(playerPath(code, S.pid), { id:S.pid, name, score:0, lastPoints:0, lastCorrect:null, joinedAt:Date.now() });
+    S.lastPhaseKey = null;
+    S.hadRoom = false;
+    startPlayerPoll();
+  }
+
+  function buildPlayerLobby(){
+    $('screen-player-lobby').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">You\'re in</div>'+
+        '<h2 style="font-size:27px;">Hi '+S.name+' 👋</h2>'+
+        '<p>Waiting for the host to start the quiz…</p>'+
+        '<div class="chip">Room <span class="code-text">'+S.code+'</span></div>'+
+      '</div>';
+    showScreen('screen-player-lobby');
+  }
+
+  function startPlayerPoll(){
+    clearInterval(S.playerPollHandle);
+    S.playerPollHandle = setInterval(playerPollTick, 1000);
+    playerPollTick();
+  }
+
+  function showPlayerEndedScreen(){
+    $('screen-player-ended').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Quiz ended</div>'+
+        '<h2 style="font-size:28px;">Thanks for playing!</h2>'+
+        '<p>The host has ended this session.</p>'+
+      '</div>';
+    showScreen('screen-player-ended');
+  }
+
+  async function playerPollTick(){
+    const st = await fbGet(statePath(S.code));
+    if(!st){
+      if(S.hadRoom){
+        clearInterval(S.playerPollHandle);
+        clearInterval(S.playerTimerHandle);
+        showPlayerEndedScreen();
+      }
+      return;
+    }
+    S.hadRoom = true;
+    const phaseKey = st.status + ':' + st.currentIndex;
+    if(st.status==='setup'){
+      if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; buildPlayerLobby(); }
+    } else if(st.status==='question'){
+      if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; enterPlayerQuestion(st); }
+    } else if(st.status==='reveal'){
+      if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerReveal(st); }
+    } else if(st.status==='leaderboard'){
+      if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerLeaderboard(st); }
+    } else if(st.status==='final'){
+      if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerFinal(); }
+    }
+  }
+
+  function enterPlayerQuestion(st){
+    const q = st.questions[st.currentIndex];
+    let answered = false;
+    const remaining = st.questions.length - (st.currentIndex + 1);
+    $('screen-player-question').innerHTML =
+      '<div class="topbar"><div class="chip">Q '+(st.currentIndex+1)+'/'+st.questions.length+' · '+(remaining>0 ? remaining+' left' : 'last one!')+'</div>'+ringSvg('player-ring')+'</div>'+
+      '<div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:16px;">'+
+        '<h2 style="font-size:23px;">'+q.q+'</h2>'+
+        '<div style="display:flex; flex-direction:column; gap:10px;">'+
+          q.options.map((o,i)=>'<div class="opt-card" data-i="'+i+'"><span class="opt-letter">'+String.fromCharCode(65+i)+'</span>'+o+'</div>').join('')+
+        '</div>'+
+        '<p id="pq-status" style="text-align:center;">Tap your answer</p>'+
+      '</div>';
+    showScreen('screen-player-question');
+    document.querySelectorAll('#screen-player-question .opt-card').forEach(card=>{
+      card.onclick = async ()=>{
+        if(answered) return;
+        answered = true;
+        const i = parseInt(card.dataset.i,10);
+        const timeMs = Date.now()-st.questionStartedAt;
+        document.querySelectorAll('#screen-player-question .opt-card').forEach(c=>c.classList.add('disabled'));
+        card.classList.add('selected');
+        $('pq-status').textContent = 'Answer locked in!';
+        await fbSet(answerPath(S.code, st.currentIndex, S.pid), { pid:S.pid, answerIndex:i, timeMs, submittedAt:Date.now() });
+      };
+    });
+    clearInterval(S.playerTimerHandle);
+    S.playerTimerHandle = setInterval(()=>{
+      const remaining = q.timeLimit - (Date.now()-st.questionStartedAt)/1000;
+      updateRing('player-ring', remaining, q.timeLimit);
+      if(remaining<=0){
+        clearInterval(S.playerTimerHandle);
+        if(!answered){ $('pq-status').textContent = "Time's up!"; document.querySelectorAll('#screen-player-question .opt-card').forEach(c=>c.classList.add('disabled')); }
+      }
+    }, 150);
+  }
+
+  async function enterPlayerReveal(st){
+    clearInterval(S.playerTimerHandle);
+    const me = await fbGet(playerPath(S.code, S.pid));
+    const q = st.questions[st.currentIndex];
+    const correct = me ? me.lastCorrect : false;
+    const points = me ? me.lastPoints : 0;
+    $('screen-player-reveal').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">'+(correct?'Correct':(correct===false?'Answer':'Result'))+'</div>'+
+        '<h2 style="font-size:28px;" class="'+(correct?'badge-correct':'badge-wrong')+'">'+(correct?'Nice! +'+points:'No points this round')+'</h2>'+
+        '<p>Correct answer: <strong>'+q.options[q.correct]+'</strong></p>'+
+        (q.explanation ? '<p style="max-width:320px;">'+escapeHtml(q.explanation)+'</p>' : '')+
+        '<div class="chip">Total score: <span class="score-num" style="margin-left:6px;">'+(me?me.score:0)+'</span></div>'+
+        '<p>Waiting for the host…</p>'+
+      '</div>';
+    showScreen('screen-player-reveal');
+  }
+
+  async function enterPlayerLeaderboard(st){
+    const players = await fetchAllPlayers(S.code);
+    const myRank = players.findIndex(p=>p.id===S.pid)+1;
+    const me = players.find(p=>p.id===S.pid);
+    const roundBadge = me
+      ? (me.lastCorrect ? '<h2 style="font-size:26px;" class="badge-correct">+'+me.lastPoints+' this round</h2>'
+                         : '<h2 style="font-size:26px;" class="badge-wrong">+0 this round</h2>')
+      : '';
+    $('screen-player-leaderboard').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Leaderboard</div>'+
+        roundBadge+
+        '<div class="chip">Total score: '+(me?me.score:0)+' · You\'re #'+ (myRank||'-') +'</div>'+
+        '<div style="display:flex; flex-direction:column; gap:8px; width:100%; max-width:420px;">'+
+          players.slice(0,5).map((p,i)=>'<div class="lb-row'+(p.id===S.pid?' me':'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+p.name+'</span><span class="lb-score">'+p.score+'</span></div>').join('')+
+        '</div>'+
+        '<p>Waiting for the next question…</p>'+
+      '</div>';
+    showScreen('screen-player-leaderboard');
+  }
+
+  async function enterPlayerFinal(){
+    const players = await fetchAllPlayers(S.code);
+    const myRank = players.findIndex(p=>p.id===S.pid)+1;
+    const me = players.find(p=>p.id===S.pid);
+    clearInterval(S.playerPollHandle);
+    $('screen-player-final').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Final results</div>'+
+        '<h1 style="font-size:33px;">'+(myRank===1?'You won! 🏆':'You finished #'+myRank)+'</h1>'+
+        '<div class="chip">Your score: '+(me?me.score:0)+'</div>'+
+        '<div style="display:flex; flex-direction:column; gap:8px; width:100%; max-width:420px;">'+
+          players.slice(0,5).map((p,i)=>'<div class="lb-row'+(p.id===S.pid?' me':'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+p.name+'</span><span class="lb-score">'+p.score+'</span></div>').join('')+
+        '</div>'+
+      '</div>';
+    showScreen('screen-player-final');
+  }
+
+  async function bootstrap(){
+    const urlJoinCode = getJoinCodeFromUrl();
+    if(urlJoinCode){
+      buildPlayerJoin();
+      showScreen('screen-player-join');
+      const codeInput = $('pj-code');
+      if(codeInput) codeInput.value = urlJoinCode;
+      return;
+    }
+    if(await tryResumeHostSession()) return;
+    const cur = await fbGet(CURRENT_ROOM_PATH);
+    if(cur && cur.code){
+      const st = await fbGet(statePath(cur.code));
+      if(st){
+        buildPlayerJoin();
+        showScreen('screen-player-join');
+        const codeInput = $('pj-code');
+        if(codeInput) codeInput.value = cur.code;
+        return;
+      }
+    }
+    buildRoleScreen();
+  }
+  bootstrap();
+});
+</script>
+</body>
+</html>
