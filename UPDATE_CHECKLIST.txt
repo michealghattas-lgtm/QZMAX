@@ -1,0 +1,19 @@
+QZMAX 3.9.0 FREE AI ROUTER — QUICK CHECKLIST
+
+[ ] Back up current repository
+[ ] Create free Groq API key
+[ ] Add GROQ_API_KEY to Netlify Environment Variables
+[ ] Keep existing GEMINI_API_KEY / GOOGLE_API_KEY
+[ ] Optional: add Cloudflare Account ID + Workers AI token
+[ ] Replace index.html
+[ ] Replace netlify/functions/generate.js
+[ ] Keep netlify.toml and other backend files
+[ ] Commit: QZMAX 3.9.0 - Free AI Router
+[ ] Push to GitHub
+[ ] Confirm Netlify deploy Published
+[ ] Test 10-question Trusted Knowledge quiz
+[ ] Test 30-question quiz batching
+[ ] Test Arabic + Egyptian Simple Arabic
+[ ] Test True/False localization
+[ ] Test My Document
+[ ] Check Netlify logs for provider=groq

@@ -2269,7 +2269,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.8.5";
+  const APP_VERSION = "3.9.0";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4514,13 +4514,20 @@ authPromise.then(() => {
     return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function aiFormatInstruction(questionType, optsPerQ){
+  function aiTrueFalseLabels(questionLanguage='English'){
+    if(questionLanguage==='Egyptian Simple Arabic') return ['صح','غلط'];
+    if(questionLanguage==='Arabic') return ['صحيح','خطأ'];
+    return ['True','False'];
+  }
+
+  function aiFormatInstruction(questionType, optsPerQ, questionLanguage='English'){
     if(questionType==='true_false'){
+      const labels = aiTrueFalseLabels(questionLanguage);
       return [
         'QUESTION FORMAT REQUIREMENT: TRUE/FALSE ONLY.',
-        'Every item must be answerable as True or False without ambiguity.',
-        'Return exactly two options in this exact order: ["True","False"].',
-        'Return correctIndex as 0 for True or 1 for False.'
+        'Every item must be answerable as true or false without ambiguity.',
+        'Return exactly two visible options in this exact order: '+JSON.stringify(labels)+'.',
+        'Return correctIndex as 0 for the first option or 1 for the second option.'
       ].join(' ');
     }
     if(questionType==='multiple_correct'){
@@ -4541,10 +4548,12 @@ authPromise.then(() => {
 
   function normalizeQuestionFingerprint(text){
     return String(text||'')
-      .toLowerCase()
+      .normalize('NFKC')
+      .toLocaleLowerCase()
       .replace(/&[a-z]+;/g,' ')
-      .replace(/[^a-z0-9\s]/g,' ')
+      .replace(/[^\p{L}\p{N}\s]/gu,' ')
       .replace(/\b(the|a|an|is|are|was|were|of|to|in|on|for|and|or|which|what|who|when|where|how)\b/g,' ')
+      .replace(/(?:^|\s)(?:ما|من|في|على|إلى|الى|عن|هو|هي|هم|هذا|هذه|الذي|التي|أي|اي|إيه|مين|فين|إمتى)(?=\s|$)/gu,' ')
       .replace(/\s+/g,' ')
       .trim();
   }
@@ -4752,11 +4761,11 @@ authPromise.then(() => {
   async function generateQuestionsWithAI(topic, count, optsPerQ, questionType, context={}){
     const requestedType = ['multiple_choice','true_false','multiple_correct'].includes(questionType)
       ? questionType : 'multiple_choice';
-    const formatInstruction = aiFormatInstruction(requestedType, optsPerQ);
+    const questionLanguage = context.questionLanguage || 'English';
+    const formatInstruction = aiFormatInstruction(requestedType, optsPerQ, questionLanguage);
     const existing = Array.isArray(context.existingQuestions) ? context.existingQuestions : [];
     const existingStems = existing.slice(-70).map((q,i)=>(i+1)+'. '+(typeof q==='string'?q:(q.q||''))).filter(Boolean);
     const sourceExcerpt = context.sourceExcerpt || '';
-    const questionLanguage = context.questionLanguage || 'English';
     const languageInstruction = questionLanguage === 'Egyptian Simple Arabic'
       ? [
           'LANGUAGE REQUIREMENT: Generate the complete visible quiz content in simple Egyptian Arabic.',
@@ -4855,12 +4864,10 @@ authPromise.then(() => {
       };
 
       if(requestedType==='true_false'){
-        const trueIndex = opts.findIndex(o=>o.toLowerCase()==='true');
-        const falseIndex = opts.findIndex(o=>o.toLowerCase()==='false');
         const returnedCorrect = parseInt(item.correctIndex,10);
-        if(opts.length!==2 || trueIndex<0 || falseIndex<0 || (returnedCorrect!==trueIndex && returnedCorrect!==falseIndex)) continue;
-        base.options=['True','False'];
-        base.correct=returnedCorrect===trueIndex?0:1;
+        if(opts.length!==2 || ![0,1].includes(returnedCorrect)) continue;
+        base.options=aiTrueFalseLabels(questionLanguage);
+        base.correct=returnedCorrect;
       }else if(requestedType==='multiple_correct'){
         const indexes = parseAICorrectIndexes(item,opts);
         if(indexes.length<2) continue;
