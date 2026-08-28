@@ -2438,6 +2438,46 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
   }
 }
 
+
+/* ===== QZMAX 3.9.2 — 100-point default + AI points selector ===== */
+.ai-format-row{
+  grid-template-columns:minmax(260px,1fr) repeat(3,150px) !important;
+}
+.ai-metric-card{
+  min-width:0;
+}
+.ai-metric-points input[type="number"]{
+  font-variant-numeric:tabular-nums;
+}
+@media(max-width:1120px){
+  .ai-format-row{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+  .ai-format-row .ai-format-type{
+    grid-column:1/-1 !important;
+  }
+}
+@media(max-width:760px){
+  .ai-format-row{
+    grid-template-columns:1fr 1fr !important;
+  }
+  .ai-format-row .ai-format-type{
+    grid-column:1/-1 !important;
+  }
+  .ai-metric-points{
+    grid-column:1/-1;
+  }
+}
+@media(max-width:480px){
+  .ai-format-row{
+    grid-template-columns:1fr !important;
+  }
+  .ai-format-row .ai-format-type,
+  .ai-metric-points{
+    grid-column:auto !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2459,7 +2499,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.9.1";
+  const APP_VERSION = "3.9.2";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -2602,6 +2642,7 @@ authPromise.then(() => {
     finalConfettiTimer:null, finalConfettiLayer:null, finalConfettiActive:false,
   };
   const MAX_OPTIONS = 8;
+  const DEFAULT_QUESTION_POINTS = 100;
 
   function normalizedQuestionType(q){
     const t = q && q.type ? String(q.type) : 'multiple_choice';
@@ -4038,6 +4079,7 @@ authPromise.then(() => {
             '<div class="qform-row ai-format-type"><label>Question format</label><select id="ai-question-type"><option value="multiple_choice">Multiple Choice</option><option value="true_false">True / False</option><option value="multiple_correct">Select Multiple</option></select></div>'+
             '<div class="qform-row ai-metric-card ai-metric-questions"><label>Questions</label><input type="number" id="ai-count" value="10" min="1" max="100" inputmode="numeric"><div class="qtype-hint">Up to 100 — generated in batches.</div></div>'+
             '<div class="qform-row ai-metric-card ai-metric-options"><label>Options each</label><input type="number" id="ai-opts-per-q" value="4" min="2" max="8" inputmode="numeric"><div class="qtype-hint">Usually 2–8 choices.</div></div>'+
+            '<div class="qform-row ai-metric-card ai-metric-points"><label>Points each</label><input type="number" id="ai-points-per-q" value="100" min="0" max="100000" step="10" inputmode="numeric"><div class="qtype-hint">Applied to every generated question.</div></div>'+
           '</div>'+
           '<div class="ai-format-note" id="ai-format-note"><strong>Multiple Choice:</strong> one correct answer per question.</div>'+
           '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate Source-Grounded Questions</button>'+
@@ -4075,7 +4117,7 @@ authPromise.then(() => {
             '</div>'+
             '<div style="display:flex; gap:14px;">'+
               '<div class="qform-row" style="max-width:160px;"><label>Time limit (sec)</label><input type="text" id="qf-time" value="20"></div>'+
-              '<div class="qform-row" style="max-width:160px;"><label>Points</label><input type="text" id="qf-points" value="1000"></div>'+
+              '<div class="qform-row" style="max-width:160px;"><label>Points</label><input type="number" id="qf-points" value="100" min="0" max="100000" step="10" inputmode="numeric"></div>'+
             '</div>'+
             '<div class="qform-row"><label>Explanation (optional)</label><textarea id="qf-explanation" class="qf-wrap-textarea qf-explanation-textarea" rows="2" placeholder="e.g. The event took place in..."></textarea></div>'+
             '<div class="err-msg" id="qf-err"></div>'+
@@ -4354,6 +4396,9 @@ authPromise.then(() => {
       const optsPerQ = aiQuestionType==='true_false'
         ? 2
         : Math.max(aiQuestionType==='multiple_correct' ? 3 : 2, Math.min(8, parseInt($('ai-opts-per-q').value,10) || 4));
+      const rawAIPoints = parseInt($('ai-points-per-q').value,10);
+      const pointsPerQuestion = Math.max(0, Math.min(100000, Number.isFinite(rawAIPoints) ? rawAIPoints : DEFAULT_QUESTION_POINTS));
+      $('ai-points-per-q').value = String(pointsPerQuestion);
 
       const btn = $('ai-generate');
       const msg = $('ai-msg');
@@ -4387,6 +4432,7 @@ authPromise.then(() => {
           sourceName,
           sourceUrls,
           questionLanguage,
+          pointsPerQuestion,
           existingQuestions:S.questionsDraft,
           onProgress:(done,total,label)=>{
             const pct = Math.min(96, 8 + Math.round((done/Math.max(1,total))*88));
@@ -4394,6 +4440,7 @@ authPromise.then(() => {
           }
         });
 
+        generated.forEach(q=>{ q.points = pointsPerQuestion; });
         S.questionsDraft = S.questionsDraft.concat(generated);
         renderHostQList();
         await pushQuestionsToState();
@@ -4432,7 +4479,8 @@ authPromise.then(() => {
       const type = $('qf-type').value || 'multiple_choice';
       const text = $('qf-text').value.trim();
       const timeLimit = Math.max(3, parseInt($('qf-time').value,10) || 20);
-      const points = Math.max(0, parseInt($('qf-points').value,10) || 1000);
+      const rawPoints = parseInt($('qf-points').value,10);
+      const points = Math.max(0, Number.isFinite(rawPoints) ? rawPoints : DEFAULT_QUESTION_POINTS);
       const explanation = $('qf-explanation').value.trim();
       const rawImage = $('qf-image-url').value.trim();
       const imageUrl = safeImageUrl(rawImage);
@@ -4689,7 +4737,7 @@ authPromise.then(() => {
     $('qf-type').value = 'multiple_choice';
     $('qf-text').value = '';
     $('qf-time').value = '20';
-    $('qf-points').value = '1000';
+    $('qf-points').value = String(DEFAULT_QUESTION_POINTS);
     $('qf-explanation').value = '';
     $('qf-image-url').value = '';
     $('qf-typed-answers').value = '';
@@ -4952,6 +5000,10 @@ authPromise.then(() => {
     const requestedType = ['multiple_choice','true_false','multiple_correct'].includes(questionType)
       ? questionType : 'multiple_choice';
     const questionLanguage = context.questionLanguage || 'English';
+    const rawPointsPerQuestion = Number(context.pointsPerQuestion);
+    const pointsPerQuestion = Number.isFinite(rawPointsPerQuestion)
+      ? Math.max(0, Math.min(100000, Math.round(rawPointsPerQuestion)))
+      : DEFAULT_QUESTION_POINTS;
     const formatInstruction = aiFormatInstruction(requestedType, optsPerQ, questionLanguage);
     const existing = Array.isArray(context.existingQuestions) ? context.existingQuestions : [];
     const existingStems = existing.slice(-70).map((q,i)=>(i+1)+'. '+(typeof q==='string'?q:(q.q||''))).filter(Boolean);
@@ -5044,7 +5096,7 @@ authPromise.then(() => {
         type:requestedType,
         options:opts,
         timeLimit:20,
-        points:1000,
+        points:pointsPerQuestion,
         explanation:typeof item.explanation==='string' ? item.explanation.trim() : '',
         excluded:false,
         aiMeta:{
@@ -5078,7 +5130,7 @@ authPromise.then(() => {
 
   async function generateVerifiedQuestionBatches({
     topic,requestedCount,optsPerQ,questionType,sourceText,sourceType,sourceName,sourceUrls,
-    questionLanguage='English',existingQuestions,onProgress
+    questionLanguage='English',pointsPerQuestion=DEFAULT_QUESTION_POINTS,existingQuestions,onProgress
   }){
     const target = Math.max(1,Math.min(100,requestedCount||10));
     const accepted = [];
@@ -5100,6 +5152,7 @@ authPromise.then(() => {
           sourceName,
           sourceUrls,
           questionLanguage,
+          pointsPerQuestion,
           existingQuestions:known.concat(accepted)
         });
       }catch(err){
@@ -5516,7 +5569,7 @@ authPromise.then(() => {
           if(correct){
             correctCount++;
             const frac = Math.max(0, Math.min(1, 1 - ((a.timeMs||0)/1000)/q.timeLimit));
-            const base = q.points || 1000;
+            const base = Number.isFinite(Number(q.points)) ? Number(q.points) : DEFAULT_QUESTION_POINTS;
             points = Math.round(base/2 + (base/2)*frac);
           }
           a.pointsAwarded = points;
@@ -5577,7 +5630,7 @@ authPromise.then(() => {
         correct = a.answerIndex === newCorrectIndex;
         if(correct){
           const frac = Math.max(0, Math.min(1, 1 - (a.timeMs/1000)/q.timeLimit));
-          const base = q.points || 1000;
+          const base = Number.isFinite(Number(q.points)) ? Number(q.points) : DEFAULT_QUESTION_POINTS;
           newPoints = Math.round(base/2 + (base/2)*frac);
         }
         a.pointsAwarded = newPoints;
