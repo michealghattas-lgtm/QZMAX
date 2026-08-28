@@ -1,2 +1,2 @@
-# live-quiz-app
+# QZMAX
 AI Powered Quiz Generating tool
