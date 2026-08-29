@@ -2478,6 +2478,119 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
   }
 }
 
+
+/* ===== QZMAX 3.10.0 — Time control + smart generation polish ===== */
+.qf-stat-field{
+  width:160px;
+  max-width:160px;
+}
+.qf-stat-field input[type="number"],
+#qf-points,
+#qf-time{
+  width:100%;
+  min-height:50px;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+  font-size:16px;
+  font-weight:700;
+  color:var(--ink);
+  background:rgba(7,10,22,.70);
+  border:1px solid rgba(124,145,255,.25);
+  border-radius:14px;
+  padding:12px 14px;
+  outline:none;
+  transition:border-color .2s ease,box-shadow .2s ease;
+}
+.qf-stat-field input[type="number"]:focus,
+#qf-points:focus,
+#qf-time:focus{
+  border-color:#8e82ff;
+  box-shadow:0 0 0 4px rgba(124,108,255,.12);
+}
+.ai-format-row{
+  grid-template-columns:minmax(250px,1fr) repeat(4,140px) !important;
+}
+.ai-metric-time input[type="number"],
+.ai-metric-points input[type="number"]{
+  font-variant-numeric:tabular-nums;
+}
+@media(max-width:1260px){
+  .ai-format-row{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  }
+  .ai-format-row .ai-format-type{
+    grid-column:1/-1 !important;
+  }
+}
+@media(max-width:820px){
+  .ai-format-row{
+    grid-template-columns:1fr 1fr !important;
+  }
+  .ai-format-row .ai-format-type{
+    grid-column:1/-1 !important;
+  }
+}
+@media(max-width:480px){
+  .ai-format-row{
+    grid-template-columns:1fr !important;
+  }
+  .ai-format-row .ai-format-type{
+    grid-column:auto !important;
+  }
+  .qf-stat-field{
+    width:100%;
+    max-width:none;
+  }
+}
+
+
+/* ===== QZMAX 3.10.1 — Mixed format + readability + clean numeric controls ===== */
+.verification-legend{
+  font-size:12px !important;
+  gap:16px !important;
+  line-height:1.45;
+}
+.verification-legend span{
+  gap:7px !important;
+}
+.verify-dot{
+  width:9px !important;
+  height:9px !important;
+}
+.accuracy-note{
+  font-size:12px !important;
+  line-height:1.55 !important;
+  padding:12px 14px !important;
+}
+.accuracy-note strong{
+  font-size:12px;
+}
+
+/* Hide browser number steppers/spinners in Auto Generate controls */
+.ai-metric-card input[type="number"]{
+  appearance:textfield;
+  -moz-appearance:textfield;
+}
+.ai-metric-card input[type="number"]::-webkit-outer-spin-button,
+.ai-metric-card input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance:none;
+  appearance:none;
+  margin:0;
+  opacity:0;
+  display:none;
+}
+
+@media(max-width:760px){
+  .verification-legend{
+    font-size:11px !important;
+    gap:10px !important;
+  }
+  .accuracy-note{
+    font-size:11px !important;
+    padding:11px 12px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2499,7 +2612,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.9.2";
+  const APP_VERSION = "3.10.1";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -2643,6 +2756,7 @@ authPromise.then(() => {
   };
   const MAX_OPTIONS = 8;
   const DEFAULT_QUESTION_POINTS = 100;
+  const DEFAULT_QUESTION_TIME = 20;
 
   function normalizedQuestionType(q){
     const t = q && q.type ? String(q.type) : 'multiple_choice';
@@ -4076,9 +4190,10 @@ authPromise.then(() => {
         '<div id="ai-generation-controls">'+
           '<div class="qform-row ai-language-row"><label>Question language</label><select id="ai-language"><option value="English" selected>English</option><option value="Arabic">العربية — Arabic</option><option value="Egyptian Simple Arabic">العربية المصرية البسيطة — Egyptian Simple Arabic</option></select><div class="qtype-hint">Questions, answer choices and explanations will be generated in the selected language or dialect.</div></div>'+
           '<div class="ai-format-row">'+
-            '<div class="qform-row ai-format-type"><label>Question format</label><select id="ai-question-type"><option value="multiple_choice">Multiple Choice</option><option value="true_false">True / False</option><option value="multiple_correct">Select Multiple</option></select></div>'+
+            '<div class="qform-row ai-format-type"><label>Question format</label><select id="ai-question-type"><option value="multiple_choice">Multiple Choice</option><option value="true_false">True / False</option><option value="multiple_correct">Select Multiple</option><option value="mixed">Mixed</option></select></div>'+
             '<div class="qform-row ai-metric-card ai-metric-questions"><label>Questions</label><input type="number" id="ai-count" value="10" min="1" max="100" inputmode="numeric"><div class="qtype-hint">Up to 100 — generated in batches.</div></div>'+
             '<div class="qform-row ai-metric-card ai-metric-options"><label>Options each</label><input type="number" id="ai-opts-per-q" value="4" min="2" max="8" inputmode="numeric"><div class="qtype-hint">Usually 2–8 choices.</div></div>'+
+            '<div class="qform-row ai-metric-card ai-metric-time"><label>Time each</label><input type="number" id="ai-time-per-q" value="20" min="3" max="600" step="1" inputmode="numeric"><div class="qtype-hint">Seconds allowed per question.</div></div>'+
             '<div class="qform-row ai-metric-card ai-metric-points"><label>Points each</label><input type="number" id="ai-points-per-q" value="100" min="0" max="100000" step="10" inputmode="numeric"><div class="qtype-hint">Applied to every generated question.</div></div>'+
           '</div>'+
           '<div class="ai-format-note" id="ai-format-note"><strong>Multiple Choice:</strong> one correct answer per question.</div>'+
@@ -4116,8 +4231,8 @@ authPromise.then(() => {
               '<div class="qtype-hint">Matching ignores capitals, extra spaces and basic punctuation.</div>'+
             '</div>'+
             '<div style="display:flex; gap:14px;">'+
-              '<div class="qform-row" style="max-width:160px;"><label>Time limit (sec)</label><input type="text" id="qf-time" value="20"></div>'+
-              '<div class="qform-row" style="max-width:160px;"><label>Points</label><input type="number" id="qf-points" value="100" min="0" max="100000" step="10" inputmode="numeric"></div>'+
+              '<div class="qform-row qf-stat-field"><label>Time limit (sec)</label><input type="number" id="qf-time" value="20" min="3" max="600" step="1" inputmode="numeric"></div>'+
+              '<div class="qform-row qf-stat-field"><label>Points</label><input type="number" id="qf-points" value="100" min="0" max="100000" step="10" inputmode="numeric"></div>'+
             '</div>'+
             '<div class="qform-row"><label>Explanation (optional)</label><textarea id="qf-explanation" class="qf-wrap-textarea qf-explanation-textarea" rows="2" placeholder="e.g. The event took place in..."></textarea></div>'+
             '<div class="err-msg" id="qf-err"></div>'+
@@ -4279,7 +4394,7 @@ authPromise.then(() => {
       const btn = $('ai-generate');
       if(!btn) return;
       if(aiSourceMode==='document') btn.textContent = 'Generate from Document';
-      else if(isSchoolMode) btn.textContent = 'Generate Source-Grounded Exam Questions';
+      else if(isSchoolMode) btn.textContent = 'Generate Year-Level Exam Questions';
       else btn.textContent = 'Generate Source-Grounded Questions';
     }
 
@@ -4316,6 +4431,10 @@ authPromise.then(() => {
         opts.disabled = false;
         if((parseInt(opts.value,10)||0) < 3) opts.value = '4';
         note.innerHTML = '<strong>Select Multiple:</strong> each question must have two or more correct answers and an unambiguous complete set.';
+      }else if(type==='mixed'){
+        opts.disabled = false;
+        if((parseInt(opts.value,10)||0) < 3) opts.value = '4';
+        note.innerHTML = '<strong>Mixed:</strong> QZMAX balances Multiple Choice, True / False and Select Multiple questions, then shuffles the order.';
       }else{
         opts.disabled = false;
         if((parseInt(opts.value,10)||0) < 2) opts.value = '4';
@@ -4356,6 +4475,86 @@ authPromise.then(() => {
       }
     };
 
+
+    function buildSchoolExamTopic(grade, subject, diff){
+      const subjectGuidance = {
+        'Mathematics': 'Test mathematical knowledge and skills directly: number operations, place value, fractions, decimals, percentages where year-appropriate, patterns/algebraic thinking, measurement, geometry/space, data/statistics, probability, and practical problem solving.',
+        'English': 'Test English knowledge and skills directly: reading comprehension, vocabulary, spelling, grammar, punctuation, sentence structure, text features, inference, and age-appropriate language analysis.',
+        'Science / Biology': 'Test science knowledge and scientific reasoning directly: living things, physical sciences, Earth/space sciences, materials, systems, observations, evidence and age-appropriate scientific interpretation.',
+        'Chemistry': 'Test chemistry knowledge and problem solving directly at the selected year level. Avoid university-level concepts unless the selected year genuinely requires them.',
+        'Physics': 'Test physics knowledge and problem solving directly at the selected year level. Focus on age-appropriate forces, motion, energy, waves, electricity, measurement and interpretation.',
+        'History': 'Test historical knowledge, chronology, cause/effect, significance, evidence and interpretation appropriate to the selected year level.',
+        'Geography': 'Test geographical knowledge and skills directly: places, environments, maps, spatial patterns, human/environment interactions, data interpretation and age-appropriate case-study reasoning.',
+        'Economics': 'Test economic knowledge and reasoning directly at the selected year level: choices, markets, consumers/producers, trade, finance and interpretation of simple economic information.',
+        'Computer Science': 'Test computing knowledge and problem solving directly: algorithms, data, digital systems, programming concepts, networks, cyber safety and computational thinking appropriate to the selected year.'
+      };
+      const difficultyRule = diff === 'Easy'
+        ? 'Easy means straightforward knowledge, recognition, or one-step application appropriate for this year level.'
+        : diff === 'Hard'
+        ? 'Hard / Exam Style means challenging multi-step reasoning and application, but NEVER content above the selected year level.'
+        : 'Medium means a balanced mix of knowledge and one- or two-step reasoning appropriate for this year level.';
+
+      return [
+        `Create ${grade} ${subject} assessment questions that directly test a ${grade} student's knowledge and skills in ${subject}.`,
+        subjectGuidance[subject] || `Test ${subject} knowledge and skills directly at the selected year level.`,
+        difficultyRule,
+        'CRITICAL RELEVANCE RULE: Do NOT ask about education systems, schooling, teaching methods, curriculum terminology, PISA, assessment organisations, school administration, or the history of education unless those are explicitly the subject being studied.',
+        `Every question must be something a ${grade} student could reasonably be expected to answer in a ${subject} class.`,
+        'Use varied question content and avoid repeatedly testing the same fact or skill.'
+      ].join(' ');
+    }
+
+    function isBroadCustomInstruction(topic){
+      const t = String(topic||'').trim();
+      if(!t) return false;
+      const separators = (t.match(/[,،;\n]/g)||[]).length;
+      const instructionWords = /generate|create|questions|topics|following|below|عن|اسئلة|أسئلة|المواضيع|الموضوع/i.test(t);
+      const mixedArabic = /[\u0600-\u06FF]/.test(t);
+      return t.length > 150 || separators >= 5 || (instructionWords && (separators >= 2 || mixedArabic));
+    }
+
+    function buildTrustedSearchQueries(topic){
+      const raw = String(topic||'').replace(/\s+/g,' ').trim();
+      const queries = [];
+      const add = q=>{
+        q = String(q||'').replace(/\s+/g,' ').trim();
+        if(q && !queries.some(x=>x.toLowerCase()===q.toLowerCase())) queries.push(q);
+      };
+
+      add(raw.slice(0,180));
+
+      const egypt = /\begypt\b|مصر|المصر|المصرية|egyptian/i.test(raw);
+      const modern = /2000|2001|2002|2003|2004|2005|2006|2007|2008|2009|2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025|2026|till now|until now|present|الان|الآن/i.test(raw);
+
+      if(egypt){
+        add(modern ? 'Egypt in the 21st century' : 'Egypt');
+        if(/افلام|أفلام|مسلسلات|اغاني|أغاني|برامج|افيهات|أفيهات|فن|cinema|film|television|music|song/i.test(raw)){
+          add('Cinema of Egypt television in Egypt music of Egypt');
+        }
+        if(/سياس|ثقاف|politic|culture/i.test(raw)){
+          add('Politics of Egypt culture of Egypt 21st century');
+        }
+        if(/جغرف|تاريخ|علم|geograph|history|science/i.test(raw)){
+          add('History of Egypt geography of Egypt science and technology in Egypt');
+        }
+      }
+
+      const mappings = [
+        [/افلام|أفلام/i,'Egyptian cinema'],
+        [/مسلسلات/i,'Egyptian television series'],
+        [/اغاني|أغاني|كلمات اغاني|كلمات أغاني/i,'Egyptian music'],
+        [/برامج تلفزيونية|برامج/i,'Television in Egypt'],
+        [/سياسه|سياسة/i,'Politics of Egypt'],
+        [/ثقافة|ثقافه/i,'Culture of Egypt'],
+        [/جغرفيا|جغرافيا/i,'Geography of Egypt'],
+        [/تاريخ/i,'History of Egypt'],
+        [/علم/i,'Science and technology in Egypt']
+      ];
+      mappings.forEach(([rx,q])=>{ if(rx.test(raw)) add(q); });
+
+      return queries.slice(0,6);
+    }
+
     $('ai-generate').onclick = async ()=>{
       let topic = '';
       let sourceText = '';
@@ -4378,7 +4577,9 @@ authPromise.then(() => {
           const grade = $('ai-grade').value;
           const subject = $('ai-subject').value;
           const diff = $('ai-diff').value;
-          topic = `${grade} level ${subject}, formal school exam practice, difficulty: ${diff}`;
+          topic = buildSchoolExamTopic(grade, subject, diff);
+          sourceType = 'school';
+          sourceName = `${grade} ${subject} — curriculum-guided review`;
         }else{
           topic = $('ai-topic').value.trim();
           if(!topic){
@@ -4395,7 +4596,10 @@ authPromise.then(() => {
       const aiQuestionType = $('ai-question-type').value || 'multiple_choice';
       const optsPerQ = aiQuestionType==='true_false'
         ? 2
-        : Math.max(aiQuestionType==='multiple_correct' ? 3 : 2, Math.min(8, parseInt($('ai-opts-per-q').value,10) || 4));
+        : Math.max((aiQuestionType==='multiple_correct' || aiQuestionType==='mixed') ? 3 : 2, Math.min(8, parseInt($('ai-opts-per-q').value,10) || 4));
+      const rawAITime = parseInt($('ai-time-per-q').value,10);
+      const timePerQuestion = Math.max(3, Math.min(600, Number.isFinite(rawAITime) ? rawAITime : DEFAULT_QUESTION_TIME));
+      $('ai-time-per-q').value = String(timePerQuestion);
       const rawAIPoints = parseInt($('ai-points-per-q').value,10);
       const pointsPerQuestion = Math.max(0, Math.min(100000, Number.isFinite(rawAIPoints) ? rawAIPoints : DEFAULT_QUESTION_POINTS));
       $('ai-points-per-q').value = String(pointsPerQuestion);
@@ -4409,15 +4613,31 @@ authPromise.then(() => {
       msg.style.color = 'var(--muted)';
 
       try{
-        if(aiSourceMode==='trusted'){
+        if(aiSourceMode==='trusted' && !isSchoolMode){
+          const broadInstruction = isBroadCustomInstruction(topic);
           const grounding = await fetchTrustedKnowledge(topic);
           sourceText = grounding.text;
           sourceUrls = grounding.sources || [];
           sourceName = grounding.label || 'Wikipedia reference material';
-          if(!sourceText){
-            throw new Error('No suitable trusted reference material was found for this topic. Try a more specific topic.');
+
+          if(broadInstruction){
+            sourceType = 'reference';
+            setAIProgress(8, sourceText
+              ? 'Broad topic detected — references found, starting flexible generation…'
+              : 'Broad topic detected — starting AI review generation…');
+          }else if(!sourceText){
+            sourceType = 'reference';
+            sourceName = 'AI knowledge — host review required';
+            setAIProgress(8, 'No strong reference match — starting AI review generation…');
+          }else{
+            sourceType = 'trusted';
+            setAIProgress(8, 'Reference material found — starting generation…');
           }
-          setAIProgress(8, 'Reference material found — starting generation…');
+        }else if(isSchoolMode){
+          sourceText = '';
+          sourceUrls = [];
+          sourceType = 'school';
+          setAIProgress(8, 'Year-level subject guidance ready — starting generation…');
         }else{
           setAIProgress(8, 'Document ready — starting generation…');
         }
@@ -4432,6 +4652,7 @@ authPromise.then(() => {
           sourceName,
           sourceUrls,
           questionLanguage,
+          timePerQuestion,
           pointsPerQuestion,
           existingQuestions:S.questionsDraft,
           onProgress:(done,total,label)=>{
@@ -4440,14 +4661,23 @@ authPromise.then(() => {
           }
         });
 
-        generated.forEach(q=>{ q.points = pointsPerQuestion; });
+        generated.forEach(q=>{
+          q.timeLimit = timePerQuestion;
+          q.points = pointsPerQuestion;
+        });
         S.questionsDraft = S.questionsDraft.concat(generated);
         renderHostQList();
         await pushQuestionsToState();
 
         setAIProgress(100, 'Complete');
         msg.style.color = 'var(--correct)';
-        const groundedLabel = aiSourceMode==='document' ? 'document-grounded' : 'source-grounded';
+        const groundedLabel = aiSourceMode==='document'
+          ? 'document-grounded'
+          : sourceType==='trusted'
+          ? 'source-grounded'
+          : sourceType==='school'
+          ? 'year-level curriculum-guided'
+          : 'AI-review';
         msg.textContent = 'Added '+generated.length+' '+groundedLabel+' question'+(generated.length===1?'':'s')+'. Duplicate and structural checks passed. Review before saving.';
       }catch(err){
         msg.style.color = 'var(--wrong)';
@@ -4478,7 +4708,7 @@ authPromise.then(() => {
     $('qf-add').onclick = ()=>{
       const type = $('qf-type').value || 'multiple_choice';
       const text = $('qf-text').value.trim();
-      const timeLimit = Math.max(3, parseInt($('qf-time').value,10) || 20);
+      const timeLimit = Math.max(3, Math.min(600, parseInt($('qf-time').value,10) || DEFAULT_QUESTION_TIME));
       const rawPoints = parseInt($('qf-points').value,10);
       const points = Math.max(0, Number.isFinite(rawPoints) ? rawPoints : DEFAULT_QUESTION_POINTS);
       const explanation = $('qf-explanation').value.trim();
@@ -4736,7 +4966,7 @@ authPromise.then(() => {
     S.questionType = 'multiple_choice';
     $('qf-type').value = 'multiple_choice';
     $('qf-text').value = '';
-    $('qf-time').value = '20';
+    $('qf-time').value = String(DEFAULT_QUESTION_TIME);
     $('qf-points').value = String(DEFAULT_QUESTION_POINTS);
     $('qf-explanation').value = '';
     $('qf-image-url').value = '';
@@ -4872,28 +5102,42 @@ authPromise.then(() => {
 
   async function fetchTrustedKnowledge(topic){
     const endpoint = 'https://en.wikipedia.org/w/api.php';
-    const searchUrl = endpoint+'?action=query&list=search&format=json&origin=*&srlimit=5&srsearch='+encodeURIComponent(topic);
-    let searchData;
+    const queries = buildTrustedSearchQueries(topic);
+    const titleMap = new Map();
+
     try{
-      const r = await fetch(searchUrl);
-      if(!r.ok) throw new Error();
-      searchData = await r.json();
+      const searchResults = await Promise.all(queries.map(async query=>{
+        const searchUrl = endpoint+'?action=query&list=search&format=json&origin=*&srlimit=4&srsearch='+encodeURIComponent(query);
+        const r = await fetch(searchUrl);
+        if(!r.ok) return [];
+        const data = await r.json();
+        return data && data.query && Array.isArray(data.query.search) ? data.query.search : [];
+      }));
+
+      searchResults.flat().forEach(hit=>{
+        if(hit && hit.title && !titleMap.has(hit.title)) titleMap.set(hit.title,hit);
+      });
     }catch(e){
       throw new Error('Trusted knowledge lookup could not reach Wikipedia. Check your connection and try again.');
     }
 
-    const hits = searchData && searchData.query && Array.isArray(searchData.query.search) ? searchData.query.search : [];
-    if(!hits.length) return {text:'',sources:[],label:'Wikipedia reference material'};
+    const titles = [...titleMap.keys()].slice(0,14);
+    if(!titles.length) return {text:'',sources:[],label:'Wikipedia reference material'};
 
-    const titles = hits.slice(0,5).map(x=>x.title);
     const extractUrl = endpoint+'?action=query&prop=extracts&explaintext=1&redirects=1&format=json&origin=*&titles='+encodeURIComponent(titles.join('|'));
-    const r2 = await fetch(extractUrl);
-    if(!r2.ok) throw new Error('Wikipedia reference retrieval failed.');
-    const data = await r2.json();
-    const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
+    let data;
+    try{
+      const r2 = await fetch(extractUrl);
+      if(!r2.ok) throw new Error();
+      data = await r2.json();
+    }catch(e){
+      return {text:'',sources:[],label:'Wikipedia reference material'};
+    }
 
+    const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
     const parts = [];
     const sources = [];
+
     pages.forEach(page=>{
       if(!page || !page.extract) return;
       parts.push('SOURCE ARTICLE: '+page.title+'\n'+cleanSourceText(page.extract));
@@ -4901,9 +5145,9 @@ authPromise.then(() => {
     });
 
     return {
-      text:parts.join('\n\n---\n\n').slice(0,70000),
+      text:parts.join('\n\n---\n\n').slice(0,90000),
       sources,
-      label:'Wikipedia · '+titles.slice(0,3).join(', ')
+      label:'Wikipedia · '+titles.slice(0,4).join(', ')
     };
   }
 
@@ -4993,6 +5237,20 @@ authPromise.then(() => {
         evidence:typeof item.sourceEvidence==='string' ? item.sourceEvidence.slice(0,500) : ''
       };
     }
+    if(sourceType==='school'){
+      return {
+        kind:'review',
+        label:'Curriculum Guided • Review',
+        sourceName:sourceName||'Year-level subject guidance'
+      };
+    }
+    if(sourceType==='reference'){
+      return {
+        kind:'review',
+        label:'AI • Review',
+        sourceName:sourceName||'Trusted references + AI knowledge'
+      };
+    }
     return {kind:'review',label:'AI • Review',sourceName:''};
   }
 
@@ -5000,6 +5258,10 @@ authPromise.then(() => {
     const requestedType = ['multiple_choice','true_false','multiple_correct'].includes(questionType)
       ? questionType : 'multiple_choice';
     const questionLanguage = context.questionLanguage || 'English';
+    const rawTimePerQuestion = Number(context.timePerQuestion);
+    const timePerQuestion = Number.isFinite(rawTimePerQuestion)
+      ? Math.max(3, Math.min(600, Math.round(rawTimePerQuestion)))
+      : DEFAULT_QUESTION_TIME;
     const rawPointsPerQuestion = Number(context.pointsPerQuestion);
     const pointsPerQuestion = Number.isFinite(rawPointsPerQuestion)
       ? Math.max(0, Math.min(100000, Math.round(rawPointsPerQuestion)))
@@ -5032,17 +5294,29 @@ authPromise.then(() => {
           'Write every question, every answer option, and every explanation in English.'
         ].join(' ');
 
+    const flexibleReference = context.sourceType==='reference';
     const sourceRule = sourceExcerpt
-      ? [
-          'CRITICAL SOURCE RULE: Use ONLY facts explicitly supported by the SOURCE MATERIAL below.',
-          'Do not use outside memory to fill gaps.',
-          'If a fact is uncertain, controversial, time-sensitive, or not directly supported by the source, do not make a question about it.',
-          'Every correct answer must be defensible from the source.',
-          'Avoid ambiguous distractors that could also be correct.',
-          'When possible include sourceEvidence as a short supporting phrase and sourcePage if a page marker is visible.',
-          'SOURCE MATERIAL:',
-          sourceExcerpt
-        ].join('\n')
+      ? flexibleReference
+        ? [
+            'REFERENCE GUIDANCE: The material below is useful supporting reference, but this host request intentionally spans a broad scope.',
+            'Use the reference material whenever it supports the requested category, and you MAY use well-established factual knowledge for requested categories not covered by the excerpt.',
+            'Do not invent uncertain facts. Avoid ambiguous answers and very time-sensitive claims unless clearly framed.',
+            'For songs, film quotes, catchphrases or other copyrighted text, do not reproduce long verbatim passages; prefer identification, attribution, context, album/work, performer, character, or very short excerpts.',
+            'REFERENCE MATERIAL:',
+            sourceExcerpt
+          ].join('\n')
+        : [
+            'CRITICAL SOURCE RULE: Use ONLY facts explicitly supported by the SOURCE MATERIAL below.',
+            'Do not use outside memory to fill gaps.',
+            'If a fact is uncertain, controversial, time-sensitive, or not directly supported by the source, do not make a question about it.',
+            'Every correct answer must be defensible from the source.',
+            'Avoid ambiguous distractors that could also be correct.',
+            'When possible include sourceEvidence as a short supporting phrase and sourcePage if a page marker is visible.',
+            'SOURCE MATERIAL:',
+            sourceExcerpt
+          ].join('\n')
+      : context.sourceType==='school'
+      ? 'YEAR-LEVEL ACCURACY RULE: Follow the school-year and subject instructions exactly. Test the student\'s subject knowledge directly. Do not drift into meta-questions about education, assessment systems, curriculum administration or teaching.'
       : 'Accuracy requirement: use established facts, avoid disputed/time-sensitive claims, and make exactly one defensible answer unless Select Multiple is requested.';
 
     const duplicateRule = existingStems.length
@@ -5095,7 +5369,7 @@ authPromise.then(() => {
         q:item.question.trim(),
         type:requestedType,
         options:opts,
-        timeLimit:20,
+        timeLimit:timePerQuestion,
         points:pointsPerQuestion,
         explanation:typeof item.explanation==='string' ? item.explanation.trim() : '',
         excluded:false,
@@ -5130,9 +5404,58 @@ authPromise.then(() => {
 
   async function generateVerifiedQuestionBatches({
     topic,requestedCount,optsPerQ,questionType,sourceText,sourceType,sourceName,sourceUrls,
-    questionLanguage='English',pointsPerQuestion=DEFAULT_QUESTION_POINTS,existingQuestions,onProgress
+    questionLanguage='English',timePerQuestion=DEFAULT_QUESTION_TIME,pointsPerQuestion=DEFAULT_QUESTION_POINTS,existingQuestions,onProgress
   }){
     const target = Math.max(1,Math.min(100,requestedCount||10));
+
+    // Mixed mode is orchestrated here rather than asking one model response to
+    // invent inconsistent schemas. Each subtype is independently validated.
+    if(questionType==='mixed'){
+      const mixedTypes = ['multiple_choice','true_false','multiple_correct'];
+      const quotas = {multiple_choice:0,true_false:0,multiple_correct:0};
+      for(let i=0;i<target;i++) quotas[mixedTypes[i % mixedTypes.length]]++;
+
+      const mixed = [];
+      let completed = 0;
+      for(const type of mixedTypes){
+        const needed = quotas[type];
+        if(!needed) continue;
+        const typeLabel = type==='multiple_choice' ? 'Multiple Choice' : type==='true_false' ? 'True / False' : 'Select Multiple';
+        if(onProgress) onProgress(completed,target,'Generating '+typeLabel+' questions for the mixed set…');
+
+        const generated = await generateVerifiedQuestionBatches({
+          topic,
+          requestedCount:needed,
+          optsPerQ:type==='true_false' ? 2 : Math.max(3,optsPerQ),
+          questionType:type,
+          sourceText,
+          sourceType,
+          sourceName,
+          sourceUrls,
+          questionLanguage,
+          timePerQuestion,
+          pointsPerQuestion,
+          existingQuestions:(Array.isArray(existingQuestions)?existingQuestions:[]).concat(mixed),
+          onProgress:(subDone,subTarget)=>{
+            if(onProgress) onProgress(
+              Math.min(target,completed+subDone),
+              target,
+              'Building mixed quiz — '+Math.min(target,completed+subDone)+' of '+target+' ready…'
+            );
+          }
+        });
+        mixed.push(...generated);
+        completed += generated.length;
+      }
+
+      // Shuffle the validated subtypes so Mixed really appears mixed in the queue/game.
+      for(let i=mixed.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [mixed[i],mixed[j]] = [mixed[j],mixed[i]];
+      }
+      if(onProgress) onProgress(target,target,'All '+target+' mixed-format questions ready.');
+      return mixed.slice(0,target);
+    }
     const accepted = [];
     const known = Array.isArray(existingQuestions) ? existingQuestions.slice() : [];
     const maxAttempts = Math.ceil(target/10) + 5;
@@ -5152,6 +5475,7 @@ authPromise.then(() => {
           sourceName,
           sourceUrls,
           questionLanguage,
+          timePerQuestion,
           pointsPerQuestion,
           existingQuestions:known.concat(accepted)
         });
