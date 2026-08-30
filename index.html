@@ -2612,7 +2612,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.10.1";
+  const APP_VERSION = "3.10.2";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4438,7 +4438,7 @@ authPromise.then(() => {
       }else{
         opts.disabled = false;
         if((parseInt(opts.value,10)||0) < 2) opts.value = '4';
-        note.innerHTML = '<strong>Multiple Choice:</strong> each question must have exactly one defensible correct answer.';
+        note.innerHTML = '<strong>Multiple Choice:</strong> each question must have exactly one defensible correct answer. QZMAX automatically balances the correct answer positions across A, B, C and D.';
       }
     }
 
@@ -5100,6 +5100,50 @@ authPromise.then(() => {
     throw new Error('Unsupported file type. Please use PDF, DOCX or TXT.');
   }
 
+
+  function buildTrustedSearchQueries(topic){
+    const raw = String(topic||'').replace(/\s+/g,' ').trim();
+    const queries = [];
+    const add = q=>{
+      q = String(q||'').replace(/\s+/g,' ').trim();
+      if(q && !queries.some(x=>x.toLowerCase()===q.toLowerCase())) queries.push(q);
+    };
+
+    // Always include a compact version of the host's exact topic.
+    add(raw.slice(0,180));
+
+    const egypt = /\begypt\b|مصر|المصر|المصرية|egyptian/i.test(raw);
+    const modern = /2000|2001|2002|2003|2004|2005|2006|2007|2008|2009|2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025|2026|till now|until now|present|الان|الآن/i.test(raw);
+
+    if(egypt){
+      add(modern ? 'Egypt in the 21st century' : 'Egypt');
+      if(/افلام|أفلام|مسلسلات|اغاني|أغاني|برامج|افيهات|أفيهات|فن|cinema|film|television|music|song/i.test(raw)){
+        add('Cinema of Egypt television in Egypt music of Egypt');
+      }
+      if(/سياس|ثقاف|politic|culture/i.test(raw)){
+        add('Politics of Egypt culture of Egypt 21st century');
+      }
+      if(/جغرف|تاريخ|علم|geograph|history|science/i.test(raw)){
+        add('History of Egypt geography of Egypt science and technology in Egypt');
+      }
+    }
+
+    const mappings = [
+      [/افلام|أفلام/i,'Egyptian cinema'],
+      [/مسلسلات/i,'Egyptian television series'],
+      [/اغاني|أغاني|كلمات اغاني|كلمات أغاني/i,'Egyptian music'],
+      [/برامج تلفزيونية|برامج/i,'Television in Egypt'],
+      [/سياسه|سياسة/i,'Politics of Egypt'],
+      [/ثقافة|ثقافه/i,'Culture of Egypt'],
+      [/جغرفيا|جغرافيا/i,'Geography of Egypt'],
+      [/تاريخ/i,'History of Egypt'],
+      [/علم/i,'Science and technology in Egypt']
+    ];
+    mappings.forEach(([rx,q])=>{ if(rx.test(raw)) add(q); });
+
+    return queries.slice(0,6);
+  }
+
   async function fetchTrustedKnowledge(topic){
     const endpoint = 'https://en.wikipedia.org/w/api.php';
     const queries = buildTrustedSearchQueries(topic);
@@ -5254,6 +5298,63 @@ authPromise.then(() => {
     return {kind:'review',label:'AI • Review',sourceName:''};
   }
 
+
+  function shuffleArrayInPlace(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  function randomizeMultipleCorrectOptions(q){
+    if(!q || q.type!=='multiple_correct' || !Array.isArray(q.options) || q.options.length<2) return q;
+    const correctSet = new Set((q.correctIndexes||[]).map(Number));
+    const mapped = q.options.map((text,index)=>({text,index,isCorrect:correctSet.has(index)}));
+    shuffleArrayInPlace(mapped);
+    q.options = mapped.map(x=>x.text);
+    q.correctIndexes = mapped.map((x,i)=>x.isCorrect?i:null).filter(i=>i!==null);
+    q.correct = q.correctIndexes[0];
+    return q;
+  }
+
+  function balanceMultipleChoiceAnswerPositions(questions){
+    const mc = (questions||[]).filter(q=>
+      q && q.type==='multiple_choice' &&
+      Array.isArray(q.options) &&
+      q.options.length>=2 &&
+      Number.isInteger(q.correct) &&
+      q.correct>=0 &&
+      q.correct<q.options.length
+    );
+    if(!mc.length) return questions;
+
+    // Start each batch at a random letter, then cycle through the available
+    // positions. This prevents the AI/provider from making every answer "A".
+    const startOffset = Math.floor(Math.random()*4);
+    let positionCounter = 0;
+
+    mc.forEach(q=>{
+      const target = (startOffset + positionCounter) % q.options.length;
+      const current = q.correct;
+      if(current !== target){
+        [q.options[current],q.options[target]] = [q.options[target],q.options[current]];
+        q.correct = target;
+      }
+      positionCounter++;
+    });
+
+    return questions;
+  }
+
+  function randomizeGeneratedAnswerPositions(questions){
+    (questions||[]).forEach(q=>{
+      if(q && q.type==='multiple_correct') randomizeMultipleCorrectOptions(q);
+    });
+    balanceMultipleChoiceAnswerPositions(questions);
+    return questions;
+  }
+
   async function generateQuestionsWithAI(topic, count, optsPerQ, questionType, context={}){
     const requestedType = ['multiple_choice','true_false','multiple_correct'].includes(questionType)
       ? questionType : 'multiple_choice';
@@ -5329,8 +5430,11 @@ authPromise.then(() => {
       formatInstruction,
       sourceRule,
       duplicateRule,
+      requestedType==='multiple_choice'
+        ? 'Vary the position of the correct answer across the returned questions. Do not make the first option correct every time.'
+        : '',
       'Return clean JSON only in the schema expected by the quiz application.'
-    ].join('\n\n');
+    ].filter(Boolean).join('\n\n');
 
     let res;
     try{
@@ -5399,6 +5503,7 @@ authPromise.then(() => {
       if(aiQuestionStructuralCheck(base)) questions.push(base);
     }
     if(!questions.length) throw new Error('The AI response did not contain structurally valid questions.');
+    randomizeGeneratedAnswerPositions(questions);
     return questions;
   }
 
