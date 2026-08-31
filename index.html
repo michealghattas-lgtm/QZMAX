@@ -2748,6 +2748,45 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
   .exam-nav .btn{min-width:0}
 }
 
+
+/* ===== QZMAX 3.12.0 FINAL — Multi-AI + Exam field polish ===== */
+.ai-first-notice{
+  border-color:rgba(124,108,255,.24) !important;
+  background:linear-gradient(135deg,rgba(124,108,255,.09),rgba(35,217,255,.035)) !important;
+}
+.exam-duration-field input[type="number"],
+#exam-duration-minutes{
+  width:100% !important;
+  min-height:50px !important;
+  box-sizing:border-box !important;
+  appearance:textfield !important;
+  -moz-appearance:textfield !important;
+  background:rgba(7,10,22,.72) !important;
+  color:#f5f7ff !important;
+  -webkit-text-fill-color:#f5f7ff !important;
+  border:1px solid rgba(124,145,255,.30) !important;
+  border-radius:14px !important;
+  padding:12px 14px !important;
+  font-family:'Inter',sans-serif !important;
+  font-size:16px !important;
+  font-weight:700 !important;
+  line-height:1.2 !important;
+  outline:none !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+.exam-duration-field input[type="number"]:focus,
+#exam-duration-minutes:focus{
+  border-color:#8e82ff !important;
+  box-shadow:0 0 0 4px rgba(124,108,255,.12) !important;
+}
+#exam-duration-minutes::-webkit-outer-spin-button,
+#exam-duration-minutes::-webkit-inner-spin-button{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  margin:0 !important;
+  display:none !important;
+}
+
 </style>
 </head>
 <body>
@@ -2769,7 +2808,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.11.0";
+  const APP_VERSION = "3.12.0";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4324,17 +4363,17 @@ authPromise.then(() => {
       // QZMAX 3.8 Verified AI + Document Quiz Engine
       '<div class="card host-studio-only verified-ai-card" id="host-ai-generator-card" style="margin-bottom:16px;">'+
         '<div class="verified-ai-head">'+
-          '<div><div class="eyebrow">QZMAX VERIFIED AI</div><h3>How do you want to create?</h3><p>Ground AI questions in trusted reference material, your own document, or create manually.</p></div>'+
+          '<div><div class="eyebrow">QZMAX MULTI-AI</div><h3>How do you want to create?</h3><p>Generate with QZMAX\'s free multi-provider AI router, use your own document, or create manually.</p></div>'+
           '<span class="verified-engine-badge">BETA</span>'+
         '</div>'+
         '<div class="ai-source-tabs" role="tablist" aria-label="Quiz creation source">'+
-          '<button type="button" class="ai-source-tab active" id="ai-source-trusted">✦ Trusted Knowledge</button>'+
+          '<button type="button" class="ai-source-tab active" id="ai-source-trusted">✦ AI Knowledge + Search</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-document">▣ My Document</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-manual">✎ Manual</button>'+
         '</div>'+
 
         '<div id="ai-source-panel-trusted" class="ai-source-panel">'+
-          '<div class="ai-source-notice trusted"><strong>Source Grounded</strong><span>QZMAX retrieves relevant Wikipedia reference text first, then instructs AI to create questions only from that material.</span></div>'+
+          '<div class="ai-source-notice trusted ai-first-notice"><strong>AI-first • Search-capable</strong><span>Your exact topic is routed through free AI providers. QZMAX can use Gemini + Google Search or Groq web search for current/niche topics, and no longer uses Wikipedia by default.</span></div>'+
           '<div style="display:flex; justify-content:space-between; align-items:center; margin:13px 0 8px;">'+
             '<div class="eyebrow" id="ai-mode-title">Custom Topic</div>'+
             '<button id="ai-mode-toggle" type="button" class="ai-text-link">Switch to School Exam Mode</button>'+
@@ -4382,11 +4421,11 @@ authPromise.then(() => {
             '<div class="qform-row ai-metric-card ai-metric-points"><label>Points each</label><input type="number" id="ai-points-per-q" value="100" min="0" max="100000" step="10" inputmode="numeric"><div class="qtype-hint">Applied to every generated question.</div></div>'+
           '</div>'+
           '<div class="ai-format-note" id="ai-format-note"><strong>Multiple Choice:</strong> one correct answer per question.</div>'+
-          '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate Source-Grounded Questions</button>'+
+          '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate with Free Multi-AI</button>'+
           '<div class="ai-progress-shell" id="ai-progress-shell" style="display:none;"><div class="ai-progress-bar"><span id="ai-progress-fill"></span></div><div class="ai-progress-label" id="ai-progress-label">Preparing…</div></div>'+
           '<div class="err-msg" id="ai-msg"></div>'+
-          '<div class="verification-legend"><span><b class="verify-dot source"></b> Source Grounded</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
-          '<div class="accuracy-note"><strong>Accuracy note:</strong> grounding and duplicate checks greatly reduce errors, but no AI-generated quiz can be guaranteed 100% correct. QZMAX keeps host review as the final safeguard.</div>'+
+          '<div class="verification-legend"><span><b class="verify-dot review"></b> AI • Review</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot source"></b> Search-capable routes</span></div>'+
+          '<div class="accuracy-note"><strong>Accuracy note:</strong> QZMAX checks topic fidelity, structure and duplicates and can switch across multiple free AI routes. Host review remains the final safeguard for AI-generated content.</div>'+
         '</div>'+
       '</div>'+
 
@@ -4618,7 +4657,7 @@ authPromise.then(() => {
       if(!btn) return;
       if(aiSourceMode==='document') btn.textContent = 'Generate from Document';
       else if(isSchoolMode) btn.textContent = 'Generate Year-Level Exam Questions';
-      else btn.textContent = 'Generate Source-Grounded Questions';
+      else btn.textContent = 'Generate with Free Multi-AI';
     }
 
     $('ai-source-trusted').onclick = ()=>setAISourceMode('trusted');
@@ -4831,31 +4870,19 @@ authPromise.then(() => {
       const msg = $('ai-msg');
       btn.disabled = true;
       $('ai-progress-shell').style.display = '';
-      setAIProgress(2, 'Preparing trusted source…');
+      setAIProgress(2, aiSourceMode==='document' ? 'Preparing document source…' : 'Preparing AI request…');
       msg.textContent = '';
       msg.style.color = 'var(--muted)';
 
       try{
         if(aiSourceMode==='trusted' && !isSchoolMode){
-          const broadInstruction = isBroadCustomInstruction(topic);
-          const grounding = await fetchTrustedKnowledge(topic);
-          sourceText = grounding.text;
-          sourceUrls = grounding.sources || [];
-          sourceName = grounding.label || 'Wikipedia reference material';
-
-          if(broadInstruction){
-            sourceType = 'reference';
-            setAIProgress(8, sourceText
-              ? 'Broad topic detected — references found, starting flexible generation…'
-              : 'Broad topic detected — starting AI review generation…');
-          }else if(!sourceText){
-            sourceType = 'reference';
-            sourceName = 'AI knowledge — host review required';
-            setAIProgress(8, 'No strong reference match — starting AI review generation…');
-          }else{
-            sourceType = 'trusted';
-            setAIProgress(8, 'Reference material found — starting generation…');
-          }
+          // QZMAX 3.12 — Custom Topic is AI-first.
+          // Search-capable providers do their own grounding when selected.
+          sourceText = '';
+          sourceUrls = [];
+          sourceType = 'ai';
+          sourceName = 'QZMAX Free Multi-AI Router';
+          setAIProgress(8, 'Routing your exact topic through search-capable and free AI providers…');
         }else if(isSchoolMode){
           sourceText = '';
           sourceUrls = [];
@@ -4900,8 +4927,18 @@ authPromise.then(() => {
           ? 'source-grounded'
           : sourceType==='school'
           ? 'year-level curriculum-guided'
+          : sourceType==='ai'
+          ? 'AI-generated'
           : 'AI-review';
-        msg.textContent = 'Added '+generated.length+' '+groundedLabel+' question'+(generated.length===1?'':'s')+'. Duplicate and structural checks passed. Review before saving.';
+        const usedRoutes = [...new Set(generated.map(q=>{
+          const p=q&&q.aiMeta&&q.aiMeta.provider;
+          const m=q&&q.aiMeta&&q.aiMeta.model;
+          return p ? (m ? p+' · '+m : p) : '';
+        }).filter(Boolean))];
+        msg.textContent = 'Added '+generated.length+' '+groundedLabel+' question'+(generated.length===1?'':'s')+
+          '. Duplicate and structural checks passed.'+
+          (usedRoutes.length ? ' Route'+(usedRoutes.length>1?'s':'')+': '+usedRoutes.join(' → ')+'.' : '')+
+          ' Review before saving.';
       }catch(err){
         msg.style.color = 'var(--wrong)';
         msg.textContent = err.message || 'Something went wrong generating questions.';
@@ -5518,6 +5555,13 @@ authPromise.then(() => {
         sourceName:sourceName||'Trusted references + AI knowledge'
       };
     }
+    if(sourceType==='ai'){
+      return {
+        kind:'review',
+        label:'AI • Review',
+        sourceName:sourceName||'QZMAX Free Multi-AI Router'
+      };
+    }
     return {kind:'review',label:'AI • Review',sourceName:''};
   }
 
@@ -5641,6 +5685,16 @@ authPromise.then(() => {
           ].join('\n')
       : context.sourceType==='school'
       ? 'YEAR-LEVEL ACCURACY RULE: Follow the school-year and subject instructions exactly. Test the student\'s subject knowledge directly. Do not drift into meta-questions about education, assessment systems, curriculum administration or teaching.'
+      : context.sourceType==='ai'
+      ? [
+          'CRITICAL TOPIC-FIDELITY RULE: Treat the host\'s Topic / Instructions field as the exact scope of the quiz.',
+          'Every question must directly satisfy the named subject, country/place, category, people and time period in the host request.',
+          'Do NOT broaden into adjacent general knowledge merely because it shares a country, century, industry or keyword.',
+          'Example: if the host asks for Egyptian movies, TV series and songs after 2000, every question must be about Egyptian cinema, Egyptian TV/series, Egyptian music/songs/artists/albums, or another category explicitly requested, and must respect the after-2000 timeframe.',
+          'Do not create unrelated questions about world events, science, education, economics, politics or geography unless the host explicitly requested those categories.',
+          'Use widely established facts. For recent, niche or entertainment facts, use live search grounding when the selected route supports it.',
+          'For copyrighted lyrics, movie dialogue and catchphrases, use only a very short excerpt or ask about identification, attribution or context rather than reproducing long text.'
+        ].join(' ')
       : 'Accuracy requirement: use established facts, avoid disputed/time-sensitive claims, and make exactly one defensible answer unless Select Multiple is requested.';
 
     const duplicateRule = existingStems.length
@@ -5674,6 +5728,7 @@ authPromise.then(() => {
           existingQuestions:existingStems,
           sourceType:context.sourceType||'',
           sourceName:context.sourceName||'',
+          preferSearch:context.sourceType==='ai',
           questionLanguage
         })
       });
@@ -5681,6 +5736,8 @@ authPromise.then(() => {
       throw new Error('Could not reach the AI server — check your connection.');
     }
 
+    const routedProvider = res.headers.get('X-QZMAX-AI-Provider') || '';
+    const routedModel = res.headers.get('X-QZMAX-AI-Model') || '';
     let items;
     try{ items = await res.json(); }catch(e){ throw new Error('Could not read the AI server response.'); }
     if(!res.ok) throw new Error(items.error || 'Server error generating questions.');
@@ -5702,7 +5759,9 @@ authPromise.then(() => {
         excluded:false,
         aiMeta:{
           ...getAIQuestionVerificationMeta(context.sourceType,context.sourceName,context.sourceUrls,item),
-          language:questionLanguage
+          language:questionLanguage,
+          provider:routedProvider,
+          model:routedModel
         }
       };
 
