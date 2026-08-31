@@ -2591,6 +2591,163 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
   }
 }
 
+
+/* ===== QZMAX 3.11.0 — Live Quiz + Exam Mode ===== */
+.session-mode-card{margin-bottom:14px}
+.session-mode-segment{margin-top:10px}
+.exam-config{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid rgba(130,160,220,.12);
+}
+.exam-config-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(210px,280px);
+  gap:18px;
+  align-items:end;
+}
+.exam-config-grid strong{font-size:14px}
+.exam-config-grid p,.exam-mode-note{font-size:11px;line-height:1.5;color:var(--muted)}
+.exam-duration-field{margin:0}
+.exam-duration-field input[type="number"]{
+  appearance:textfield;
+  -moz-appearance:textfield;
+  min-height:48px;
+}
+.exam-duration-field input[type="number"]::-webkit-outer-spin-button,
+.exam-duration-field input[type="number"]::-webkit-inner-spin-button{
+  -webkit-appearance:none;margin:0;
+}
+.exam-mode-note{
+  margin-top:12px;
+  padding:10px 12px;
+  border:1px solid rgba(124,108,255,.18);
+  border-radius:12px;
+  background:rgba(124,108,255,.06);
+}
+.exam-host-shell,.exam-player-shell{
+  width:100%;
+  min-height:100%;
+  padding:18px;
+}
+.exam-host-hero{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  align-items:center;
+  max-width:1080px;
+  margin:30px auto 18px;
+}
+.exam-host-hero h1{font-size:38px;margin:5px 0}
+.exam-clock-card{
+  min-width:220px;
+  padding:18px 20px;
+  border-radius:18px;
+  border:1px solid rgba(124,145,255,.23);
+  background:linear-gradient(180deg,rgba(23,31,58,.88),rgba(9,15,32,.9));
+  text-align:center;
+  box-shadow:0 16px 40px rgba(0,0,0,.23);
+}
+.exam-clock-card span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#9da9c4;font-weight:800}
+.exam-clock-card strong{display:block;font-family:'Space Grotesk';font-size:34px;margin-top:5px;color:#fff}
+.exam-clock-card.compact{min-width:180px;padding:12px 14px}
+.exam-clock-card.compact strong{font-size:27px}
+.exam-monitor-grid{
+  max-width:1080px;
+  margin:0 auto 16px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.exam-monitor-stat{
+  border:1px solid rgba(124,145,255,.18);
+  border-radius:16px;
+  padding:16px;
+  background:rgba(14,21,42,.75);
+}
+.exam-monitor-stat span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.1em}
+.exam-monitor-stat strong{display:block;font-family:'Space Grotesk';font-size:29px;margin-top:5px}
+.exam-host-note{
+  max-width:1080px;margin:0 auto 16px;padding:12px 14px;border-radius:13px;
+  border:1px solid rgba(35,217,255,.14);background:rgba(35,217,255,.045);color:#a8b4ca;font-size:12px
+}
+#btn-end-exam-now{display:block;margin:0 auto}
+.exam-player-top{
+  display:grid;
+  grid-template-columns:1fr minmax(180px,1fr) auto;
+  gap:14px;
+  align-items:center;
+  max-width:1180px;
+  margin:0 auto 16px;
+}
+.exam-player-progress{min-width:0}
+.exam-player-progress>span{display:block;text-align:center;font-size:11px;color:var(--muted);margin-bottom:5px}
+.exam-player-layout{
+  max-width:1180px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 260px;
+  gap:16px;
+  align-items:start;
+}
+.exam-question-card,.exam-side-panel,.exam-submitted-card{
+  border:1px solid rgba(124,145,255,.2);
+  border-radius:20px;
+  background:rgba(11,17,36,.88);
+  box-shadow:0 18px 50px rgba(0,0,0,.2);
+}
+.exam-question-card{padding:22px}
+.exam-side-panel{padding:16px;position:sticky;top:14px}
+.exam-side-head{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px}
+.exam-side-head span{color:var(--signal-2);font-weight:800}
+.exam-side-panel>p{font-size:10px;line-height:1.45;margin-top:10px}
+.exam-palette{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px}
+.exam-palette-btn{
+  min-height:36px;border:1px solid rgba(124,145,255,.18);border-radius:9px;
+  background:rgba(255,255,255,.025);color:#aeb8ce;font-weight:800;cursor:pointer
+}
+.exam-palette-btn.answered{border-color:rgba(39,230,160,.35);background:rgba(39,230,160,.08);color:#7ff1c2}
+.exam-palette-btn.current{outline:2px solid rgba(124,108,255,.7);color:#fff}
+.exam-save-status{
+  margin:15px 0 0;padding:10px 12px;border-radius:11px;
+  background:rgba(35,217,255,.05);border:1px solid rgba(35,217,255,.12);
+  color:#9ec4cf;font-size:11px
+}
+.exam-nav{display:flex;justify-content:space-between;gap:10px;margin-top:15px}
+.exam-nav .btn{min-width:130px}
+.exam-submitted-card{max-width:520px;padding:32px;text-align:center}
+.exam-submitted-icon{
+  width:68px;height:68px;border-radius:50%;display:grid;place-items:center;margin:0 auto 15px;
+  background:rgba(39,230,160,.12);border:1px solid rgba(39,230,160,.3);color:var(--correct);font-size:32px;font-weight:900
+}
+.exam-lobby-note{
+  max-width:420px;margin:13px auto 0;padding:10px 12px;border-radius:12px;
+  border:1px solid rgba(124,108,255,.18);background:rgba(124,108,255,.06);font-size:11px;color:#aeb8ce
+}
+@media(max-width:900px){
+  .exam-config-grid{grid-template-columns:1fr}
+  .exam-monitor-grid{grid-template-columns:1fr 1fr}
+  .exam-player-top{grid-template-columns:1fr 1fr}
+  .exam-player-top .exam-clock-card{grid-column:1/-1}
+  .exam-player-layout{grid-template-columns:1fr}
+  .exam-side-panel{position:static}
+  .exam-palette{grid-template-columns:repeat(8,1fr)}
+}
+@media(max-width:600px){
+  .exam-host-shell,.exam-player-shell{padding:10px}
+  .exam-host-hero{display:block;margin-top:16px}
+  .exam-host-hero .exam-clock-card{margin-top:12px;width:100%}
+  .exam-host-hero h1{font-size:29px}
+  .exam-monitor-grid{grid-template-columns:1fr 1fr}
+  .exam-player-top{display:block}
+  .exam-player-progress{margin:10px 0}
+  .exam-player-top .exam-clock-card{width:100%}
+  .exam-question-card{padding:14px}
+  .exam-palette{grid-template-columns:repeat(5,1fr)}
+  .exam-nav{display:grid;grid-template-columns:1fr 1fr}
+  .exam-nav .btn{min-width:0}
+}
+
 </style>
 </head>
 <body>
@@ -2612,7 +2769,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.10.2";
+  const APP_VERSION = "3.11.0";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -2747,6 +2904,7 @@ authPromise.then(() => {
     playerTimerHandle:null, playerPollHandle:null,
     lastPhaseKey:null, questionsDraft:[],
     gameMode:'individual', teams:[], teamId:null,
+    sessionMode:'live', examDurationMinutes:30, examQuestionIndex:0,
     questionType:'multiple_choice',
     typedAnswers:[''],
     questionImageUrl:'',
@@ -3179,6 +3337,7 @@ authPromise.then(() => {
   function hostPhaseLabel(st){
     if(!st) return 'Unknown';
     if(st.status==='setup') return 'Lobby / setup';
+    if(st.status==='exam') return 'Exam in progress';
     if(st.status==='question') return 'Live question '+((st.currentIndex||0)+1);
     if(st.status==='reveal') return 'Answer reveal';
     if(st.status==='leaderboard') return 'Leaderboard';
@@ -3898,6 +4057,8 @@ authPromise.then(() => {
     startHostControlWatch(code);
     S.hostControlLost = false;
     S.questionsDraft = st.questions || [];
+    S.sessionMode = st.sessionMode === 'exam' ? 'exam' : 'live';
+    S.examDurationMinutes = Math.max(1, Math.min(480, Number(st.examDurationMinutes)||30));
     S.gameMode = st.gameMode === 'teams' ? 'teams' : 'individual';
     S.teams = normalizeTeams(st.teams, st.teamCount);
     S.loadedQuizId = null;
@@ -3911,6 +4072,8 @@ authPromise.then(() => {
       buildHostSetup('launch');
       showScreen('screen-host-setup');
       startHostSetupPoll();
+    } else if(st.status === 'exam'){
+      enterHostExam(st);
     } else if(st.status === 'question'){
       enterHostQuestion(st);
     } else if(st.status === 'reveal'){
@@ -4060,6 +4223,8 @@ authPromise.then(() => {
     S.code = code;
     S.questionsDraft = [];
     S.gameMode = 'individual';
+    S.sessionMode = 'live';
+    S.examDurationMinutes = 30;
     S.teams = defaultTeams(2);
     S.loadedQuizId = null;
     S.editingQuestionIndex = null;
@@ -4069,9 +4234,11 @@ authPromise.then(() => {
       code, status:'setup', hostUid:currentUserUid,
       hostControllerId:getHostControllerId(),
       hostControllerUpdatedAt:getSyncedTime(),
+      sessionMode:'live', examDurationMinutes:30,
       gameMode:'individual', teamCount:2, teams:defaultTeams(2),
       appVersion:APP_VERSION,
-      questions:[], currentIndex:-1, questionStartedAt:null, createdAt:Date.now()
+      questions:[], currentIndex:-1, questionStartedAt:null,
+      examStartedAt:null, examEndsAt:null, createdAt:Date.now()
     };
     await fbSet(statePath(code), state);
     saveHostSession(code);
@@ -4117,9 +4284,27 @@ authPromise.then(() => {
         '</div>'+
       '</div>'+
 
-      '<div class="mode-card host-launch-only" id="host-game-mode-card">'+
+      '<div class="mode-card host-launch-only session-mode-card" id="host-session-mode-card">'+
         '<div class="mode-head">'+
-          '<div><div class="eyebrow">Game mode</div><p style="margin-top:5px;">Choose how the room competes.</p></div>'+
+          '<div><div class="eyebrow">Session mode</div><p style="margin-top:5px;">Choose a live game or a timed exam.</p></div>'+
+          '<div class="team-badge" id="host-session-badge">'+(S.sessionMode==='exam'?'📝 Exam':'⚡ Live Quiz')+'</div>'+
+        '</div>'+
+        '<div class="mode-segment session-mode-segment">'+
+          '<button class="mode-btn '+(S.sessionMode!=='exam'?'active':'')+'" id="session-live">⚡ Live Quiz</button>'+
+          '<button class="mode-btn '+(S.sessionMode==='exam'?'active':'')+'" id="session-exam">📝 Exam</button>'+
+        '</div>'+
+        '<div class="exam-config" id="exam-config" style="display:'+(S.sessionMode==='exam'?'block':'none')+';">'+
+          '<div class="exam-config-grid">'+
+            '<div><strong>Whole-exam timer</strong><p>One countdown applies to all questions. Per-question timers are ignored.</p></div>'+
+            '<div class="qform-row exam-duration-field"><label>Exam duration (minutes)</label><input type="number" id="exam-duration-minutes" value="'+Number(S.examDurationMinutes||30)+'" min="1" max="480" step="1" inputmode="numeric"></div>'+
+          '</div>'+
+          '<div class="exam-mode-note">Students can move forward and backward, change saved answers, and submit early. When the timer reaches zero, their exam is automatically submitted. Correct answers receive the full question points — there is no speed bonus.</div>'+
+        '</div>'+
+      '</div>'+
+
+      '<div class="mode-card host-launch-only" id="host-game-mode-card" style="display:'+(S.sessionMode==='exam'?'none':'block')+';">'+
+        '<div class="mode-head">'+
+          '<div><div class="eyebrow">Live scoring mode</div><p style="margin-top:5px;">Choose individual play or Team Battle.</p></div>'+
           '<div class="team-badge" id="host-mode-badge">'+(S.gameMode==='teams'?'👥 Team Battle':'👤 Individual')+'</div>'+
         '</div>'+
         '<div class="mode-segment">'+
@@ -4292,6 +4477,41 @@ authPromise.then(() => {
       });
     }
 
+    async function setSessionMode(mode){
+      S.sessionMode = mode === 'exam' ? 'exam' : 'live';
+      if(S.sessionMode==='exam') S.gameMode = 'individual';
+
+      $('session-live').classList.toggle('active', S.sessionMode==='live');
+      $('session-exam').classList.toggle('active', S.sessionMode==='exam');
+      $('exam-config').style.display = S.sessionMode==='exam' ? 'block' : 'none';
+      $('host-game-mode-card').style.display = S.sessionMode==='exam' ? 'none' : 'block';
+      $('host-session-badge').textContent = S.sessionMode==='exam' ? '📝 Exam' : '⚡ Live Quiz';
+
+      const startBtn = $('btn-start-quiz');
+      if(startBtn) startBtn.textContent = S.sessionMode==='exam' ? 'Start exam' : 'Start quiz';
+
+      try{
+        await update(ref(db,statePath(S.code)), {
+          sessionMode:S.sessionMode,
+          examDurationMinutes:S.examDurationMinutes,
+          gameMode:S.sessionMode==='exam' ? 'individual' : S.gameMode
+        });
+      }catch(e){ showConnectionBanner('Could not update session mode yet.', false); }
+    }
+
+    $('session-live').onclick = ()=>setSessionMode('live');
+    $('session-exam').onclick = ()=>setSessionMode('exam');
+
+    const examDurationInput = $('exam-duration-minutes');
+    examDurationInput.onchange = async ()=>{
+      const raw = parseInt(examDurationInput.value,10);
+      S.examDurationMinutes = Math.max(1,Math.min(480,Number.isFinite(raw)?raw:30));
+      examDurationInput.value = String(S.examDurationMinutes);
+      try{
+        await update(ref(db,statePath(S.code)), {examDurationMinutes:S.examDurationMinutes});
+      }catch(e){ showConnectionBanner('Could not save exam duration yet.', false); }
+    };
+
     async function setRoomMode(mode){
       S.gameMode = mode === 'teams' ? 'teams' : 'individual';
       if(!S.teams.length) S.teams = defaultTeams(2);
@@ -4307,6 +4527,9 @@ authPromise.then(() => {
         });
       }catch(e){ showConnectionBanner('Could not update game mode yet.', false); }
     }
+
+    const initialStartBtn = $('btn-start-quiz');
+    if(initialStartBtn) initialStartBtn.textContent = S.sessionMode==='exam' ? 'Start exam' : 'Start quiz';
 
     $('mode-individual').onclick = ()=>setRoomMode('individual');
     $('mode-teams').onclick = ()=>setRoomMode('teams');
@@ -5820,12 +6043,14 @@ authPromise.then(() => {
       if(!st) return;
       const playersObj = playersObjRaw || {};
 
-      st.gameMode = S.gameMode === 'teams' ? 'teams' : 'individual';
+      st.sessionMode = S.sessionMode === 'exam' ? 'exam' : 'live';
+      st.examDurationMinutes = Math.max(1,Math.min(480,Number(S.examDurationMinutes)||30));
+      st.gameMode = st.sessionMode==='exam' ? 'individual' : (S.gameMode === 'teams' ? 'teams' : 'individual');
       st.appVersion = APP_VERSION;
       st.teams = normalizeTeams(S.teams, S.teams && S.teams.length ? S.teams.length : 2);
       st.teamCount = st.teams.length;
 
-      if(st.gameMode==='teams'){
+      if(st.sessionMode==='live' && st.gameMode==='teams'){
         const counts={};
         st.teams.forEach(t=>counts[t.id]=0);
         Object.values(playersObj).forEach(p=>{
@@ -5841,17 +6066,46 @@ authPromise.then(() => {
         });
       }
 
-      st.status = 'question';
-      st.currentIndex = 0;
-      st.questionStartedAt = getSyncedTime();
-      st.optionCounts = null;
-      st.totalAnswered = 0;
+      const now = getSyncedTime();
 
-      const updates={};
-      updates[statePath(S.code)] = st;
-      updates[playersPath(S.code)] = playersObj;
-      await fbAtomicUpdate(updates);
-      enterHostQuestion(st);
+      if(st.sessionMode==='exam'){
+        st.status = 'exam';
+        st.currentIndex = -1;
+        st.questionStartedAt = null;
+        st.examStartedAt = now;
+        st.examEndsAt = now + st.examDurationMinutes*60*1000;
+        st.optionCounts = null;
+        st.totalAnswered = 0;
+
+        Object.keys(playersObj).forEach(pid=>{
+          playersObj[pid].score = 0;
+          playersObj[pid].lastPoints = 0;
+          playersObj[pid].lastCorrect = null;
+          delete playersObj[pid].examSubmittedAt;
+          delete playersObj[pid].examAutoSubmitted;
+        });
+
+        const updates={};
+        updates[statePath(S.code)] = st;
+        updates[playersPath(S.code)] = playersObj;
+        updates['rooms/' + S.code + '/answers'] = null;
+        await fbAtomicUpdate(updates);
+        enterHostExam(st);
+      }else{
+        st.status = 'question';
+        st.currentIndex = 0;
+        st.questionStartedAt = now;
+        st.examStartedAt = null;
+        st.examEndsAt = null;
+        st.optionCounts = null;
+        st.totalAnswered = 0;
+
+        const updates={};
+        updates[statePath(S.code)] = st;
+        updates[playersPath(S.code)] = playersObj;
+        await fbAtomicUpdate(updates);
+        enterHostQuestion(st);
+      }
     }catch(e){
       showConnectionBanner('Could not start yet — reconnecting to the room.', false);
       startHostSetupPoll();
@@ -5864,6 +6118,155 @@ authPromise.then(() => {
       clearInterval(S.hostPollHandle);
       hostGoToFinal(st);
     }
+  }
+
+
+  function formatExamClock(ms){
+    const total = Math.max(0,Math.ceil(ms/1000));
+    const h = Math.floor(total/3600);
+    const m = Math.floor((total%3600)/60);
+    const s = total%60;
+    if(h>0) return h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+
+  async function finalizeExam(st, reason='completed'){
+    clearInterval(S.hostTimerHandle);
+    clearInterval(S.hostPollHandle);
+
+    try{
+      const fresh = await fbGetStrict(statePath(S.code));
+      if(!fresh) return;
+      if(fresh.status==='final'){
+        buildHostFinal(fresh, await fetchAllPlayers(S.code));
+        return;
+      }
+      if(fresh.status!=='exam') return;
+
+      const [playersObjRaw, allAnswersRaw] = await Promise.all([
+        fbGetStrict(playersPath(S.code)),
+        fbGetStrict('rooms/'+S.code+'/answers')
+      ]);
+      const playersObj = playersObjRaw || {};
+      const allAnswers = allAnswersRaw || {};
+      const endedAt = getSyncedTime();
+
+      Object.keys(playersObj).forEach(pid=>{
+        const player = playersObj[pid];
+        let totalScore = 0;
+        let answered = 0;
+        let correctCount = 0;
+
+        (fresh.questions||[]).forEach((q,qi)=>{
+          const qAnswers = allAnswers[qi] || {};
+          const a = qAnswers[pid];
+          const submitted = answerSubmitted(a);
+          if(submitted) answered++;
+          const correct = submitted && answerIsCorrect(q,a);
+          if(correct) correctCount++;
+          const base = Number.isFinite(Number(q.points)) ? Number(q.points) : DEFAULT_QUESTION_POINTS;
+          const points = (!q.excluded && correct) ? base : 0;
+          if(a && submitted){
+            a.wasCorrect = correct;
+            a.pointsAwarded = points;
+            qAnswers[pid] = a;
+            allAnswers[qi] = qAnswers;
+          }
+          totalScore += points;
+        });
+
+        player.score = totalScore;
+        player.lastPoints = 0;
+        player.lastCorrect = null;
+        player.examAnsweredCount = answered;
+        player.examCorrectCount = correctCount;
+        if(!player.examSubmittedAt){
+          player.examSubmittedAt = endedAt;
+          player.examAutoSubmitted = reason==='time';
+        }
+      });
+
+      fresh.status = 'final';
+      fresh.examEndedAt = endedAt;
+      fresh.examEndReason = reason;
+      fresh.currentIndex = -1;
+
+      const updates = {};
+      updates[playersPath(S.code)] = playersObj;
+      updates['rooms/'+S.code+'/answers'] = allAnswers;
+      updates[statePath(S.code)] = fresh;
+      await fbAtomicUpdate(updates);
+
+      buildHostFinal(fresh, await fetchAllPlayers(S.code));
+    }catch(e){
+      console.error('exam finalization failed',e);
+      showConnectionBanner('Could not finalize the exam yet — retrying…',false);
+      setTimeout(()=>finalizeExam(st,reason),1800);
+    }
+  }
+
+  function enterHostExam(st){
+    S.hostRevealing = false;
+    const totalQuestions = (st.questions||[]).length;
+    const durationMin = Number(st.examDurationMinutes)||30;
+
+    $('screen-host-question').innerHTML =
+      '<div class="exam-host-shell">'+
+        '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div><div class="team-badge">📝 Exam Mode</div></div>'+
+        '<div class="exam-host-hero">'+
+          '<div><div class="eyebrow">Timed assessment</div><h1>Exam in progress</h1><p>'+totalQuestions+' questions · '+durationMin+' minute'+(durationMin===1?'':'s')+' · no speed bonus</p></div>'+
+          '<div class="exam-clock-card"><span>Time remaining</span><strong id="host-exam-clock">--:--</strong></div>'+
+        '</div>'+
+        '<div class="exam-monitor-grid">'+
+          '<div class="exam-monitor-stat"><span>Students</span><strong id="host-exam-students">0</strong></div>'+
+          '<div class="exam-monitor-stat"><span>Submitted</span><strong id="host-exam-submitted">0</strong></div>'+
+          '<div class="exam-monitor-stat"><span>Answers saved</span><strong id="host-exam-answers">0</strong></div>'+
+          '<div class="exam-monitor-stat"><span>Possible answers</span><strong id="host-exam-possible">0</strong></div>'+
+        '</div>'+
+        '<div class="exam-host-note">Students can move between questions and change saved answers until they submit or the timer reaches zero.</div>'+
+        '<button class="btn btn-danger" id="btn-end-exam-now">End exam & grade now</button>'+
+      '</div>';
+    showScreen('screen-host-question');
+
+    $('btn-end-exam-now').onclick = ()=>{
+      if(confirm('End the exam now? All saved answers will be graded immediately.')) finalizeExam(st,'host');
+    };
+
+    const updateClock = ()=>{
+      const remaining = Number(st.examEndsAt||0) - getSyncedTime();
+      const clock = $('host-exam-clock');
+      if(clock) clock.textContent = formatExamClock(remaining);
+      if(remaining<=0) finalizeExam(st,'time');
+    };
+    updateClock();
+    clearInterval(S.hostTimerHandle);
+    S.hostTimerHandle = setInterval(updateClock,250);
+
+    clearInterval(S.hostPollHandle);
+    S.hostPollHandle = setInterval(async ()=>{
+      const [playersObj,answersRoot,stateNow] = await Promise.all([
+        fbGet(playersPath(S.code)),
+        fbGet('rooms/'+S.code+'/answers'),
+        fbGet(statePath(S.code))
+      ]);
+      if(!stateNow || stateNow.status!=='exam') return;
+
+      const players = playersObj ? Object.values(playersObj) : [];
+      const submitted = players.filter(p=>p.examSubmittedAt).length;
+      let savedAnswers = 0;
+      if(answersRoot){
+        Object.values(answersRoot).forEach(qAnswers=>{
+          if(qAnswers) savedAnswers += Object.values(qAnswers).filter(answerSubmitted).length;
+        });
+      }
+
+      if($('host-exam-students')) $('host-exam-students').textContent = players.length;
+      if($('host-exam-submitted')) $('host-exam-submitted').textContent = submitted;
+      if($('host-exam-answers')) $('host-exam-answers').textContent = savedAnswers;
+      if($('host-exam-possible')) $('host-exam-possible').textContent = players.length * totalQuestions;
+
+      if(players.length>0 && submitted>=players.length) finalizeExam(stateNow,'all-submitted');
+    },1200);
   }
 
   function enterHostQuestion(st){
@@ -6643,13 +7046,17 @@ authPromise.then(() => {
           hostUid: currentUserUid,
           hostControllerId:getHostControllerId(),
           hostControllerUpdatedAt:getSyncedTime(),
-          gameMode:st.gameMode==='teams'?'teams':'individual',
+          sessionMode:'live',
+          examDurationMinutes:Number(st.examDurationMinutes)||30,
+          gameMode:'individual',
           appVersion:APP_VERSION,
           teamCount:nextTeams.length,
           teams:nextTeams,
           questions:[],
           currentIndex:-1,
           questionStartedAt:null,
+          examStartedAt:null,
+          examEndsAt:null,
           optionCounts:null,
           totalAnswered:0,
           createdAt:Date.now()
@@ -6661,6 +7068,8 @@ authPromise.then(() => {
         updates[statePath(code)] = nextState;
         await fbAtomicUpdate(updates);
 
+        S.sessionMode = nextState.sessionMode;
+        S.examDurationMinutes = nextState.examDurationMinutes;
         S.gameMode = nextState.gameMode;
         S.teams = nextState.teams;
       }catch(e){
@@ -6721,7 +7130,7 @@ authPromise.then(() => {
     S.code = code; S.name = name; S.pid = genId(); S.teamId = null;
 
     // In a live Team Battle, late joiners are placed into the smallest team automatically.
-    if(st.gameMode==='teams' && st.status!=='setup'){
+    if((st.sessionMode||'live')==='live' && st.gameMode==='teams' && st.status!=='setup'){
       const existingPlayersObj = await fbGet(playersPath(code)) || {};
       const teams = normalizeTeams(st.teams, st.teamCount);
       const counts={};
@@ -6744,7 +7153,8 @@ authPromise.then(() => {
   }
 
   function buildPlayerLobby(st){
-    const teamMode = st && st.gameMode==='teams';
+    const examMode = st && st.sessionMode==='exam';
+    const teamMode = !examMode && st && st.gameMode==='teams';
     const teams = teamMode ? normalizeTeams(st.teams, st.teamCount) : [];
     if(teamMode && S.teamId && !teams.some(t=>t.id===S.teamId)) S.teamId = null;
 
@@ -6766,7 +7176,8 @@ authPromise.then(() => {
           '<div>'+
             '<div class="eyebrow">You’re in</div>'+
             '<h2 style="font-size:27px;">Hi '+escapeHtml(S.name)+' 👋</h2>'+
-            '<p>Waiting for the host to start the quiz…</p>'+
+            '<p>'+(examMode?'Waiting for the host to start the exam…':'Waiting for the host to start the quiz…')+'</p>'+
+            (examMode?'<div class="exam-lobby-note">📝 One timer will apply to the whole exam. You can move between questions and submit when ready.</div>':'')+
             '<div class="chip" style="margin-top:12px;">Room <span class="code-text">'+S.code+'</span></div>'+
             '<button class="btn btn-ghost" id="player-leave-lobby" style="margin-top:8px;font-size:12px;">Leave this room</button>'+
           '</div>'
@@ -6831,9 +7242,11 @@ authPromise.then(() => {
     const teamKey = st.gameMode==='teams' ? ':'+JSON.stringify(st.teams||[]) : '';
     const currentQ = st.questions && st.currentIndex>=0 ? st.questions[st.currentIndex] : null;
     const mediaKey = currentQ ? ':'+(currentQ.imageUrl||'')+':'+normalizedQuestionType(currentQ) : '';
-    const phaseKey = st.status + ':' + st.currentIndex + ':' + (st.gameMode||'individual') + teamKey + mediaKey + ':'+(st.appVersion||'');
+    const phaseKey = st.status + ':' + st.currentIndex + ':' + (st.gameMode||'individual') + ':'+(st.sessionMode||'live') + ':'+(st.examEndsAt||'') + teamKey + mediaKey + ':'+(st.appVersion||'');
     if(st.status==='setup'){
       if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; buildPlayerLobby(st); }
+    } else if(st.status==='exam'){
+      if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerExam(st); }
     } else if(st.status==='question'){
       if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerQuestion(st); }
     } else if(st.status==='reveal'){
@@ -6843,6 +7256,206 @@ authPromise.then(() => {
     } else if(st.status==='final'){
       if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerFinal(); }
     }
+  }
+
+
+  async function submitExamForPlayer(st, auto=false){
+    clearInterval(S.playerTimerHandle);
+    try{
+      const player = await fbGetStrict(playerPath(S.code,S.pid));
+      if(!player) return;
+      if(!player.examSubmittedAt){
+        player.examSubmittedAt = getSyncedTime();
+        player.examAutoSubmitted = !!auto;
+        await fbSet(playerPath(S.code,S.pid),player);
+      }
+      showPlayerExamSubmitted(st,auto);
+    }catch(e){
+      showConnectionBanner('Your answers are saved, but submission is retrying…',false);
+      setTimeout(()=>submitExamForPlayer(st,auto),1200);
+    }
+  }
+
+  function showPlayerExamSubmitted(st,auto=false){
+    clearInterval(S.playerTimerHandle);
+    $('screen-player-question').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="exam-submitted-card">'+
+          '<div class="exam-submitted-icon">✓</div>'+
+          '<div class="eyebrow">Exam submitted</div>'+
+          '<h2>'+(auto?'Time is up':'Your answers are saved')+'</h2>'+
+          '<p>'+(auto?'QZMAX submitted your saved answers automatically.':'Your exam has been submitted successfully.')+'</p>'+
+          '<div class="chip">Room <span class="code-text">'+S.code+'</span></div>'+
+          '<p style="margin-top:14px;">Waiting for the exam to close and results to be released…</p>'+
+        '</div>'+
+      '</div>';
+    showScreen('screen-player-question');
+  }
+
+  async function enterPlayerExam(st){
+    clearInterval(S.playerTimerHandle);
+    const [allAnswersRaw,currentPlayer] = await Promise.all([
+      fbGet('rooms/'+S.code+'/answers'),
+      fbGet(playerPath(S.code,S.pid))
+    ]);
+
+    if(currentPlayer && currentPlayer.examSubmittedAt){
+      showPlayerExamSubmitted(st,!!currentPlayer.examAutoSubmitted);
+      return;
+    }
+
+    const allAnswers = allAnswersRaw || {};
+    const questions = st.questions || [];
+    if(!questions.length) return;
+    S.examQuestionIndex = Math.max(0,Math.min(questions.length-1,Number(S.examQuestionIndex)||0));
+
+    const playerAnswers = {};
+    questions.forEach((q,qi)=>{
+      const a = allAnswers[qi] && allAnswers[qi][S.pid];
+      if(a) playerAnswers[qi] = a;
+    });
+
+    const countAnswered = ()=>Object.values(playerAnswers).filter(answerSubmitted).length;
+
+    const renderExamQuestion = (qi)=>{
+      S.examQuestionIndex = Math.max(0,Math.min(questions.length-1,qi));
+      const q = questions[S.examQuestionIndex];
+      const type = normalizedQuestionType(q);
+      const existing = playerAnswers[S.examQuestionIndex] || null;
+      const answeredCount = countAnswered();
+      const selectedSet = new Set(
+        type==='multiple_correct' && existing && Array.isArray(existing.answerIndexes)
+          ? existing.answerIndexes.map(Number) : []
+      );
+
+      let answerHtml = '';
+      if(type==='typed'){
+        answerHtml =
+          '<div class="typed-player-box exam-typed-box">'+
+            '<input type="text" id="exam-typed-input" maxlength="120" autocomplete="off" placeholder="Type your answer..." value="'+escapeHtml(existing&&existing.answerText?existing.answerText:'')+'">'+
+            '<button class="btn btn-primary" id="exam-save-typed">Save answer</button>'+
+          '</div>';
+      }else{
+        answerHtml =
+          '<div class="live-answer-grid exam-answer-grid">'+
+            (q.options||[]).map((o,i)=>{
+              const selected = type==='multiple_correct'
+                ? selectedSet.has(i)
+                : !!(existing && existing.answerIndex===i);
+              return '<div class="live-answer opt-card'+(selected?' selected':'')+'" data-i="'+i+'"><span class="opt-letter">'+String.fromCharCode(65+i)+'</span><span class="live-answer-text">'+escapeHtml(o)+'</span></div>';
+            }).join('')+
+          (type==='multiple_correct'
+            ? '<div class="multi-cue">Select every answer you believe is correct. Changes save automatically.</div>'
+            : '');
+      }
+
+      const palette = questions.map((qq,i)=>
+        '<button class="exam-palette-btn'+(i===S.examQuestionIndex?' current':'')+(answerSubmitted(playerAnswers[i])?' answered':'')+'" data-exam-q="'+i+'">'+(i+1)+'</button>'
+      ).join('');
+
+      $('screen-player-question').innerHTML =
+        '<div class="exam-player-shell">'+
+          '<div class="exam-player-top">'+
+            '<div><div class="eyebrow">📝 Exam Mode</div><strong>Question '+(S.examQuestionIndex+1)+' of '+questions.length+'</strong></div>'+
+            '<div class="exam-player-progress"><span>'+answeredCount+' answered</span><div class="live-progress"><span style="width:'+Math.round((answeredCount/questions.length)*100)+'%;"></span></div></div>'+
+            '<div class="exam-clock-card compact"><span>Time remaining</span><strong id="player-exam-clock">--:--</strong></div>'+
+          '</div>'+
+          '<div class="exam-player-layout">'+
+            '<div class="exam-question-card">'+
+              '<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;"><span class="qtype-pill">'+questionTypeLabel(q)+'</span><span class="live-micro-pill">'+Number(q.points||DEFAULT_QUESTION_POINTS)+' pts</span></div>'+
+              '<h2 class="live-question-text">'+escapeHtml(q.q)+'</h2>'+
+              questionMediaHtml(q)+
+              answerHtml+
+              '<div class="exam-save-status" id="exam-save-status">'+(answerSubmitted(existing)?'✓ Answer saved':'Choose or enter your answer')+'</div>'+
+              '<div class="exam-nav">'+
+                '<button class="btn btn-ghost" id="exam-prev" '+(S.examQuestionIndex===0?'disabled':'')+'>← Previous</button>'+
+                '<button class="btn btn-ghost" id="exam-next" '+(S.examQuestionIndex===questions.length-1?'disabled':'')+'>Next →</button>'+
+              '</div>'+
+            '</div>'+
+            '<div class="exam-side-panel">'+
+              '<div class="exam-side-head"><strong>Questions</strong><span>'+answeredCount+'/'+questions.length+'</span></div>'+
+              '<div class="exam-palette">'+palette+'</div>'+
+              '<button class="btn btn-primary btn-block" id="exam-submit-all">Submit exam</button>'+
+              '<p>Answers can be changed until you submit or time expires.</p>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+      showScreen('screen-player-question');
+
+      const saveStatus = msg=>{
+        const el=$('exam-save-status');
+        if(el) el.textContent=msg;
+      };
+
+      if(type==='typed'){
+        $('exam-save-typed').onclick = async ()=>{
+          const val=$('exam-typed-input').value.trim();
+          if(!val){
+            delete playerAnswers[S.examQuestionIndex];
+            await fbDelete(answerPath(S.code,S.examQuestionIndex,S.pid));
+            saveStatus('Answer cleared');
+          }else{
+            const data={pid:S.pid,answerText:val,savedAt:getSyncedTime(),exam:true};
+            playerAnswers[S.examQuestionIndex]=data;
+            await fbSet(answerPath(S.code,S.examQuestionIndex,S.pid),data);
+            saveStatus('✓ Answer saved');
+          }
+          renderExamQuestion(S.examQuestionIndex);
+        };
+      }else if(type==='multiple_correct'){
+        document.querySelectorAll('#screen-player-question .opt-card').forEach(card=>{
+          card.onclick = async ()=>{
+            const i=parseInt(card.dataset.i,10);
+            if(selectedSet.has(i)) selectedSet.delete(i); else selectedSet.add(i);
+            if(selectedSet.size){
+              const data={pid:S.pid,answerIndexes:[...selectedSet].sort((a,b)=>a-b),savedAt:getSyncedTime(),exam:true};
+              playerAnswers[S.examQuestionIndex]=data;
+              await fbSet(answerPath(S.code,S.examQuestionIndex,S.pid),data);
+            }else{
+              delete playerAnswers[S.examQuestionIndex];
+              await fbDelete(answerPath(S.code,S.examQuestionIndex,S.pid));
+            }
+            renderExamQuestion(S.examQuestionIndex);
+          };
+        });
+      }else{
+        document.querySelectorAll('#screen-player-question .opt-card').forEach(card=>{
+          card.onclick = async ()=>{
+            const i=parseInt(card.dataset.i,10);
+            const data={pid:S.pid,answerIndex:i,savedAt:getSyncedTime(),exam:true};
+            playerAnswers[S.examQuestionIndex]=data;
+            await fbSet(answerPath(S.code,S.examQuestionIndex,S.pid),data);
+            renderExamQuestion(S.examQuestionIndex);
+          };
+        });
+      }
+
+      $('exam-prev').onclick=()=>renderExamQuestion(S.examQuestionIndex-1);
+      $('exam-next').onclick=()=>renderExamQuestion(S.examQuestionIndex+1);
+      document.querySelectorAll('[data-exam-q]').forEach(btn=>{
+        btn.onclick=()=>renderExamQuestion(parseInt(btn.dataset.examQ,10));
+      });
+      $('exam-submit-all').onclick=()=>{
+        const answered=countAnswered();
+        const missing=questions.length-answered;
+        const text=missing
+          ? 'Submit now? You still have '+missing+' unanswered question'+(missing===1?'':'s')+'.'
+          : 'Submit your exam now? You will not be able to change answers after submitting.';
+        if(confirm(text)) submitExamForPlayer(st,false);
+      };
+
+      const updatePlayerExamClock=()=>{
+        const remaining=Number(st.examEndsAt||0)-getSyncedTime();
+        const el=$('player-exam-clock');
+        if(el) el.textContent=formatExamClock(remaining);
+        if(remaining<=0) submitExamForPlayer(st,true);
+      };
+      updatePlayerExamClock();
+      clearInterval(S.playerTimerHandle);
+      S.playerTimerHandle=setInterval(updatePlayerExamClock,250);
+    };
+
+    renderExamQuestion(S.examQuestionIndex);
   }
 
   async function enterPlayerQuestion(st){
@@ -7107,8 +7720,8 @@ authPromise.then(() => {
       const myRank = players.findIndex(p=>p.id===S.pid)+1;
       $('screen-player-final').innerHTML =
         '<div class="center-stage">'+
-          '<div class="eyebrow">Final results</div>'+
-          '<h1 style="font-size:33px;">'+(myRank===1?'You won! 🏆':'You finished #'+myRank)+'</h1>'+
+          '<div class="eyebrow">'+(st&&st.sessionMode==='exam'?'Exam results':'Final results')+'</div>'+
+          '<h1 style="font-size:33px;">'+(st&&st.sessionMode==='exam' ? ('You scored '+(me?me.score:0)+' points') : (myRank===1?'You won! 🏆':'You finished #'+myRank))+'</h1>'+
           '<div class="chip">Your score: '+(me?me.score:0)+'</div>'+
           '<div style="display:flex; flex-direction:column; gap:8px; width:100%; max-width:420px;">'+
             players.slice(0,5).map((p,i)=>'<div class="lb-row'+(p.id===S.pid?' me':'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+escapeHtml(p.name)+'</span><span class="lb-score">'+p.score+'</span></div>').join('')+
