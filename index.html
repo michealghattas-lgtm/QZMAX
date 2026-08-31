@@ -2787,6 +2787,34 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
   display:none !important;
 }
 
+
+/* ===== QZMAX 3.12.1 — Host workspace home background ===== */
+.host-dashboard{
+  position:relative;
+  isolation:isolate;
+}
+.host-dashboard::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(4,7,17,.76),rgba(4,7,17,.88)),
+    url("assets/background-home.png") center center / cover no-repeat;
+}
+#screen-host-setup{
+  background:
+    linear-gradient(180deg,rgba(4,7,17,.74),rgba(4,7,17,.88)),
+    url("assets/background-home.png") center center / cover fixed no-repeat !important;
+}
+#screen-host-setup .card,
+#screen-host-setup .mode-card,
+#screen-host-setup .host-workspace-header{
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+
 </style>
 </head>
 <body>
@@ -2808,7 +2836,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.12.0";
+  const APP_VERSION = "3.12.1";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4373,7 +4401,7 @@ authPromise.then(() => {
         '</div>'+
 
         '<div id="ai-source-panel-trusted" class="ai-source-panel">'+
-          '<div class="ai-source-notice trusted ai-first-notice"><strong>AI-first • Search-capable</strong><span>Your exact topic is routed through free AI providers. QZMAX can use Gemini + Google Search or Groq web search for current/niche topics, and no longer uses Wikipedia by default.</span></div>'+
+          '<div class="ai-source-notice trusted ai-first-notice"><strong>Web evidence first • Verified AI</strong><span>QZMAX searches the exact topic, generates only from retrieved evidence, then runs a second-model factual verification gate. Unsupported questions are rejected instead of entering the queue.</span></div>'+
           '<div style="display:flex; justify-content:space-between; align-items:center; margin:13px 0 8px;">'+
             '<div class="eyebrow" id="ai-mode-title">Custom Topic</div>'+
             '<button id="ai-mode-toggle" type="button" class="ai-text-link">Switch to School Exam Mode</button>'+
@@ -4424,8 +4452,8 @@ authPromise.then(() => {
           '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate with Free Multi-AI</button>'+
           '<div class="ai-progress-shell" id="ai-progress-shell" style="display:none;"><div class="ai-progress-bar"><span id="ai-progress-fill"></span></div><div class="ai-progress-label" id="ai-progress-label">Preparing…</div></div>'+
           '<div class="err-msg" id="ai-msg"></div>'+
-          '<div class="verification-legend"><span><b class="verify-dot review"></b> AI • Review</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot source"></b> Search-capable routes</span></div>'+
-          '<div class="accuracy-note"><strong>Accuracy note:</strong> QZMAX checks topic fidelity, structure and duplicates and can switch across multiple free AI routes. Host review remains the final safeguard for AI-generated content.</div>'+
+          '<div class="verification-legend"><span><b class="verify-dot source"></b> Web Verified</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
+          '<div class="accuracy-note"><strong>Accuracy safeguard:</strong> Custom Topic questions must pass web-evidence citation checks and an independent second-model answer check before entering the queue. QZMAX rejects unsupported questions rather than guessing.</div>'+
         '</div>'+
       '</div>'+
 
@@ -4921,7 +4949,10 @@ authPromise.then(() => {
 
         setAIProgress(100, 'Complete');
         msg.style.color = 'var(--correct)';
-        const groundedLabel = aiSourceMode==='document'
+        const allWebVerified = generated.length>0 && generated.every(q=>q&&q.aiMeta&&q.aiMeta.label==='Web Verified');
+        const groundedLabel = allWebVerified
+          ? 'web-verified'
+          : aiSourceMode==='document'
           ? 'document-grounded'
           : sourceType==='trusted'
           ? 'source-grounded'
@@ -5523,6 +5554,16 @@ authPromise.then(() => {
   }
 
   function getAIQuestionVerificationMeta(sourceType,sourceName,sourceUrls,item){
+    if(item && item.webVerified){
+      return {
+        kind:'source',
+        label:'Web Verified',
+        sourceName:item.sourceTitle||'Verified web evidence',
+        sourceUrls:item.sourceUrl ? [item.sourceUrl] : [],
+        evidence:typeof item.sourceEvidence==='string' ? item.sourceEvidence.slice(0,500) : '',
+        verificationProvider:item.verificationProvider||''
+      };
+    }
     if(sourceType==='document'){
       return {
         kind:'document',
@@ -5738,6 +5779,7 @@ authPromise.then(() => {
 
     const routedProvider = res.headers.get('X-QZMAX-AI-Provider') || '';
     const routedModel = res.headers.get('X-QZMAX-AI-Model') || '';
+    const routedVerification = res.headers.get('X-QZMAX-AI-Verification') || '';
     let items;
     try{ items = await res.json(); }catch(e){ throw new Error('Could not read the AI server response.'); }
     if(!res.ok) throw new Error(items.error || 'Server error generating questions.');
@@ -5761,7 +5803,8 @@ authPromise.then(() => {
           ...getAIQuestionVerificationMeta(context.sourceType,context.sourceName,context.sourceUrls,item),
           language:questionLanguage,
           provider:routedProvider,
-          model:routedModel
+          model:routedModel,
+          verification:routedVerification
         }
       };
 
