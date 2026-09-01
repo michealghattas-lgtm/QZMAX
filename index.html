@@ -2836,7 +2836,7 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.12.1";
+  const APP_VERSION = "3.12.3";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4401,7 +4401,7 @@ authPromise.then(() => {
         '</div>'+
 
         '<div id="ai-source-panel-trusted" class="ai-source-panel">'+
-          '<div class="ai-source-notice trusted ai-first-notice"><strong>Web evidence first • Verified AI</strong><span>QZMAX searches the exact topic, generates only from retrieved evidence, then runs a second-model factual verification gate. Unsupported questions are rejected instead of entering the queue.</span></div>'+
+          '<div class="ai-source-notice trusted ai-first-notice"><strong>Blind fact check • Two-source evidence</strong><span>QZMAX searches the topic to draft questions, then performs a fresh search for every individual question. A blind verifier must solve it independently and cite two different websites before it can enter the queue.</span></div>'+
           '<div style="display:flex; justify-content:space-between; align-items:center; margin:13px 0 8px;">'+
             '<div class="eyebrow" id="ai-mode-title">Custom Topic</div>'+
             '<button id="ai-mode-toggle" type="button" class="ai-text-link">Switch to School Exam Mode</button>'+
@@ -4452,8 +4452,8 @@ authPromise.then(() => {
           '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate with Free Multi-AI</button>'+
           '<div class="ai-progress-shell" id="ai-progress-shell" style="display:none;"><div class="ai-progress-bar"><span id="ai-progress-fill"></span></div><div class="ai-progress-label" id="ai-progress-label">Preparing…</div></div>'+
           '<div class="err-msg" id="ai-msg"></div>'+
-          '<div class="verification-legend"><span><b class="verify-dot source"></b> Web Verified</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
-          '<div class="accuracy-note"><strong>Accuracy safeguard:</strong> Custom Topic questions must pass web-evidence citation checks and an independent second-model answer check before entering the queue. QZMAX rejects unsupported questions rather than guessing.</div>'+
+          '<div class="verification-legend"><span><b class="verify-dot source"></b> 2-Source Checked</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
+          '<div class="accuracy-note"><strong>Accuracy safeguard:</strong> Custom Topic questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.</div>'+
         '</div>'+
       '</div>'+
 
@@ -4794,57 +4794,6 @@ authPromise.then(() => {
       ].join(' ');
     }
 
-    function isBroadCustomInstruction(topic){
-      const t = String(topic||'').trim();
-      if(!t) return false;
-      const separators = (t.match(/[,،;\n]/g)||[]).length;
-      const instructionWords = /generate|create|questions|topics|following|below|عن|اسئلة|أسئلة|المواضيع|الموضوع/i.test(t);
-      const mixedArabic = /[\u0600-\u06FF]/.test(t);
-      return t.length > 150 || separators >= 5 || (instructionWords && (separators >= 2 || mixedArabic));
-    }
-
-    function buildTrustedSearchQueries(topic){
-      const raw = String(topic||'').replace(/\s+/g,' ').trim();
-      const queries = [];
-      const add = q=>{
-        q = String(q||'').replace(/\s+/g,' ').trim();
-        if(q && !queries.some(x=>x.toLowerCase()===q.toLowerCase())) queries.push(q);
-      };
-
-      add(raw.slice(0,180));
-
-      const egypt = /\begypt\b|مصر|المصر|المصرية|egyptian/i.test(raw);
-      const modern = /2000|2001|2002|2003|2004|2005|2006|2007|2008|2009|2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025|2026|till now|until now|present|الان|الآن/i.test(raw);
-
-      if(egypt){
-        add(modern ? 'Egypt in the 21st century' : 'Egypt');
-        if(/افلام|أفلام|مسلسلات|اغاني|أغاني|برامج|افيهات|أفيهات|فن|cinema|film|television|music|song/i.test(raw)){
-          add('Cinema of Egypt television in Egypt music of Egypt');
-        }
-        if(/سياس|ثقاف|politic|culture/i.test(raw)){
-          add('Politics of Egypt culture of Egypt 21st century');
-        }
-        if(/جغرف|تاريخ|علم|geograph|history|science/i.test(raw)){
-          add('History of Egypt geography of Egypt science and technology in Egypt');
-        }
-      }
-
-      const mappings = [
-        [/افلام|أفلام/i,'Egyptian cinema'],
-        [/مسلسلات/i,'Egyptian television series'],
-        [/اغاني|أغاني|كلمات اغاني|كلمات أغاني/i,'Egyptian music'],
-        [/برامج تلفزيونية|برامج/i,'Television in Egypt'],
-        [/سياسه|سياسة/i,'Politics of Egypt'],
-        [/ثقافة|ثقافه/i,'Culture of Egypt'],
-        [/جغرفيا|جغرافيا/i,'Geography of Egypt'],
-        [/تاريخ/i,'History of Egypt'],
-        [/علم/i,'Science and technology in Egypt']
-      ];
-      mappings.forEach(([rx,q])=>{ if(rx.test(raw)) add(q); });
-
-      return queries.slice(0,6);
-    }
-
     $('ai-generate').onclick = async ()=>{
       let topic = '';
       let sourceText = '';
@@ -4880,6 +4829,7 @@ authPromise.then(() => {
         }
       }
 
+      const generationId = newGenerationId();
       const count = Math.max(1, Math.min(100, parseInt($('ai-count').value,10) || 10));
       $('ai-count').value = String(count);
       const questionLanguage = $('ai-language') ? $('ai-language').value : 'English';
@@ -4932,6 +4882,7 @@ authPromise.then(() => {
           questionLanguage,
           timePerQuestion,
           pointsPerQuestion,
+          generationId,
           existingQuestions:S.questionsDraft,
           onProgress:(done,total,label)=>{
             const pct = Math.min(96, 8 + Math.round((done/Math.max(1,total))*88));
@@ -4949,7 +4900,7 @@ authPromise.then(() => {
 
         setAIProgress(100, 'Complete');
         msg.style.color = 'var(--correct)';
-        const allWebVerified = generated.length>0 && generated.every(q=>q&&q.aiMeta&&q.aiMeta.label==='Web Verified');
+        const allWebVerified = generated.length>0 && generated.every(q=>q&&q.aiMeta&&q.aiMeta.label==='2-Source Checked');
         const groundedLabel = allWebVerified
           ? 'web-verified'
           : aiSourceMode==='document'
@@ -5305,6 +5256,147 @@ authPromise.then(() => {
     ].join(' ');
   }
 
+
+  const GENERAL_KNOWLEDGE_CATEGORIES = [
+    'Geography',
+    'Science & Nature',
+    'World History',
+    'Arts & Culture',
+    'Technology & Inventions',
+    'Sport',
+    'Nature & Environment',
+    'Human Body & Health',
+    'Literature & Language',
+    'World Society & Everyday Knowledge'
+  ];
+
+  function normalizedTopicKey(text){
+    return String(text||'')
+      .normalize('NFKC')
+      .toLocaleLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+
+  function isGeneralKnowledgeTopic(topic){
+    const t = normalizedTopicKey(topic);
+    return /\bgeneral knowledge\b/.test(t) ||
+      /(?:^|\s)(?:معلومات عامة|معلومات عامه)(?:\s|$)/u.test(t);
+  }
+
+  function topicDifficultyLabel(topic){
+    const t = normalizedTopicKey(topic);
+    if(/\bhard\b|\bdifficult\b|\bexpert\b|صعب/u.test(t)) return 'Hard';
+    if(/\beasy\b|\bbeginner\b|سهل/u.test(t)) return 'Easy';
+    return 'Medium';
+  }
+
+  function buildGenerationScope(topic,count,attempt=0){
+    if(!isGeneralKnowledgeTopic(topic)){
+      return {
+        generalKnowledge:false,
+        coverageCategories:[],
+        instruction:[
+          'HOST SCOPE CONTRACT: '+String(topic||'').trim(),
+          'Generate only questions that directly belong to this host-requested scope.',
+          'Do not import themes, entities, examples, or subject matter from any previous quiz generation.'
+        ].join(' ')
+      };
+    }
+
+    const difficulty = topicDifficultyLabel(topic);
+    const categories = GENERAL_KNOWLEDGE_CATEGORIES.slice();
+    const shift = Math.abs(Number(attempt)||0) % categories.length;
+    const rotated = categories.slice(shift).concat(categories.slice(0,shift));
+    const selected = rotated.slice(0,Math.min(Math.max(1,count),categories.length));
+
+    return {
+      generalKnowledge:true,
+      coverageCategories:selected,
+      instruction:[
+        'GENERAL KNOWLEDGE COVERAGE CONTRACT.',
+        'Difficulty: '+difficulty+'.',
+        'Use a broad worldwide mix rather than concentrating on one country, celebrity, film, music scene, franchise, era, or industry.',
+        'For this batch use these categories: '+selected.join(' | ')+'.',
+        'Include a JSON field named category on every question, using exactly one of those category labels.',
+        'Use every listed category once before repeating any category.',
+        'Do not generate more than one question about the same person, work, franchise, team, country-specific entertainment scene, or underlying fact in this batch.',
+        'Questions must feel like a balanced general-knowledge quiz at '+difficulty.toLowerCase()+' difficulty.'
+      ].join(' ')
+    };
+  }
+
+  function correctAnswerFingerprint(q){
+    if(!q || !Array.isArray(q.options)) return '';
+    if(q.type==='multiple_correct' && Array.isArray(q.correctIndexes)){
+      return q.correctIndexes
+        .map(i=>q.options[i])
+        .filter(v=>v!=null)
+        .map(normalizeQuestionFingerprint)
+        .sort()
+        .join('|');
+    }
+    const idx = Number(q.correct);
+    return Number.isInteger(idx) && q.options[idx]!=null
+      ? normalizeQuestionFingerprint(q.options[idx])
+      : '';
+  }
+
+  function canonicalFactKey(q){
+    const stored = q && q.aiMeta && q.aiMeta.factKey;
+    if(stored) return normalizedTopicKey(stored);
+    const stem = normalizeQuestionFingerprint(q && q.q);
+    const answer = correctAnswerFingerprint(q);
+    return [stem,answer].filter(Boolean).join('|');
+  }
+
+  function sameRequestedTopic(q,topic){
+    const previous = q && q.aiMeta && q.aiMeta.requestedTopic;
+    if(!previous) return false;
+    return normalizedTopicKey(previous) === normalizedTopicKey(topic);
+  }
+
+  function sameTopicFactKeys(existing,topic){
+    const out = [];
+    for(const q of Array.isArray(existing)?existing:[]){
+      if(!sameRequestedTopic(q,topic)) continue;
+      const key = canonicalFactKey(q);
+      if(key && !out.includes(key)) out.push(key);
+    }
+    return out.slice(-80);
+  }
+
+  function isDuplicateGeneratedQuestion(candidate,existing){
+    const candidateFact = canonicalFactKey(candidate);
+    const candidateAnswer = correctAnswerFingerprint(candidate);
+
+    return (Array.isArray(existing)?existing:[]).some(q=>{
+      if(!q) return false;
+
+      const existingFact = canonicalFactKey(q);
+      if(candidateFact && existingFact && candidateFact===existingFact) return true;
+
+      const sim = questionSimilarity(candidate.q,q.q);
+      if(sim >= .72) return true;
+
+      const existingAnswer = correctAnswerFingerprint(q);
+      if(candidateAnswer && existingAnswer && candidateAnswer===existingAnswer && sim >= .48) return true;
+
+      const cEvidence = normalizedTopicKey(candidate?.aiMeta?.evidence||'');
+      const eEvidence = normalizedTopicKey(q?.aiMeta?.evidence||'');
+      if(candidateAnswer && candidateAnswer===existingAnswer &&
+         cEvidence.length>24 && eEvidence.length>24 &&
+         (cEvidence.includes(eEvidence) || eEvidence.includes(cEvidence))) return true;
+
+      return false;
+    });
+  }
+
+  function newGenerationId(){
+    return 'gen_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
+  }
+
   function normalizeQuestionFingerprint(text){
     return String(text||'')
       .normalize('NFKC')
@@ -5392,100 +5484,6 @@ authPromise.then(() => {
   }
 
 
-  function buildTrustedSearchQueries(topic){
-    const raw = String(topic||'').replace(/\s+/g,' ').trim();
-    const queries = [];
-    const add = q=>{
-      q = String(q||'').replace(/\s+/g,' ').trim();
-      if(q && !queries.some(x=>x.toLowerCase()===q.toLowerCase())) queries.push(q);
-    };
-
-    // Always include a compact version of the host's exact topic.
-    add(raw.slice(0,180));
-
-    const egypt = /\begypt\b|مصر|المصر|المصرية|egyptian/i.test(raw);
-    const modern = /2000|2001|2002|2003|2004|2005|2006|2007|2008|2009|2010|2011|2012|2013|2014|2015|2016|2017|2018|2019|2020|2021|2022|2023|2024|2025|2026|till now|until now|present|الان|الآن/i.test(raw);
-
-    if(egypt){
-      add(modern ? 'Egypt in the 21st century' : 'Egypt');
-      if(/افلام|أفلام|مسلسلات|اغاني|أغاني|برامج|افيهات|أفيهات|فن|cinema|film|television|music|song/i.test(raw)){
-        add('Cinema of Egypt television in Egypt music of Egypt');
-      }
-      if(/سياس|ثقاف|politic|culture/i.test(raw)){
-        add('Politics of Egypt culture of Egypt 21st century');
-      }
-      if(/جغرف|تاريخ|علم|geograph|history|science/i.test(raw)){
-        add('History of Egypt geography of Egypt science and technology in Egypt');
-      }
-    }
-
-    const mappings = [
-      [/افلام|أفلام/i,'Egyptian cinema'],
-      [/مسلسلات/i,'Egyptian television series'],
-      [/اغاني|أغاني|كلمات اغاني|كلمات أغاني/i,'Egyptian music'],
-      [/برامج تلفزيونية|برامج/i,'Television in Egypt'],
-      [/سياسه|سياسة/i,'Politics of Egypt'],
-      [/ثقافة|ثقافه/i,'Culture of Egypt'],
-      [/جغرفيا|جغرافيا/i,'Geography of Egypt'],
-      [/تاريخ/i,'History of Egypt'],
-      [/علم/i,'Science and technology in Egypt']
-    ];
-    mappings.forEach(([rx,q])=>{ if(rx.test(raw)) add(q); });
-
-    return queries.slice(0,6);
-  }
-
-  async function fetchTrustedKnowledge(topic){
-    const endpoint = 'https://en.wikipedia.org/w/api.php';
-    const queries = buildTrustedSearchQueries(topic);
-    const titleMap = new Map();
-
-    try{
-      const searchResults = await Promise.all(queries.map(async query=>{
-        const searchUrl = endpoint+'?action=query&list=search&format=json&origin=*&srlimit=4&srsearch='+encodeURIComponent(query);
-        const r = await fetch(searchUrl);
-        if(!r.ok) return [];
-        const data = await r.json();
-        return data && data.query && Array.isArray(data.query.search) ? data.query.search : [];
-      }));
-
-      searchResults.flat().forEach(hit=>{
-        if(hit && hit.title && !titleMap.has(hit.title)) titleMap.set(hit.title,hit);
-      });
-    }catch(e){
-      throw new Error('Trusted knowledge lookup could not reach Wikipedia. Check your connection and try again.');
-    }
-
-    const titles = [...titleMap.keys()].slice(0,14);
-    if(!titles.length) return {text:'',sources:[],label:'Wikipedia reference material'};
-
-    const extractUrl = endpoint+'?action=query&prop=extracts&explaintext=1&redirects=1&format=json&origin=*&titles='+encodeURIComponent(titles.join('|'));
-    let data;
-    try{
-      const r2 = await fetch(extractUrl);
-      if(!r2.ok) throw new Error();
-      data = await r2.json();
-    }catch(e){
-      return {text:'',sources:[],label:'Wikipedia reference material'};
-    }
-
-    const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : [];
-    const parts = [];
-    const sources = [];
-
-    pages.forEach(page=>{
-      if(!page || !page.extract) return;
-      parts.push('SOURCE ARTICLE: '+page.title+'\n'+cleanSourceText(page.extract));
-      sources.push('https://en.wikipedia.org/wiki/'+encodeURIComponent(String(page.title).replace(/ /g,'_')));
-    });
-
-    return {
-      text:parts.join('\n\n---\n\n').slice(0,90000),
-      sources,
-      label:'Wikipedia · '+titles.slice(0,4).join(', ')
-    };
-  }
-
   function selectSourceExcerpt(sourceText, topic, batchNumber, maxChars=15000){
     const text = cleanSourceText(sourceText);
     if(text.length <= maxChars) return text;
@@ -5557,10 +5555,14 @@ authPromise.then(() => {
     if(item && item.webVerified){
       return {
         kind:'source',
-        label:'Web Verified',
-        sourceName:item.sourceTitle||'Verified web evidence',
-        sourceUrls:item.sourceUrl ? [item.sourceUrl] : [],
-        evidence:typeof item.sourceEvidence==='string' ? item.sourceEvidence.slice(0,500) : '',
+        label:'2-Source Checked',
+        sourceName:Array.isArray(item.sourceTitles) && item.sourceTitles.length
+          ? item.sourceTitles.slice(0,2).join(' • ')
+          : (item.sourceTitle||'Two independent web sources'),
+        sourceUrls:Array.isArray(item.sourceUrls) && item.sourceUrls.length
+          ? item.sourceUrls.slice(0,2)
+          : (item.sourceUrl ? [item.sourceUrl] : []),
+        evidence:typeof item.sourceEvidence==='string' ? item.sourceEvidence.slice(0,900) : '',
         verificationProvider:item.verificationProvider||''
       };
     }
@@ -5677,7 +5679,9 @@ authPromise.then(() => {
       : DEFAULT_QUESTION_POINTS;
     const formatInstruction = aiFormatInstruction(requestedType, optsPerQ, questionLanguage);
     const existing = Array.isArray(context.existingQuestions) ? context.existingQuestions : [];
-    const existingStems = existing.slice(-70).map((q,i)=>(i+1)+'. '+(typeof q==='string'?q:(q.q||''))).filter(Boolean);
+    const generationAttempt = Math.max(0,Number(context.generationAttempt)||0);
+    const generationScope = buildGenerationScope(topic,count,generationAttempt);
+    const avoidFactKeys = sameTopicFactKeys(existing,topic);
     const sourceExcerpt = context.sourceExcerpt || '';
     const languageInstruction = questionLanguage === 'Egyptian Simple Arabic'
       ? [
@@ -5728,26 +5732,31 @@ authPromise.then(() => {
       ? 'YEAR-LEVEL ACCURACY RULE: Follow the school-year and subject instructions exactly. Test the student\'s subject knowledge directly. Do not drift into meta-questions about education, assessment systems, curriculum administration or teaching.'
       : context.sourceType==='ai'
       ? [
-          'CRITICAL TOPIC-FIDELITY RULE: Treat the host\'s Topic / Instructions field as the exact scope of the quiz.',
-          'Every question must directly satisfy the named subject, country/place, category, people and time period in the host request.',
-          'Do NOT broaden into adjacent general knowledge merely because it shares a country, century, industry or keyword.',
-          'Example: if the host asks for Egyptian movies, TV series and songs after 2000, every question must be about Egyptian cinema, Egyptian TV/series, Egyptian music/songs/artists/albums, or another category explicitly requested, and must respect the after-2000 timeframe.',
-          'Do not create unrelated questions about world events, science, education, economics, politics or geography unless the host explicitly requested those categories.',
-          'Use widely established facts. For recent, niche or entertainment facts, use live search grounding when the selected route supports it.',
-          'For copyrighted lyrics, movie dialogue and catchphrases, use only a very short excerpt or ask about identification, attribution or context rather than reproducing long text.'
+          'CRITICAL TOPIC-FIDELITY RULE: The current host Topic / Instructions field is the only subject scope for this generation.',
+          'Do not carry over any subject, person, place, work, example, theme, or category from earlier generations.',
+          'Every question must directly satisfy the current scope contract.',
+          'Use widely established facts. Current Topic questions will be independently web checked after generation.',
+          'For copyrighted lyrics, dialogue and other protected text, use only very short excerpts or ask about identification, attribution or context.'
         ].join(' ')
       : 'Accuracy requirement: use established facts, avoid disputed/time-sensitive claims, and make exactly one defensible answer unless Select Multiple is requested.';
 
-    const duplicateRule = existingStems.length
-      ? 'DO NOT repeat, paraphrase, or test the same underlying fact as any of these existing questions:\n'+existingStems.join('\n')
-      : 'Create distinct questions that test different facts.';
+    const duplicateRule = avoidFactKeys.length
+      ? [
+          'SAME-TOPIC FACTS ALREADY USED:',
+          avoidFactKeys.join('\n'),
+          'Do not generate a question whose underlying fact matches any fact key above.',
+          'These keys come ONLY from prior batches of this same requested topic.'
+        ].join('\n')
+      : 'Create distinct questions that test different facts. No previous-topic content is supplied to this request.';
 
     const enhancedTopic = [
-      topic,
+      'CURRENT HOST TOPIC / INSTRUCTIONS: '+topic,
+      generationScope.instruction,
       languageInstruction,
       formatInstruction,
       sourceRule,
       duplicateRule,
+      'GENERATION VARIATION TOKEN: '+String(generationAttempt+1)+'. On retries, choose different valid subtopics/facts within the SAME current scope.',
       requestedType==='multiple_choice'
         ? 'Vary the position of the correct answer across the returned questions. Do not make the first option correct every time.'
         : '',
@@ -5766,11 +5775,15 @@ authPromise.then(() => {
           optsPerQ,
           questionType:requestedType,
           formatInstruction,
-          existingQuestions:existingStems,
           sourceType:context.sourceType||'',
           sourceName:context.sourceName||'',
           preferSearch:context.sourceType==='ai',
-          questionLanguage
+          questionLanguage,
+          generationId:context.generationId||'',
+          scopeInstruction:generationScope.instruction,
+          generalKnowledge:generationScope.generalKnowledge,
+          coverageCategories:generationScope.coverageCategories,
+          avoidFactKeys
         })
       });
     }catch(e){
@@ -5804,7 +5817,11 @@ authPromise.then(() => {
           language:questionLanguage,
           provider:routedProvider,
           model:routedModel,
-          verification:routedVerification
+          verification:routedVerification,
+          generationId:context.generationId||'',
+          requestedTopic:topic,
+          factKey:typeof item.factKey==='string' ? item.factKey.trim().slice(0,240) : '',
+          category:typeof item.category==='string' ? item.category.trim().slice(0,120) : ''
         }
       };
 
@@ -5834,7 +5851,7 @@ authPromise.then(() => {
 
   async function generateVerifiedQuestionBatches({
     topic,requestedCount,optsPerQ,questionType,sourceText,sourceType,sourceName,sourceUrls,
-    questionLanguage='English',timePerQuestion=DEFAULT_QUESTION_TIME,pointsPerQuestion=DEFAULT_QUESTION_POINTS,existingQuestions,onProgress
+    questionLanguage='English',timePerQuestion=DEFAULT_QUESTION_TIME,pointsPerQuestion=DEFAULT_QUESTION_POINTS,generationId='',existingQuestions,onProgress
   }){
     const target = Math.max(1,Math.min(100,requestedCount||10));
 
@@ -5865,6 +5882,7 @@ authPromise.then(() => {
           questionLanguage,
           timePerQuestion,
           pointsPerQuestion,
+          generationId,
           existingQuestions:(Array.isArray(existingQuestions)?existingQuestions:[]).concat(mixed),
           onProgress:(subDone,subTarget)=>{
             if(onProgress) onProgress(
@@ -5888,7 +5906,7 @@ authPromise.then(() => {
     }
     const accepted = [];
     const known = Array.isArray(existingQuestions) ? existingQuestions.slice() : [];
-    const maxAttempts = Math.ceil(target/10) + 5;
+    const maxAttempts = Math.ceil(target/10) + 8;
     let attempts = 0;
 
     while(accepted.length < target && attempts < maxAttempts){
@@ -5907,6 +5925,8 @@ authPromise.then(() => {
           questionLanguage,
           timePerQuestion,
           pointsPerQuestion,
+          generationId,
+          generationAttempt:attempts,
           existingQuestions:known.concat(accepted)
         });
       }catch(err){
@@ -5918,21 +5938,21 @@ authPromise.then(() => {
       for(const q of batch){
         if(accepted.length>=target) break;
         if(!aiQuestionStructuralCheck(q)) continue;
-        if(isNearDuplicateQuestion(q.q,known) || isNearDuplicateQuestion(q.q,accepted)) continue;
+        if(isDuplicateGeneratedQuestion(q,known) || isDuplicateGeneratedQuestion(q,accepted)) continue;
         accepted.push(q);
       }
 
       attempts++;
       if(onProgress) onProgress(accepted.length,target,
         accepted.length<target
-          ? 'Checked duplicates — '+accepted.length+' of '+target+' unique questions ready…'
+          ? 'Checked topic scope, facts and duplicates — '+accepted.length+' of '+target+' unique questions ready…'
           : 'All '+target+' questions ready.'
       );
     }
 
     if(!accepted.length) throw new Error('QZMAX could not produce a reliable unique question set. Try a broader source or different topic.');
     if(accepted.length < target){
-      throw new Error('Only '+accepted.length+' unique, structurally valid questions could be produced from this source. Try a broader document/topic or request fewer questions.');
+      throw new Error('Only '+accepted.length+' unique, in-scope questions could be produced after verification and duplicate checks. Try a broader document/topic or request fewer questions.');
     }
     return accepted.slice(0,target);
   }
@@ -5941,7 +5961,13 @@ authPromise.then(() => {
     const meta = q && q.aiMeta;
     if(!meta) return '';
     const kind = meta.kind==='document'?'document':meta.kind==='source'?'source':'review';
-    return '<span class="q-verify-badge '+kind+'" title="'+escapeHtml(meta.sourceName||meta.label||'')+'">'+
+    const sourceCount = Array.isArray(meta.sourceUrls) ? meta.sourceUrls.length : 0;
+    const verifyTitle = [
+      meta.sourceName||meta.label||'',
+      meta.verificationProvider ? 'Blind verifier: '+meta.verificationProvider : '',
+      sourceCount ? sourceCount+' independent source'+(sourceCount===1?'':'s') : ''
+    ].filter(Boolean).join(' · ');
+    return '<span class="q-verify-badge '+kind+'" title="'+escapeHtml(verifyTitle)+'">'+
       (kind==='review'?'!':'✓')+' '+escapeHtml(meta.label||'AI • Review')+
     '</span>';
   }
