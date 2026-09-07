@@ -1,17 +1,65 @@
 'use strict';
 
-// QZMAX Free AI Router — Netlify Function
-// Provider order (default): Groq -> Cloudflare Workers AI -> Gemini -> local source fallback
-// No provider is required. Missing credentials are skipped automatically.
+// QZMAX 3.14.0 — Source Link Generation
+//
+// No paid OpenAI, Claude or xAI API is used.
+// The router keeps the requested batch size and switches providers on rate limit.
+//
+// Search-first Custom Topic order:
+// Gemini + Google Search -> Groq Compound -> Groq Qwen -> Cerebras ->
+// Groq GPT-OSS 20B -> Mistral -> NVIDIA NIM -> SambaNova ->
+// Cloudflare -> OpenRouter Free -> Groq GPT-OSS 120B -> Gemini -> local.
+//
+// Strict Document / School generation does not use live-search routes.
 
-const DEFAULT_ORDER = ['groq', 'cloudflare', 'gemini', 'local'];
-const GROQ_MODEL = process.env.GROQ_MODEL || 'qwen/qwen3.8-27b';
-const CLOUDFLARE_MODEL = process.env.CLOUDFLARE_MODEL || '@cf/zai-org/glm-4.7-flash';
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 const MAX_BATCH = 10;
 const MAX_OPTIONS = 8;
 const MAX_PROMPT_CHARS = 60000;
-const GLOBAL_BUDGET_MS = 26000;
+const GLOBAL_BUDGET_MS = 28000;
+
+const MODELS = {
+  geminiSearch: process.env.GEMINI_SEARCH_MODEL || 'gemini-2.5-flash',
+  gemini: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
+  groqQwen: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b',
+  groqCompound: process.env.GROQ_COMPOUND_MODEL || 'groq/compound',
+  groqOss20: process.env.GROQ_GPT_OSS_20B_MODEL || 'openai/gpt-oss-20b',
+  groqOss120: process.env.GROQ_GPT_OSS_120B_MODEL || 'openai/gpt-oss-120b',
+  cerebras: process.env.CEREBRAS_MODEL || 'gpt-oss-120b',
+  mistral: process.env.MISTRAL_MODEL || 'mistral-small-latest',
+  nvidia: process.env.NVIDIA_MODEL || 'nvidia/nemotron-3.5-lightning-30b-a3b',
+  sambanova: process.env.SAMBANOVA_MODEL || 'gpt-oss-120b',
+  cloudflare: process.env.CLOUDFLARE_MODEL || '@cf/zai-org/glm-4.7-flash',
+  openrouter: process.env.OPENROUTER_MODEL || 'openrouter/free',
+};
+
+const CUSTOM_DEFAULT_ORDER = [
+  'groq_qwen',
+  'cerebras',
+  'groq_oss20',
+  'mistral',
+  'nvidia',
+  'sambanova',
+  'cloudflare',
+  'openrouter',
+  'groq_oss120',
+  'gemini',
+];
+
+const STRICT_DEFAULT_ORDER = [
+  'groq_qwen',
+  'cerebras',
+  'groq_oss20',
+  'mistral',
+  'nvidia',
+  'sambanova',
+  'cloudflare',
+  'openrouter',
+  'groq_oss120',
+  'gemini',
+  'local',
+];
+
+const ROUTE_COOLDOWNS = new Map();
 
 function jsonResponse(statusCode, body, extraHeaders = {}) {
   return {
@@ -34,13 +82,116 @@ function safeInt(value, fallback, min, max) {
   return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
 }
 
-function parseProviderOrder() {
+function normalizeRouteName(name) {
+  const n = String(name || '').trim().toLowerCase();
+  const aliases = {
+    google_search:'gemini_search', gemini_search:'gemini_search',
+    groq_compound:'groq_compound',
+    groq:'groq_qwen', groq_qwen:'groq_qwen',
+    cerebras:'cerebras',
+    groq_oss20:'groq_oss20', groq_gpt_oss_20b:'groq_oss20',
+    mistral:'mistral',
+    nvidia:'nvidia', nvidia_nim:'nvidia',
+    sambanova:'sambanova',
+    cloudflare:'cloudflare',
+    openrouter:'openrouter',
+    groq_oss120:'groq_oss120', groq_gpt_oss_120b:'groq_oss120',
+    gemini:'gemini',
+    local:'local',
+  };
+  return aliases[n] || '';
+}
+
+function parseProviderOrder(request) {
+  const customAI = request?.sourceType === 'ai' || request?.preferSearch === true;
+  let order = (customAI ? CUSTOM_DEFAULT_ORDER : STRICT_DEFAULT_ORDER).slice();
+
   const raw = String(process.env.AI_PROVIDER_ORDER || '').trim();
-  if (!raw) return DEFAULT_ORDER;
-  const valid = new Set(DEFAULT_ORDER);
-  const out = raw.toLowerCase().split(',').map(s => s.trim()).filter(s => valid.has(s));
-  if (!out.includes('local')) out.push('local');
-  return out.length ? [...new Set(out)] : DEFAULT_ORDER;
+  if (raw) {
+    const parsed = raw.split(',').map(normalizeRouteName).filter(Boolean);
+    if (parsed.length) order = [...new Set(parsed)];
+  }
+
+  if (!customAI) {
+    order = order.filter(route => !['gemini_search','groq_compound'].includes(route));
+  }
+  if (!order.includes('local')) order.push('local');
+  return [...new Set(order)];
+}
+
+function routeProvider(route) {
+  return {
+    gemini_search:'Google Gemini Search',
+    groq_compound:'Groq Web Search',
+    groq_qwen:'Groq',
+    cerebras:'Cerebras',
+    groq_oss20:'Groq',
+    mistral:'Mistral',
+    nvidia:'NVIDIA NIM',
+    sambanova:'SambaNova',
+    cloudflare:'Cloudflare',
+    openrouter:'OpenRouter Free',
+    groq_oss120:'Groq',
+    gemini:'Google Gemini',
+    local:'Local Source Fallback',
+  }[route] || route;
+}
+
+function routeModel(route) {
+  return {
+    gemini_search:MODELS.geminiSearch,
+    groq_compound:MODELS.groqCompound,
+    groq_qwen:MODELS.groqQwen,
+    cerebras:MODELS.cerebras,
+    groq_oss20:MODELS.groqOss20,
+    mistral:MODELS.mistral,
+    nvidia:MODELS.nvidia,
+    sambanova:MODELS.sambanova,
+    cloudflare:MODELS.cloudflare,
+    openrouter:MODELS.openrouter,
+    groq_oss120:MODELS.groqOss120,
+    gemini:MODELS.gemini,
+    local:'source-fallback',
+  }[route] || '';
+}
+
+function configuredRoutes() {
+  return {
+    tavily_verification: !!process.env.TAVILY_API_KEY,
+    tavily_extract: !!process.env.TAVILY_API_KEY,
+    gemini_search: !!(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY),
+    groq_compound: !!process.env.GROQ_API_KEY,
+    groq_qwen: !!process.env.GROQ_API_KEY,
+    cerebras: !!process.env.CEREBRAS_API_KEY,
+    groq_oss20: !!process.env.GROQ_API_KEY,
+    mistral: !!process.env.MISTRAL_API_KEY,
+    nvidia: !!process.env.NVIDIA_API_KEY,
+    sambanova: !!process.env.SAMBANOVA_API_KEY,
+    cloudflare: !!(process.env.CLOUDFLARE_ACCOUNT_ID && (process.env.CLOUDFLARE_API_TOKEN || process.env.CLOUDFLARE_AUTH_TOKEN)),
+    openrouter: !!process.env.OPENROUTER_API_KEY,
+    groq_oss120: !!process.env.GROQ_API_KEY,
+    gemini: !!(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY),
+    local: true,
+  };
+}
+
+function routeOnCooldown(route) {
+  const until = ROUTE_COOLDOWNS.get(route) || 0;
+  if (until <= Date.now()) {
+    ROUTE_COOLDOWNS.delete(route);
+    return false;
+  }
+  return true;
+}
+
+function markRouteCooldown(route, err) {
+  if (!err || ![429, 503, 529].includes(err.status)) return;
+  const requestedMs = Number(err.retryAfter || 0) * 1000;
+  const fallbackMs = err.status === 429 ? 30000 : 12000;
+  ROUTE_COOLDOWNS.set(
+    route,
+    Date.now() + Math.max(4000, Math.min(120000, requestedMs || fallbackMs))
+  );
 }
 
 function stripCodeFences(text) {
@@ -91,11 +242,31 @@ function normalizedIndexArray(item, optionsLength) {
     .sort((a, b) => a - b);
 }
 
-function validateQuestions(items, { count, optsPerQ, questionType }) {
+
+function cleanDocumentQuestionFraming(value) {
+  let q = String(value || '').trim();
+  const patterns = [
+    /^(?:according\s+to|based\s+on)\s+(?:the\s+)?(?:source|text|document|passage|material|uploaded\s+document)\s*[:,\-–—]?\s*/i,
+    /^from\s+(?:the\s+)?(?:source|text|document|passage|material|uploaded\s+document)\s*[:,\-–—]?\s*/i,
+    /^(?:as\s+stated|as\s+described|as\s+mentioned)\s+in\s+(?:the\s+)?(?:source|text|document|passage)\s*[:,\-–—]?\s*/i,
+    /^(?:حسب|بحسب)\s+(?:المصدر|النص|الوثيقة|المستند)\s*[،,:؛\-–—]?\s*/u,
+    /^وفق[ًااً]+\s+(?:للمصدر|للنص|للوثيقة|للمستند)\s*[،,:؛\-–—]?\s*/u,
+    /^استناد[ًااً]+\s+(?:إلى|الى)\s+(?:المصدر|النص|الوثيقة|المستند)\s*[،,:؛\-–—]?\s*/u,
+    /^من\s+(?:المصدر|النص|الوثيقة|المستند)\s*[،,:؛\-–—]?\s*/u
+  ];
+  for (const pattern of patterns) q = q.replace(pattern, '').trim();
+  return q;
+}
+
+function validateQuestions(items, request) {
+  const { count, optsPerQ, questionType } = request;
   const out = [];
   for (const raw of Array.isArray(items) ? items : []) {
     if (!raw || typeof raw.question !== 'string') continue;
-    const question = raw.question.trim();
+    let question = raw.question.trim();
+    if (request.sourceType === 'document' || request.sourceType === 'link') {
+      question = cleanDocumentQuestionFraming(question);
+    }
     const options = Array.isArray(raw.options) ? raw.options.map(v => String(v).trim()).filter(Boolean) : [];
     if (!question || options.length < 2) continue;
     if (new Set(options.map(v => v.toLocaleLowerCase())).size !== options.length) continue;
@@ -103,11 +274,22 @@ function validateQuestions(items, { count, optsPerQ, questionType }) {
     const explanation = typeof raw.explanation === 'string' ? raw.explanation.trim() : '';
     const sourceEvidence = typeof raw.sourceEvidence === 'string' ? raw.sourceEvidence.trim().slice(0, 600) : '';
     const sourcePage = raw.sourcePage == null ? '' : String(raw.sourcePage).trim().slice(0, 80);
+    const sourceId = raw.sourceId == null ? '' : String(raw.sourceId).trim().slice(0, 30);
+    const sourceUrl = raw.sourceUrl == null ? '' : String(raw.sourceUrl).trim().slice(0, 1000);
+    const sourceTitle = raw.sourceTitle == null ? '' : String(raw.sourceTitle).trim().slice(0, 300);
+    const category = raw.category == null ? '' : String(raw.category).trim().slice(0, 120);
+    const factKey = raw.factKey == null ? '' : String(raw.factKey).trim().slice(0, 240);
+
+    if (request.sourceType === 'link') {
+      const evidenceNorm = normalizeEvidenceText(sourceEvidence);
+      const sourceNorm = normalizeEvidenceText(request.sourceEvidenceText || '');
+      if (evidenceNorm.length < 18 || !sourceNorm || !sourceNorm.includes(evidenceNorm)) continue;
+    }
 
     if (questionType === 'true_false') {
       const correctIndex = Number.parseInt(raw.correctIndex, 10);
       if (options.length !== 2 || ![0, 1].includes(correctIndex)) continue;
-      out.push({ question, options, correctIndex, explanation, sourceEvidence, sourcePage });
+      out.push({ question, options, correctIndex, explanation, sourceEvidence, sourcePage, sourceId, sourceUrl, sourceTitle, category, factKey });
     } else if (questionType === 'multiple_correct') {
       if (options.length > MAX_OPTIONS) continue;
       const correctIndexes = normalizedIndexArray(raw, options.length);
@@ -120,12 +302,17 @@ function validateQuestions(items, { count, optsPerQ, questionType }) {
         explanation,
         sourceEvidence,
         sourcePage,
+        sourceId,
+        sourceUrl,
+        sourceTitle,
+        category,
+        factKey,
       });
     } else {
       const correctIndex = Number.parseInt(raw.correctIndex, 10);
       if (!Number.isInteger(correctIndex) || correctIndex < 0 || correctIndex >= options.length) continue;
       if (optsPerQ >= 2 && options.length > MAX_OPTIONS) continue;
-      out.push({ question, options, correctIndex, explanation, sourceEvidence, sourcePage });
+      out.push({ question, options, correctIndex, explanation, sourceEvidence, sourcePage, sourceId, sourceUrl, sourceTitle, category, factKey });
     }
     if (out.length >= count) break;
   }
@@ -137,9 +324,15 @@ function schemaInstruction({ count, optsPerQ, questionType }) {
     `Return exactly ${count} quiz questions.`,
     'Return ONLY one valid JSON object with a top-level array named "questions".',
     'Every question object must contain: question, options, correctIndex, explanation.',
-    'When source material is supplied, also include sourceEvidence as a short exact supporting phrase where practical.',
+    'When source material is supplied, include sourceEvidence as a short exact supporting phrase copied from the source.',
+    'When web evidence IDs are supplied, also include sourceId, sourceUrl and sourceTitle exactly as provided for the source that proves the answer.',
     'Do not wrap JSON in Markdown fences.',
   ];
+
+  if (Array.isArray(arguments[0]?.coverageCategories) && arguments[0].coverageCategories.length) {
+    common.push('Every question must contain a category field exactly matching one of these values: '+arguments[0].coverageCategories.join(' | ')+'.');
+    common.push('Use each requested category once before repeating a category.');
+  }
 
   if (questionType === 'multiple_correct') {
     common.push(`Each question must contain exactly ${optsPerQ} options.`);
@@ -155,8 +348,10 @@ function schemaInstruction({ count, optsPerQ, questionType }) {
 function buildMessages(request) {
   const system = [
     'You are the QZMAX quiz-generation engine.',
-    'Follow all factual grounding, language, format, and duplicate-avoidance instructions in the user prompt exactly.',
+    'Follow the current host scope, factual grounding, language, format, coverage, and same-topic fact-avoidance instructions in the user prompt exactly.',
+    'Never infer subject matter from prior requests; only the current request is authoritative.',
     'Never invent a fact that is not supported when the prompt contains source material.',
+    'When generating from supplied source material, write natural stand-alone question stems. Never start visible questions with "According to the source", "According to the text", "According to the document", "Based on the source", "From the text", or equivalent source-referencing phrases.',
     schemaInstruction(request),
   ].join('\n\n');
 
@@ -166,6 +361,7 @@ function buildMessages(request) {
     { role: 'user', content: userPrompt },
   ];
 }
+
 
 async function fetchWithTimeout(url, options, timeoutMs) {
   const controller = new AbortController();
@@ -184,110 +380,241 @@ async function readErrorResponse(res) {
     text = await res.text();
     data = text ? JSON.parse(text) : null;
   } catch (_) {}
-  const message = data?.error?.message || data?.errors?.[0]?.message || data?.message || text || `${res.status} ${res.statusText}`;
-  const error = new Error(String(message).slice(0, 1200));
-  error.status = res.status;
-  error.retryAfter = Number.parseFloat(res.headers.get('retry-after') || '0') || 0;
-  return error;
+  const message =
+    data?.error?.message ||
+    data?.errors?.[0]?.message ||
+    data?.message ||
+    text ||
+    `${res.status} ${res.statusText}`;
+
+  const err = new Error(String(message).slice(0, 1200));
+  err.status = res.status;
+  err.retryAfter = Number.parseFloat(res.headers.get('retry-after') || '0') || 0;
+  return err;
 }
 
 async function maybeRetry(call, deadline, providerName) {
   try {
     return await call();
   } catch (err) {
-    const retryable = err && (err.status === 429 || err.status === 503 || err.status === 529);
-    const suggested = err?.retryAfter ? err.retryAfter * 1000 : 0;
-    const waitMs = Math.min(5500, Math.max(750, suggested || 1200));
-    if (!retryable || Date.now() + waitMs + 1500 >= deadline) throw err;
-    console.warn(`[QZMAX AI] ${providerName} temporary limit; retrying once in ${waitMs}ms.`);
+    const retryable = err && [429,503,529].includes(err.status);
+    const suggestedMs = Number(err?.retryAfter || 0) * 1000;
+    const waitMs = Math.min(3500, Math.max(600, suggestedMs || 900));
+    if (!retryable || Date.now() + waitMs + 1300 >= deadline) throw err;
+    console.warn(`[QZMAX AI] ${providerName} temporary limit; one retry in ${waitMs}ms.`);
     await sleep(waitMs);
     return call();
   }
 }
 
-async function callGroq(messages, request, deadline) {
-  const key = process.env.GROQ_API_KEY;
-  if (!key) throw Object.assign(new Error('GROQ_API_KEY is not configured.'), { skip: true });
-  const timeout = Math.max(2500, Math.min(12000, deadline - Date.now() - 500));
+async function callOpenAICompatible({
+  providerName, url, key, model, messages, deadline,
+  responseFormat = false, extraHeaders = {}, extraBody = {}
+}) {
+  if (!key) throw Object.assign(new Error(`${providerName} key is not configured.`), { skip:true });
+  const remaining = deadline - Date.now();
+  if (remaining < 1800) throw Object.assign(new Error('Request time budget exhausted.'), { timeout:true });
+  const timeout = Math.max(1600, Math.min(9500, remaining - 300));
 
   const doCall = async () => {
-    const res = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json',
+    const body = {
+      model,
+      messages,
+      temperature: 0.2,
+      stream: false,
+      ...extraBody,
+    };
+    if (responseFormat) body.response_format = { type:'json_object' };
+
+    const res = await fetchWithTimeout(url, {
+      method:'POST',
+      headers:{
+        'Authorization':`Bearer ${key}`,
+        'Content-Type':'application/json',
+        ...extraHeaders,
       },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages,
-        temperature: 0.2,
-        response_format: { type: 'json_object' },
-      }),
+      body:JSON.stringify(body),
     }, timeout);
+
     if (!res.ok) throw await readErrorResponse(res);
     const data = await res.json();
-    const text = data?.choices?.[0]?.message?.content || '';
+    const text =
+      data?.choices?.[0]?.message?.content ??
+      data?.choices?.[0]?.text ??
+      '';
     return normalizeQuestionPayload(extractBalancedJson(text));
   };
 
-  return maybeRetry(doCall, deadline, 'Groq');
+  return maybeRetry(doCall, deadline, providerName);
 }
 
-async function callCloudflare(messages, request, deadline) {
+async function callGroq(messages, deadline, model, label, responseFormat=true) {
+  return callOpenAICompatible({
+    providerName:label,
+    url:'https://api.groq.com/openai/v1/chat/completions',
+    key:process.env.GROQ_API_KEY,
+    model,
+    messages,
+    deadline,
+    responseFormat,
+  });
+}
+
+async function callCerebras(messages, deadline) {
+  return callOpenAICompatible({
+    providerName:'Cerebras',
+    url:'https://api.cerebras.ai/v1/chat/completions',
+    key:process.env.CEREBRAS_API_KEY,
+    model:MODELS.cerebras,
+    messages,
+    deadline,
+    responseFormat:false,
+  });
+}
+
+async function callMistral(messages, deadline) {
+  return callOpenAICompatible({
+    providerName:'Mistral',
+    url:'https://api.mistral.ai/v1/chat/completions',
+    key:process.env.MISTRAL_API_KEY,
+    model:MODELS.mistral,
+    messages,
+    deadline,
+    responseFormat:true,
+  });
+}
+
+async function callNvidia(messages, deadline) {
+  return callOpenAICompatible({
+    providerName:'NVIDIA NIM',
+    url:'https://integrate.api.nvidia.com/v1/chat/completions',
+    key:process.env.NVIDIA_API_KEY,
+    model:MODELS.nvidia,
+    messages,
+    deadline,
+    responseFormat:false,
+    extraBody:{
+      max_tokens:5000,
+      top_p:0.85,
+    },
+  });
+}
+
+async function callSambaNova(messages, deadline) {
+  return callOpenAICompatible({
+    providerName:'SambaNova',
+    url:'https://api.sambanova.ai/v1/chat/completions',
+    key:process.env.SAMBANOVA_API_KEY,
+    model:MODELS.sambanova,
+    messages,
+    deadline,
+    responseFormat:true,
+  });
+}
+
+async function callOpenRouter(messages, deadline) {
+  const extraHeaders = { 'X-Title':'QZMAX' };
+  if (process.env.QZMAX_SITE_URL) extraHeaders['HTTP-Referer'] = process.env.QZMAX_SITE_URL;
+  return callOpenAICompatible({
+    providerName:'OpenRouter Free',
+    url:'https://openrouter.ai/api/v1/chat/completions',
+    key:process.env.OPENROUTER_API_KEY,
+    model:MODELS.openrouter,
+    messages,
+    deadline,
+    responseFormat:false,
+    extraHeaders,
+  });
+}
+
+async function callCloudflare(messages, deadline) {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
   const token = process.env.CLOUDFLARE_API_TOKEN || process.env.CLOUDFLARE_AUTH_TOKEN;
-  if (!accountId || !token) throw Object.assign(new Error('Cloudflare Workers AI credentials are not configured.'), { skip: true });
-  const timeout = Math.max(2500, Math.min(12000, deadline - Date.now() - 500));
-  const modelPath = CLOUDFLARE_MODEL.split('/').map(encodeURIComponent).join('/').replace('%40cf', '@cf');
+  if (!accountId || !token) {
+    throw Object.assign(new Error('Cloudflare Workers AI credentials are not configured.'), { skip:true });
+  }
+
+  const remaining = deadline - Date.now();
+  if (remaining < 1800) throw Object.assign(new Error('Request time budget exhausted.'), { timeout:true });
+  const timeout = Math.max(1600, Math.min(9500, remaining - 300));
+  const modelPath = MODELS.cloudflare
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/')
+    .replace('%40cf','@cf');
   const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/ai/run/${modelPath}`;
 
   const doCall = async () => {
     const res = await fetchWithTimeout(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+      method:'POST',
+      headers:{
+        'Authorization':`Bearer ${token}`,
+        'Content-Type':'application/json',
       },
-      body: JSON.stringify({
+      body:JSON.stringify({
         messages,
-        temperature: 0.2,
-        max_completion_tokens: 5000,
+        temperature:0.2,
+        max_completion_tokens:5000,
       }),
     }, timeout);
+
     if (!res.ok) throw await readErrorResponse(res);
     const data = await res.json();
     const result = data?.result ?? data;
-    let text = '';
-    if (typeof result?.response === 'string') text = result.response;
-    else if (typeof result?.text === 'string') text = result.text;
-    else if (typeof result?.choices?.[0]?.message?.content === 'string') text = result.choices[0].message.content;
-    else if (typeof data?.response === 'string') text = data.response;
-    else if (result && (Array.isArray(result.questions) || Array.isArray(result))) return normalizeQuestionPayload(result);
+
+    if (result && (Array.isArray(result.questions) || Array.isArray(result))) {
+      return normalizeQuestionPayload(result);
+    }
+
+    const text =
+      (typeof result?.response === 'string' && result.response) ||
+      (typeof result?.text === 'string' && result.text) ||
+      result?.choices?.[0]?.message?.content ||
+      data?.response ||
+      '';
+
     return normalizeQuestionPayload(extractBalancedJson(text));
   };
 
   return maybeRetry(doCall, deadline, 'Cloudflare Workers AI');
 }
 
-async function callGemini(messages, request, deadline) {
+async function callGemini(messages, deadline, search=false) {
   const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
-  if (!key) throw Object.assign(new Error('Gemini API key is not configured.'), { skip: true });
-  const timeout = Math.max(2500, Math.min(11000, deadline - Date.now() - 500));
+  if (!key) throw Object.assign(new Error('Gemini key is not configured.'), { skip:true });
+
+  const model = search ? MODELS.geminiSearch : MODELS.gemini;
+  const remaining = deadline - Date.now();
+  if (remaining < 1800) throw Object.assign(new Error('Request time budget exhausted.'), { timeout:true });
+  const timeout = Math.max(1600, Math.min(9500, remaining - 300));
   const prompt = messages.map(m => `${m.role.toUpperCase()}:\n${m.content}`).join('\n\n');
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
   const doCall = async () => {
-    const res = await fetchWithTimeout(url, {
-      method: 'POST',
-      headers: {
-        'x-goog-api-key': key,
-        'Content-Type': 'application/json',
+    const body = {
+      contents:[{ role:'user', parts:[{ text:prompt }] }],
+      generationConfig:{
+        temperature:0.2,
       },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { response_mime_type: 'application/json' },
-      }),
+    };
+
+    // Search-grounded Gemini can reject strict JSON MIME mode with tools,
+    // so the prompt enforces JSON and QZMAX parses the result.
+    if (search) {
+      body.tools = [{ google_search:{} }];
+    } else {
+      body.generationConfig.responseMimeType = 'application/json';
+    }
+
+    const res = await fetchWithTimeout(url, {
+      method:'POST',
+      headers:{
+        'x-goog-api-key':key,
+        'Content-Type':'application/json',
+      },
+      body:JSON.stringify(body),
     }, timeout);
+
     if (!res.ok) throw await readErrorResponse(res);
     const data = await res.json();
     const parts = data?.candidates?.[0]?.content?.parts || [];
@@ -295,34 +622,34 @@ async function callGemini(messages, request, deadline) {
     return normalizeQuestionPayload(extractBalancedJson(text));
   };
 
-  return maybeRetry(doCall, deadline, 'Gemini');
+  return maybeRetry(doCall, deadline, search ? 'Gemini + Google Search' : 'Gemini');
 }
 
 function getLanguageLabels(language) {
   if (language === 'Egyptian Simple Arabic') {
     return {
       trueFalse: ['صح', 'غلط'],
-      cloze: 'حسب المصدر، إيه الاختيار اللي بيكمّل الجملة دي صح؟',
-      trueQuestion: 'حسب المصدر، هل الجملة دي صحيحة؟',
-      multiple: 'حسب المصدر، اختار كل الإجابات اللي ظهرت في العبارة دي:',
-      explanation: 'المصدر بيقول:',
+      cloze: 'إيه الاختيار اللي بيكمّل الجملة دي صح؟',
+      trueQuestion: 'هل الجملة دي صحيحة؟',
+      multiple: 'اختار كل الإجابات اللي موجودة في العبارة دي:',
+      explanation: 'الدليل:',
     };
   }
   if (language === 'Arabic') {
     return {
       trueFalse: ['صحيح', 'خطأ'],
-      cloze: 'وفقًا للمصدر، أي اختيار يُكمل العبارة التالية بشكل صحيح؟',
-      trueQuestion: 'وفقًا للمصدر، هل العبارة التالية صحيحة؟',
-      multiple: 'وفقًا للمصدر، اختر جميع الإجابات التي تظهر في العبارة التالية:',
-      explanation: 'يذكر المصدر:',
+      cloze: 'أي اختيار يُكمل العبارة التالية بشكل صحيح؟',
+      trueQuestion: 'هل العبارة التالية صحيحة؟',
+      multiple: 'اختر جميع الإجابات التي تظهر في العبارة التالية:',
+      explanation: 'الدليل:',
     };
   }
   return {
     trueFalse: ['True', 'False'],
-    cloze: 'According to the source, which option correctly completes this statement?',
-    trueQuestion: 'According to the source, is this statement correct?',
-    multiple: 'According to the source, select all options that appear in this statement:',
-    explanation: 'The source states:',
+    cloze: 'Which option correctly completes this statement?',
+    trueQuestion: 'Is this statement correct?',
+    multiple: 'Select all options that appear in this statement:',
+    explanation: 'Supporting evidence:',
   };
 }
 
@@ -477,71 +804,817 @@ function sourceFallback(request) {
   return out;
 }
 
-async function runProvider(name, messages, request, deadline) {
-  if (name === 'groq') return callGroq(messages, request, deadline);
-  if (name === 'cloudflare') return callCloudflare(messages, request, deadline);
-  if (name === 'gemini') return callGemini(messages, request, deadline);
-  if (name === 'local') return sourceFallback(request);
+
+
+const TAVILY_CACHE = new Map();
+const TAVILY_CACHE_TTL_MS = 15 * 60 * 1000;
+
+function normalizeEvidenceText(value) {
+  return String(value || '')
+    .normalize('NFKC')
+    .toLocaleLowerCase()
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function evidencePackText(evidence) {
+  return (evidence || []).map(src =>
+    `[${src.id}]\nTITLE: ${src.title}\nURL: ${src.url}\nCONTENT: ${src.content}`
+  ).join('\n\n---\n\n');
+}
+
+async function fetchTavilyEvidence(request, deadline) {
+  const key = process.env.TAVILY_API_KEY;
+  if (!key) {
+    throw Object.assign(
+      new Error('TAVILY_API_KEY is required for Web Verified Custom Topic generation.'),
+      { status:503 }
+    );
+  }
+
+  const query = String(request.originalTopic || request.topic || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 900);
+  if (!query) throw new Error('No usable topic was supplied for web verification.');
+
+  const cacheKey = normalizeEvidenceText(query);
+  const cached = TAVILY_CACHE.get(cacheKey);
+  if (cached && (Date.now() - cached.savedAt) < TAVILY_CACHE_TTL_MS) {
+    return cached.evidence;
+  }
+
+  const remaining = deadline - Date.now();
+  if (remaining < 2500) throw new Error('Not enough request time remained for web verification.');
+
+  const res = await fetchWithTimeout('https://api.tavily.com/search', {
+    method:'POST',
+    headers:{
+      'Authorization':`Bearer ${key}`,
+      'Content-Type':'application/json',
+    },
+    body:JSON.stringify({
+      query,
+      search_depth:'basic',
+      max_results:10,
+      topic:'general',
+      include_answer:false,
+      include_raw_content:false,
+      include_images:false,
+      auto_parameters:false,
+      safe_search:true
+    }),
+  }, Math.max(1800, Math.min(7000, remaining - 500)));
+
+  if (!res.ok) throw await readErrorResponse(res);
+  const data = await res.json();
+  const evidence = (Array.isArray(data?.results) ? data.results : [])
+    .filter(r => r && r.url && (r.content || r.title))
+    .slice(0, 10)
+    .map((r, i) => ({
+      id:`S${i+1}`,
+      title:String(r.title || '').trim().slice(0, 300),
+      url:String(r.url || '').trim().slice(0, 1000),
+      content:String(r.content || '').replace(/\s+/g, ' ').trim().slice(0, 2400),
+      score:Number(r.score || 0)
+    }))
+    .filter(r => r.content.length >= 40);
+
+  if (evidence.length < 2) {
+    throw new Error('QZMAX could not find enough relevant web evidence to safely generate this topic.');
+  }
+
+  TAVILY_CACHE.set(cacheKey, {savedAt:Date.now(), evidence});
+  return evidence;
+}
+
+function buildWebEvidenceMessages(baseMessages, request, evidence) {
+  const pack = evidencePackText(evidence);
+  const webRule = [
+    'QZMAX WEB-VERIFIED MODE — MANDATORY RULES:',
+    'Use ONLY the WEB EVIDENCE PACK below for factual claims. Do not use memory or unsupported outside knowledge.',
+    'Every question must be directly within the host topic and directly supported by one evidence source.',
+    'For EACH question return sourceId, sourceUrl, sourceTitle and sourceEvidence.',
+    'sourceId/sourceUrl/sourceTitle must exactly match one source below.',
+    'sourceEvidence must be an EXACT copied phrase of roughly 8–45 words from that source CONTENT which directly supports the correct answer.',
+    'The evidence must establish the named entity and relationship asked by the question — not merely mention the same people, work, year or topic.',
+    'If the evidence does not support a safe question, do not invent one.',
+    'Do not infer a cast member, release year, singer, album, director, character, award, quotation or relationship unless the evidence explicitly establishes it.',
+    'For translated visible answers, keep the factual identity identical to the cited source.',
+    'WEB EVIDENCE PACK:',
+    pack
+  ].join('\n');
+
+  return [...baseMessages, {role:'user', content:webRule}];
+}
+
+function attachAndValidateEvidence(items, evidence) {
+  const byId = new Map(evidence.map(s => [s.id, s]));
+  const byUrl = new Map(evidence.map(s => [s.url, s]));
+  const accepted = [];
+
+  for (const item of items || []) {
+    const source = byId.get(String(item.sourceId || '').trim()) ||
+      byUrl.get(String(item.sourceUrl || '').trim());
+    if (!source) continue;
+
+    const quote = String(item.sourceEvidence || '').trim();
+    const quoteNorm = normalizeEvidenceText(quote);
+    const sourceNorm = normalizeEvidenceText(`${source.title} ${source.content}`);
+
+    if (quoteNorm.length < 18 || !sourceNorm.includes(quoteNorm)) continue;
+
+    accepted.push({
+      ...item,
+      sourceId:source.id,
+      sourceUrl:source.url,
+      sourceTitle:source.title,
+      sourceEvidence:quote
+    });
+  }
+  return accepted;
+}
+
+function answerSignature(item, type) {
+  if (type === 'multiple_correct') {
+    const arr = Array.isArray(item.correctIndexes)
+      ? item.correctIndexes.map(Number).sort((a,b)=>a-b)
+      : [];
+    return arr.join(',');
+  }
+  return String(Number.parseInt(item.correctIndex,10));
+}
+
+function sameQuestionAndOptions(a, b) {
+  if (!a || !b) return false;
+  if (normalizeEvidenceText(a.question) !== normalizeEvidenceText(b.question)) return false;
+
+  const ao = Array.isArray(a.options) ? a.options : [];
+  const bo = Array.isArray(b.options) ? b.options : [];
+  if (ao.length !== bo.length) return false;
+
+  return ao.every((opt, i) =>
+    normalizeEvidenceText(opt) === normalizeEvidenceText(bo[i])
+  );
+}
+
+
+const TARGETED_FACT_CACHE = new Map();
+const TARGETED_FACT_CACHE_TTL_MS = 30 * 60 * 1000;
+
+function sourceDomain(url) {
+  try {
+    return new URL(String(url || '')).hostname.toLowerCase().replace(/^www\./,'');
+  } catch (_) {
+    return '';
+  }
+}
+
+async function mapWithConcurrency(items, limit, worker) {
+  const out = new Array(items.length);
+  let next = 0;
+
+  async function run() {
+    while (true) {
+      const i = next++;
+      if (i >= items.length) return;
+      try {
+        out[i] = await worker(items[i], i);
+      } catch (err) {
+        out[i] = { error:err };
+      }
+    }
+  }
+
+  const workers = Array.from(
+    {length:Math.min(Math.max(1,limit),items.length)},
+    () => run()
+  );
+  await Promise.all(workers);
+  return out;
+}
+
+async function fetchTargetedQuestionEvidence(candidate, request, deadline, candidateIndex) {
+  const key = process.env.TAVILY_API_KEY;
+  if (!key) throw new Error('TAVILY_API_KEY is required for question-specific fact checking.');
+
+  const question = String(candidate?.question || '').replace(/\s+/g,' ').trim();
+  const topic = String(request.originalTopic || '').replace(/\s+/g,' ').trim();
+  const category = String(candidate?.category || '').replace(/\s+/g,' ').trim();
+  const query = [question,category,topic].filter(Boolean).join(' ').trim().slice(0, 900);
+
+  const cacheKey = normalizeEvidenceText(query);
+  const cached = TARGETED_FACT_CACHE.get(cacheKey);
+  if (cached && (Date.now() - cached.savedAt) < TARGETED_FACT_CACHE_TTL_MS) {
+    return cached.evidence;
+  }
+
+  const remaining = deadline - Date.now();
+  if (remaining < 2600) return [];
+
+  const res = await fetchWithTimeout('https://api.tavily.com/search', {
+    method:'POST',
+    headers:{
+      'Authorization':`Bearer ${key}`,
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({
+      query,
+      search_depth:'basic',
+      chunks_per_source:3,
+      max_results:5,
+      topic:'general',
+      include_answer:false,
+      include_raw_content:false,
+      include_images:false,
+      include_usage:true,
+      auto_parameters:false,
+      exact_match:false,
+      safe_search:true,
+      exclude_domains:[
+        'facebook.com','instagram.com','tiktok.com','x.com','twitter.com',
+        'pinterest.com','reddit.com'
+      ]
+    })
+  }, Math.max(1800, Math.min(6500, remaining - 500)));
+
+  if (!res.ok) throw await readErrorResponse(res);
+  const data = await res.json();
+
+  const byDomain = new Map();
+  for (const r of Array.isArray(data?.results) ? data.results : []) {
+    if (!r || !r.url || !r.content) continue;
+    const domain = sourceDomain(r.url);
+    if (!domain || byDomain.has(domain)) continue;
+
+    const content = String(r.content || '').replace(/\s+/g,' ').trim().slice(0,2600);
+    if (content.length < 50) continue;
+
+    byDomain.set(domain, {
+      id:`Q${candidateIndex+1}S${byDomain.size+1}`,
+      title:String(r.title || '').trim().slice(0,300),
+      url:String(r.url || '').trim().slice(0,1000),
+      domain,
+      content,
+      score:Number(r.score || 0)
+    });
+    if (byDomain.size >= 5) break;
+  }
+
+  const evidence = [...byDomain.values()];
+  TARGETED_FACT_CACHE.set(cacheKey,{savedAt:Date.now(),evidence});
+  return evidence;
+}
+
+async function fetchTargetedEvidenceForCandidates(candidates, request, deadline) {
+  const records = await mapWithConcurrency(
+    candidates,
+    4,
+    async (candidate, index) => {
+      const evidence = await fetchTargetedQuestionEvidence(candidate, request, deadline, index);
+      return { candidate, index, evidence };
+    }
+  );
+
+  return records.filter(r =>
+    r && !r.error &&
+    Array.isArray(r.evidence) &&
+    new Set(r.evidence.map(s=>s.domain).filter(Boolean)).size >= 2
+  );
+}
+
+function verifierEvidenceText(records) {
+  return records.map(record => {
+    const evidence = record.evidence.map(src =>
+      `[${src.id}] ${src.title}\nURL: ${src.url}\nSOURCE TEXT: ${src.content}`
+    ).join('\n\n');
+
+    return [
+      `CANDIDATE ${record.index+1}`,
+      `QUESTION: ${record.candidate.question}`,
+      `OPTIONS: ${JSON.stringify(record.candidate.options)}`,
+      record.candidate.category ? `PROPOSED CATEGORY: ${record.candidate.category}` : '',
+      'QUESTION-SPECIFIC WEB RESULTS:',
+      evidence
+    ].join('\n');
+  }).join('\n\n====================\n\n');
+}
+
+function blindAuditSignature(audit, questionType, optionsLength) {
+  if (questionType === 'multiple_correct') {
+    const values = Array.isArray(audit?.correctIndexes)
+      ? [...new Set(audit.correctIndexes.map(Number).filter(i=>Number.isInteger(i)&&i>=0&&i<optionsLength))].sort((a,b)=>a-b)
+      : [];
+    return values.length >= 2 ? values.join(',') : '';
+  }
+
+  const idx = Number.parseInt(audit?.correctIndex,10);
+  return Number.isInteger(idx) && idx>=0 && idx<optionsLength ? String(idx) : '';
+}
+
+function validateBlindSupports(audit, evidence) {
+  const supports = Array.isArray(audit?.supports) ? audit.supports : [];
+  const byId = new Map(evidence.map(s=>[s.id,s]));
+  const valid = [];
+
+  for (const support of supports) {
+    const source = byId.get(String(support?.sourceId || '').trim());
+    if (!source) continue;
+
+    const quote = String(support?.evidence || '').trim();
+    const quoteNorm = normalizeEvidenceText(quote);
+    const sourceNorm = normalizeEvidenceText(source.content);
+
+    if (quoteNorm.length < 18 || !sourceNorm.includes(quoteNorm)) continue;
+
+    valid.push({source,quote});
+  }
+
+  const domains = new Set(valid.map(v=>v.source.domain).filter(Boolean));
+  if (domains.size < 2) return [];
+
+  // Keep at most one supporting citation per independent domain.
+  const kept = [];
+  const seenDomains = new Set();
+  for (const v of valid) {
+    if (seenDomains.has(v.source.domain)) continue;
+    seenDomains.add(v.source.domain);
+    kept.push(v);
+    if (kept.length >= 2) break;
+  }
+  return kept;
+}
+
+async function verifyCandidatesWithIndependentModel(candidates, broadEvidence, request, deadline, generatorRoute) {
+  if (!candidates.length) return {verified:[], verifierRoute:''};
+
+  // Fresh search for the exact fact asked by every candidate.
+  const targetedRecords = await fetchTargetedEvidenceForCandidates(candidates, request, deadline);
+  if (!targetedRecords.length) {
+    return {verified:[], verifierRoute:''};
+  }
+
+  const verificationRoutes = [
+    'gemini','cerebras','groq_oss120','mistral','nvidia',
+    'sambanova','cloudflare','openrouter','groq_oss20','groq_qwen'
+  ].filter(r => r !== generatorRoute);
+
+  const system = [
+    'You are the BLIND QZMAX factual verifier.',
+    'You are deliberately NOT being shown the answer selected by the question writer.',
+    'Solve every question independently from its QUESTION-SPECIFIC WEB RESULTS only.',
+    'Do not use memory, prior model knowledge, the broad topic evidence, or assumptions.',
+    'CURRENT HOST SCOPE: '+String(request.originalTopic || '').trim(),
+    request.scopeInstruction ? 'SCOPE/COVERAGE CONTRACT: '+request.scopeInstruction : '',
+    'First decide whether each candidate is directly in scope for the CURRENT HOST SCOPE. Ignore all prior topics because none are relevant to this audit.',
+    'For each accepted candidate output scopeVerdict:"in_scope". Omit anything off-topic, over-specialised relative to the requested general-knowledge coverage, or outside the named timeframe/category.',
+    'For each candidate, output it only when the web results establish exactly one defensible answer (or the exact complete set for Select Multiple).',
+    'For every accepted candidate include verdict:"supported", confidence:"high", scopeVerdict:"in_scope", question, options, category when supplied, and your independently chosen correctIndex/correctIndexes.',
+    'Also include factKey: a concise canonical fact identity in the form relationship|subject|answer. It must identify the underlying fact rather than copy the question wording.',
+    'Also include supports as an array of at least TWO objects from TWO DIFFERENT source IDs/domains. Each support object must contain sourceId and evidence.',
+    'The evidence value must be an EXACT copied phrase from that source text which materially supports your chosen answer.',
+    'Do not treat absence of a name in one snippet as proof that an option is false.',
+    'For True/False questions marked False, the cited evidence must explicitly establish a contradictory fact, not merely fail to mention the statement.',
+    'If two sources disagree, if the evidence is incomplete, or if you cannot prove the answer, OMIT the candidate.',
+    'Copy the question and options EXACTLY. Do not rewrite or reorder them.',
+    `Question type: ${request.questionType}.`,
+    'Return ONLY one valid JSON object: {"questions":[...]}'
+  ].filter(Boolean).join('\n\n');
+
+  const user = verifierEvidenceText(targetedRecords);
+
+  for (const route of verificationRoutes) {
+    if (Date.now() >= deadline - 1800) break;
+    if (routeOnCooldown(route)) continue;
+
+    try {
+      const rawAudits = await runProvider(
+        route,
+        [{role:'system',content:system},{role:'user',content:user}],
+        {...request, count:targetedRecords.length},
+        deadline
+      );
+
+      if (!Array.isArray(rawAudits) || !rawAudits.length) continue;
+
+      const verified = [];
+
+      for (const record of targetedRecords) {
+        const original = record.candidate;
+        const audit = rawAudits.find(v => sameQuestionAndOptions(original,v));
+        if (!audit) continue;
+
+        if (String(audit.verdict || '').toLowerCase() !== 'supported') continue;
+        if (String(audit.confidence || '').toLowerCase() !== 'high') continue;
+        if (String(audit.scopeVerdict || '').toLowerCase() !== 'in_scope') continue;
+
+        if (request.generalKnowledge && request.coverageCategories.length) {
+          const categoryKey = normalizeCategory(original.category);
+          const allowed = new Set(request.coverageCategories.map(normalizeCategory));
+          if (!categoryKey || !allowed.has(categoryKey)) continue;
+          if (audit.category && normalizeCategory(audit.category)!==categoryKey) continue;
+        }
+
+        const factKey = String(audit.factKey || '').replace(/\s+/g,' ').trim().slice(0,240);
+        if (factKey.length < 8) continue;
+
+        const blindSig = blindAuditSignature(
+          audit,
+          request.questionType,
+          Array.isArray(original.options) ? original.options.length : 0
+        );
+        const writerSig = answerSignature(original,request.questionType);
+        if (!blindSig || blindSig !== writerSig) continue;
+
+        const supports = validateBlindSupports(audit,record.evidence);
+        if (supports.length < 2) continue;
+
+        verified.push({
+          ...original,
+          webVerified:true,
+          verificationProvider:routeProvider(route),
+          factKey,
+          category:original.category||audit.category||'',
+          sourceUrls:supports.map(s=>s.source.url),
+          sourceTitles:supports.map(s=>s.source.title),
+          sourceUrl:supports[0].source.url,
+          sourceTitle:supports[0].source.title,
+          sourceEvidence:supports
+            .map(s=>`${s.source.title}: ${s.quote}`)
+            .join(' | ')
+            .slice(0,1000)
+        });
+      }
+
+      if (verified.length) return {verified,verifierRoute:route};
+    } catch (err) {
+      if (!err?.skip) {
+        markRouteCooldown(route,err);
+        console.warn(`[QZMAX BLIND VERIFY] ${route} failed`,String(err?.message||err).slice(0,400));
+      }
+    }
+  }
+
+  return {verified:[],verifierRoute:''};
+}
+
+
+function normalizeCategory(value) {
+  return String(value || '').trim().toLocaleLowerCase();
+}
+
+function applyCoverageGuard(items, request) {
+  if (!request?.generalKnowledge || !Array.isArray(request.coverageCategories) || !request.coverageCategories.length) {
+    return Array.isArray(items) ? items : [];
+  }
+
+  const allowed = new Map(
+    request.coverageCategories.map(c => [normalizeCategory(c), c])
+  );
+  const counts = new Map();
+  const maxPerCategory = Math.max(
+    1,
+    Math.ceil((Number(request.count)||1) / request.coverageCategories.length)
+  );
+
+  const accepted = [];
+  for (const item of Array.isArray(items) ? items : []) {
+    const key = normalizeCategory(item?.category);
+    if (!allowed.has(key)) continue;
+
+    const used = counts.get(key) || 0;
+    if (used >= maxPerCategory) continue;
+
+    counts.set(key, used + 1);
+    accepted.push({...item, category:allowed.get(key)});
+  }
+  return accepted;
+}
+
+async function runProvider(route, messages, request, deadline) {
+  if (route==='gemini_search') return callGemini(messages, deadline, true);
+  if (route==='groq_compound') return callGroq(messages, deadline, MODELS.groqCompound, 'Groq Compound', false);
+  if (route==='groq_qwen') return callGroq(messages, deadline, MODELS.groqQwen, 'Groq Qwen');
+  if (route==='cerebras') return callCerebras(messages, deadline);
+  if (route==='groq_oss20') return callGroq(messages, deadline, MODELS.groqOss20, 'Groq GPT-OSS 20B');
+  if (route==='mistral') return callMistral(messages, deadline);
+  if (route==='nvidia') return callNvidia(messages, deadline);
+  if (route==='sambanova') return callSambaNova(messages, deadline);
+  if (route==='cloudflare') return callCloudflare(messages, deadline);
+  if (route==='openrouter') return callOpenRouter(messages, deadline);
+  if (route==='groq_oss120') return callGroq(messages, deadline, MODELS.groqOss120, 'Groq GPT-OSS 120B');
+  if (route==='gemini') return callGemini(messages, deadline, false);
+  if (route==='local') return sourceFallback(request);
   return [];
 }
 
-exports.handler = async function handler(event) {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers: { 'Cache-Control': 'no-store' }, body: '' };
+
+const SOURCE_EXTRACT_CACHE = new Map();
+const SOURCE_EXTRACT_CACHE_TTL_MS = 30 * 60 * 1000;
+const SOURCE_LINK_MAX_CHARS = 220000;
+
+function validatePublicSourceUrl(value) {
+  let parsed;
+  try {
+    parsed = new URL(String(value || '').trim());
+  } catch (_) {
+    throw Object.assign(new Error('Enter a valid public web URL.'), { status:400 });
   }
-  if (event.httpMethod !== 'POST') return jsonResponse(405, { error: 'Method not allowed.' });
+
+  if (!['http:','https:'].includes(parsed.protocol)) {
+    throw Object.assign(new Error('Source Link supports only http:// and https:// URLs.'), { status:400 });
+  }
+
+  const host = parsed.hostname.toLowerCase().replace(/\.$/,'');
+  const blockedNames = new Set(['localhost','localhost.localdomain']);
+  if (
+    blockedNames.has(host) ||
+    host.endsWith('.local') ||
+    host === '0.0.0.0' ||
+    host === '::1' ||
+    /^127\./.test(host) ||
+    /^10\./.test(host) ||
+    /^192\.168\./.test(host) ||
+    /^169\.254\./.test(host) ||
+    /^172\.(?:1[6-9]|2\d|3[01])\./.test(host)
+  ) {
+    throw Object.assign(new Error('Source Link requires a public internet URL.'), { status:400 });
+  }
+
+  parsed.hash = '';
+  return parsed.toString();
+}
+
+function sourceTitleFromExtract(result, rawContent, url) {
+  const direct = String(result?.title || '').replace(/\s+/g,' ').trim();
+  if (direct && direct.length <= 220) return direct;
+
+  const lines = String(rawContent || '').split(/\n+/).map(v=>v.trim()).filter(Boolean).slice(0,30);
+  for (const line of lines) {
+    const heading = line.match(/^#{1,3}\s+(.{3,200})$/);
+    if (heading) return heading[1].replace(/\s+/g,' ').trim();
+  }
+
+  try {
+    const u = new URL(url);
+    const last = decodeURIComponent(u.pathname.split('/').filter(Boolean).pop() || '')
+      .replace(/[-_]+/g,' ')
+      .replace(/\.[a-z0-9]{2,5}$/i,'')
+      .replace(/\s+/g,' ')
+      .trim();
+    if (last.length >= 3) return last.slice(0,220);
+    return u.hostname.replace(/^www\./,'');
+  } catch (_) {
+    return 'Source page';
+  }
+}
+
+async function extractSourceLink(url) {
+  const key = process.env.TAVILY_API_KEY;
+  if (!key) {
+    throw Object.assign(
+      new Error('TAVILY_API_KEY is required for Source Link extraction.'),
+      { status:503 }
+    );
+  }
+
+  const normalizedUrl = validatePublicSourceUrl(url);
+  const cached = SOURCE_EXTRACT_CACHE.get(normalizedUrl);
+  if (cached && Date.now() - cached.savedAt < SOURCE_EXTRACT_CACHE_TTL_MS) {
+    return {...cached.data, cached:true};
+  }
+
+  const res = await fetchWithTimeout('https://api.tavily.com/extract', {
+    method:'POST',
+    headers:{
+      'Authorization':`Bearer ${key}`,
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify({
+      urls:[normalizedUrl],
+      extract_depth:'basic',
+      include_images:false
+    })
+  }, 12000);
+
+  if (!res.ok) throw await readErrorResponse(res);
+  const data = await res.json();
+  const result = Array.isArray(data?.results) ? data.results[0] : null;
+  const raw = String(result?.raw_content || result?.content || '')
+    .replace(/\u0000/g,'')
+    .trim();
+
+  if (raw.length < 120) {
+    const failed = Array.isArray(data?.failed_results) ? data.failed_results[0] : null;
+    const reason = failed?.error || failed?.message || 'The page returned too little usable text.';
+    throw Object.assign(
+      new Error(`QZMAX could not extract enough usable content from this link. ${reason}`),
+      { status:422 }
+    );
+  }
+
+  const truncated = raw.length > SOURCE_LINK_MAX_CHARS;
+  const content = raw.slice(0, SOURCE_LINK_MAX_CHARS);
+  const resolvedUrl = String(result?.url || normalizedUrl);
+  let domain = '';
+  try { domain = new URL(resolvedUrl).hostname.replace(/^www\./,''); } catch (_) {}
+
+  const response = {
+    url:resolvedUrl,
+    domain,
+    title:sourceTitleFromExtract(result,content,resolvedUrl),
+    content,
+    chars:content.length,
+    words:(content.match(/\S+/g) || []).length,
+    truncated,
+    extractDepth:'basic',
+    cached:false
+  };
+
+  SOURCE_EXTRACT_CACHE.set(normalizedUrl,{savedAt:Date.now(),data:response});
+  return response;
+}
+
+exports.handler = async function handler(event) {
+  // Lightweight status endpoint — does not spend AI quota.
+  if (event.httpMethod === 'GET') {
+    return jsonResponse(200, {
+      version:'3.14.0',
+      freeOnly:true,
+      factualRetrieval:'Tavily search + Tavily Extract for host-selected Source Links',
+      sourceLinkExtraction:'Tavily Extract · exact selected page only',
+      factualVerification:'Topic-scope audit + question-specific Tavily + blind two-source answer audit + canonical factKey',
+      configured:configuredRoutes(),
+      customTopicOrder:CUSTOM_DEFAULT_ORDER,
+      strictOrder:STRICT_DEFAULT_ORDER,
+    });
+  }
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode:204, headers:{'Cache-Control':'no-store'}, body:'' };
+  }
+  if (event.httpMethod !== 'POST') {
+    return jsonResponse(405, { error:'Method not allowed.' });
+  }
 
   let body;
   try {
     body = JSON.parse(event.body || '{}');
   } catch (_) {
-    return jsonResponse(400, { error: 'Invalid JSON request.' });
+    return jsonResponse(400, { error:'Invalid JSON request.' });
+  }
+
+  if (body.action === 'extract_source') {
+    try {
+      const extracted = await extractSourceLink(body.url);
+      return jsonResponse(200, extracted);
+    } catch (err) {
+      const status = Number(err?.status) || 502;
+      return jsonResponse(
+        status >= 400 && status < 600 ? status : 502,
+        { error:String(err?.message || 'Could not extract this source link.').slice(0,1200) }
+      );
+    }
   }
 
   const request = {
-    topic: String(body.topic || '').trim(),
-    originalTopic: String(body.originalTopic || '').trim(),
-    count: safeInt(body.count, 10, 1, MAX_BATCH),
-    optsPerQ: safeInt(body.optsPerQ, 4, 2, MAX_OPTIONS),
-    questionType: ['multiple_choice', 'true_false', 'multiple_correct'].includes(body.questionType)
+    topic:String(body.topic || '').trim(),
+    originalTopic:String(body.originalTopic || '').trim(),
+    count:safeInt(body.count,10,1,MAX_BATCH),
+    optsPerQ:safeInt(body.optsPerQ,4,2,MAX_OPTIONS),
+    questionType:['multiple_choice','true_false','multiple_correct'].includes(body.questionType)
       ? body.questionType : 'multiple_choice',
-    questionLanguage: ['English', 'Arabic', 'Egyptian Simple Arabic'].includes(body.questionLanguage)
+    questionLanguage:['English','Arabic','Egyptian Simple Arabic'].includes(body.questionLanguage)
       ? body.questionLanguage : 'English',
+    sourceType:String(body.sourceType || '').trim().toLowerCase(),
+    sourceName:String(body.sourceName || '').trim(),
+    sourceUrls:Array.isArray(body.sourceUrls)
+      ? body.sourceUrls.map(v=>String(v).trim().slice(0,1200)).filter(Boolean).slice(0,2)
+      : [],
+    sourceEvidenceText:String(body.sourceEvidenceText || '').slice(0,20000),
+    preferSearch:body.preferSearch === true,
+    generationId:String(body.generationId || '').trim().slice(0,100),
+    scopeInstruction:String(body.scopeInstruction || '').trim().slice(0,5000),
+    generalKnowledge:body.generalKnowledge === true,
+    coverageCategories:Array.isArray(body.coverageCategories)
+      ? body.coverageCategories.map(v=>String(v).trim().slice(0,120)).filter(Boolean).slice(0,12)
+      : [],
+    avoidFactKeys:Array.isArray(body.avoidFactKeys)
+      ? body.avoidFactKeys.map(v=>String(v).trim().slice(0,240)).filter(Boolean).slice(0,80)
+      : [],
   };
 
-  if (!request.topic) return jsonResponse(400, { error: 'A topic or source is required.' });
-  const messages = buildMessages(request);
+  if (!request.topic) {
+    return jsonResponse(400, { error:'A topic or source is required.' });
+  }
+
   const deadline = Date.now() + GLOBAL_BUDGET_MS;
+  const customWebVerified = request.sourceType === 'ai' || request.preferSearch === true;
+  let webEvidence = [];
+  let messages = buildMessages(request);
+
+  if (customWebVerified && !request.generalKnowledge) {
+    try {
+      webEvidence = await fetchTavilyEvidence(request, deadline);
+      messages = buildWebEvidenceMessages(messages, request, webEvidence);
+    } catch (err) {
+      console.warn('[QZMAX VERIFY] Tavily retrieval failed', String(err?.message || err).slice(0,500));
+      return jsonResponse(503, {
+        error:'QZMAX could not retrieve enough web evidence to safely draft this Custom Topic. No unchecked questions were generated. Please try a more specific topic or try again shortly.',
+        details:process.env.QZMAX_AI_DEBUG === '1' ? [String(err?.message || err)] : undefined
+      });
+    }
+  } else if (customWebVerified && request.generalKnowledge) {
+    messages = [
+      ...messages,
+      {
+        role:'user',
+        content:[
+          'GENERAL KNOWLEDGE DRAFTING MODE.',
+          request.scopeInstruction,
+          request.coverageCategories.length
+            ? 'Required category labels: '+request.coverageCategories.join(' | ')
+            : '',
+          'Draft broadly across the required categories. Every candidate will be independently searched and fact-checked before release.'
+        ].filter(Boolean).join('\n')
+      }
+    ];
+  }
+
+  const order = parseProviderOrder(request);
   const errors = [];
 
-  for (const provider of parseProviderOrder()) {
-    if (Date.now() >= deadline && provider !== 'local') {
-      errors.push(`${provider}: skipped because the request time budget was exhausted`);
+  for (const route of order) {
+    if (route !== 'local' && routeOnCooldown(route)) {
+      errors.push(`${route}: cooling down after a recent rate limit`);
       continue;
     }
+
+    if (Date.now() >= deadline && route !== 'local') {
+      errors.push(`${route}: skipped because the Netlify function time budget was exhausted`);
+      continue;
+    }
+
     try {
-      const raw = await runProvider(provider, messages, request, deadline);
-      const valid = validateQuestions(raw, request);
-      if (valid.length) {
-        console.log(`[QZMAX AI] provider=${provider} model=${provider === 'groq' ? GROQ_MODEL : provider === 'cloudflare' ? CLOUDFLARE_MODEL : provider === 'gemini' ? GEMINI_MODEL : 'source-fallback'} valid=${valid.length}`);
-        return jsonResponse(200, valid.slice(0, request.count), {
-          'X-QZMAX-AI-Provider': provider,
+      const raw = await runProvider(route, messages, request, deadline);
+      const structurallyValid = applyCoverageGuard(validateQuestions(raw, request), request);
+
+      if (structurallyValid.length) {
+        const provider = routeProvider(route);
+        const model = routeModel(route);
+
+        if (customWebVerified) {
+          const audit = await verifyCandidatesWithIndependentModel(
+            structurallyValid,
+            webEvidence,
+            request,
+            deadline,
+            route
+          );
+          const verified = audit.verified || [];
+
+          if (verified.length) {
+            console.log(`[QZMAX AI] route=${route} provider=${provider} model=${model} twoSourceChecked=${verified.length}/${request.count} blindVerifier=${audit.verifierRoute}`);
+            return jsonResponse(200, verified.slice(0, request.count), {
+              'X-QZMAX-AI-Provider':provider,
+              'X-QZMAX-AI-Model':model,
+              'X-QZMAX-AI-Route':route,
+              'X-QZMAX-AI-Verification':`Question-specific Tavily × 2 sources + blind ${routeProvider(audit.verifierRoute)}`
+            });
+          }
+
+          errors.push(`${route}: blind two-source verifier rejected all candidate facts`);
+          continue;
+        }
+
+        console.log(`[QZMAX AI] route=${route} provider=${provider} model=${model} valid=${structurallyValid.length}/${request.count}`);
+        return jsonResponse(200, structurallyValid.slice(0, request.count), {
+          'X-QZMAX-AI-Provider':provider,
+          'X-QZMAX-AI-Model':model,
+          'X-QZMAX-AI-Route':route
         });
       }
-      errors.push(`${provider}: no structurally valid questions returned`);
+
+      errors.push(`${route}: no structurally valid questions`);
     } catch (err) {
       if (err?.skip) {
-        errors.push(`${provider}: not configured`);
-      } else {
-        const status = err?.status ? ` HTTP ${err.status}` : '';
-        errors.push(`${provider}:${status} ${String(err?.message || err).slice(0, 300)}`);
-        console.warn(`[QZMAX AI] ${provider} failed:${status}`, String(err?.message || err).slice(0, 600));
+        errors.push(`${route}: not configured`);
+        continue;
       }
+
+      markRouteCooldown(route, err);
+      const status = err?.status ? `HTTP ${err.status}` : '';
+      errors.push(`${route}: ${status} ${String(err?.message || err).slice(0,240)}`);
+      console.warn(`[QZMAX AI] ${route} failed ${status}`, String(err?.message || err).slice(0,500));
     }
   }
 
   return jsonResponse(503, {
-    error: 'All free AI routes are currently unavailable or rate-limited, and the source-only fallback could not build a usable batch. Please wait a moment and try again.',
-    details: process.env.QZMAX_AI_DEBUG === '1' ? errors : undefined,
+    error:customWebVerified
+      ? 'QZMAX could not establish the requested questions with two independent web sources and a blind answer check. No unchecked questions were added. Try a more specific topic or request fewer questions.'
+      : 'All configured free AI routes are currently unavailable or rate-limited. QZMAX kept the requested batch size unchanged. Configure additional free providers or try again shortly.',
+    details:process.env.QZMAX_AI_DEBUG === '1' ? errors : undefined,
   });
 };
