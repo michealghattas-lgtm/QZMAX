@@ -2815,6 +2815,1295 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
   -webkit-backdrop-filter:blur(7px);
 }
 
+
+/* ===== QZMAX 3.13.0 — Dark / Bright Theme System ===== */
+html[data-theme="dark"]{color-scheme:dark;}
+html[data-theme="light"]{
+  color-scheme:light;
+  --void:#f3f6fb;
+  --surface:rgba(255,255,255,.82);
+  --surface-2:rgba(246,249,255,.94);
+  --line:rgba(36,74,125,.18);
+  --ink:#142033;
+  --muted:#61718a;
+  --signal:#0878f9;
+  --signal-ink:#ffffff;
+  --correct:#008b61;
+  --wrong:#d92b58;
+}
+html[data-theme="light"],html[data-theme="light"] body{background:#f3f6fb!important;}
+html[data-theme="light"] #quiz-root{background:radial-gradient(circle at 50% 0%,#fff 0%,#eef3f9 72%)!important;color:var(--ink)!important;}
+html[data-theme="light"] p{color:var(--muted);}
+html[data-theme="light"] .card,
+html[data-theme="light"] .qlist-item,
+html[data-theme="light"] .opt-card,
+html[data-theme="light"] .lb-row,
+html[data-theme="light"] .chip{background:rgba(255,255,255,.84)!important;border-color:rgba(45,85,135,.16)!important;box-shadow:0 12px 35px rgba(43,66,95,.08);}
+html[data-theme="light"] .btn-ghost{background:rgba(255,255,255,.88)!important;color:var(--ink)!important;border-color:rgba(45,85,135,.17)!important;}
+html[data-theme="light"] .btn-danger{background:rgba(217,43,88,.07)!important;}
+html[data-theme="light"] input[type=text],
+html[data-theme="light"] input[type=password],
+html[data-theme="light"] input[type=email],
+html[data-theme="light"] input[type=number],
+html[data-theme="light"] textarea,
+html[data-theme="light"] select{background:rgba(255,255,255,.94)!important;color:var(--ink)!important;border-color:rgba(45,85,135,.18)!important;}
+html[data-theme="light"] select option{background:#fff!important;color:#18243a!important;}
+html[data-theme="light"] .opt-letter,
+html[data-theme="light"] .correct-toggle:not(.on){background:#eef3fa!important;color:#52637d!important;}
+html[data-theme="light"] .bar-track{background:rgba(40,65,95,.10)!important;}
+html[data-theme="light"] .ring-bg{stroke:rgba(40,65,95,.12)!important;}
+
+.qz-global-theme-toggle{
+  position:fixed;z-index:9999;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:7px;height:40px;padding:0 13px;border-radius:999px;
+  border:1px solid rgba(126,155,210,.22);background:rgba(10,16,34,.80);color:#f8fbff;
+  box-shadow:0 10px 34px rgba(0,0,0,.22);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  font:700 11px/1 'Inter',sans-serif;letter-spacing:.02em;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.qz-global-theme-toggle:hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(0,0,0,.26);}
+html[data-theme="light"] .qz-global-theme-toggle{background:rgba(255,255,255,.88);color:#1e2b41;border-color:rgba(50,80,120,.16);box-shadow:0 10px 34px rgba(60,85,115,.15);}
+
+/* Bright treatment using existing QZMAX photography */
+html[data-theme="light"] .host-dashboard::before{background:linear-gradient(180deg,rgba(248,251,255,.78),rgba(239,245,252,.90)),url("assets/background-home.png") center center / cover no-repeat!important;}
+html[data-theme="light"] #screen-host-setup{background:linear-gradient(180deg,rgba(248,251,255,.76),rgba(239,245,252,.90)),url("assets/background-home.png") center center / cover fixed no-repeat!important;}
+html[data-theme="light"] .qz-host-auth-stage,
+html[data-theme="light"] .qz-premium-entry{background-image:linear-gradient(180deg,rgba(249,252,255,.72),rgba(238,244,251,.90)),url("assets/background-home.png")!important;}
+html[data-theme="light"] .qz-host-auth-overlay,
+html[data-theme="light"] .qz-premium-entry-shade{background:linear-gradient(180deg,rgba(249,252,255,.40),rgba(238,244,251,.72))!important;}
+html[data-theme="light"] .qz-host-auth-card,
+html[data-theme="light"] .qz-premium-entry-card{background:rgba(255,255,255,.86)!important;color:var(--ink)!important;border-color:rgba(50,85,135,.15)!important;box-shadow:0 26px 75px rgba(46,73,106,.15)!important;}
+html[data-theme="light"] .qz-premium-entry-option{background:rgba(247,250,255,.93)!important;color:var(--ink)!important;border-color:rgba(50,85,135,.15)!important;}
+html[data-theme="light"] .qz-premium-entry-option small,
+html[data-theme="light"] .qz-host-auth-subtitle{color:var(--muted)!important;}
+
+html[data-theme="light"] #screen-player-join,
+html[data-theme="light"] #screen-player-lobby,
+html[data-theme="light"] #screen-player-question,
+html[data-theme="light"] #screen-player-reveal,
+html[data-theme="light"] #screen-player-leaderboard,
+html[data-theme="light"] #screen-player-final,
+html[data-theme="light"] #screen-player-ended{color:var(--ink)!important;}
+html[data-theme="light"] #screen-player-join::before,
+html[data-theme="light"] #screen-player-lobby::before,
+html[data-theme="light"] #screen-player-question::before,
+html[data-theme="light"] #screen-player-reveal::before,
+html[data-theme="light"] #screen-player-leaderboard::before,
+html[data-theme="light"] #screen-player-final::before,
+html[data-theme="light"] #screen-player-ended::before{background:linear-gradient(180deg,rgba(247,251,255,.77),rgba(235,242,250,.91))!important;}
+html[data-theme="light"] .qz-player-join-card,
+html[data-theme="light"] .player-reveal-card,
+html[data-theme="light"] .exam-player-shell,
+html[data-theme="light"] .exam-host-shell{background:rgba(255,255,255,.88)!important;color:var(--ink)!important;border-color:rgba(50,85,135,.15)!important;box-shadow:0 24px 65px rgba(43,69,99,.13)!important;}
+html[data-theme="light"] .qz-player-join-sub,
+html[data-theme="light"] .player-score-cell span{color:var(--muted)!important;}
+
+html[data-theme="light"] .hd-card{background:rgba(255,255,255,.88)!important;border-color:rgba(50,85,135,.14)!important;box-shadow:0 16px 46px rgba(45,70,100,.10)!important;}
+html[data-theme="light"] .hd-stat,
+html[data-theme="light"] .hd-quick,
+html[data-theme="light"] .hd-active,
+html[data-theme="light"] .hd-empty,
+html[data-theme="light"] .hd-quiz-row,
+html[data-theme="light"] .hd-history-row{background:rgba(255,255,255,.70)!important;border-color:rgba(50,85,135,.12)!important;}
+html[data-theme="light"] .hd-card-head span,
+html[data-theme="light"] .hd-row-sub,
+html[data-theme="light"] .hd-quick span{color:var(--muted)!important;}
+
+/* Edit animation */
+.qz-edit-focus{animation:qzEditFocus 1s ease both;}
+@keyframes qzEditFocus{0%{box-shadow:0 0 0 0 rgba(0,212,255,0)}35%{box-shadow:0 0 0 4px rgba(0,212,255,.22),0 18px 55px rgba(0,0,0,.18)}100%{box-shadow:0 0 0 0 rgba(0,212,255,0)}}
+.qlist-item.qz-return-focus{animation:qzQuestionReturn 1.15s ease both;}
+@keyframes qzQuestionReturn{0%{transform:translateX(0)}30%{transform:translateX(5px);border-color:var(--signal)}100%{transform:translateX(0)}}
+
+/* Commercial landing */
+.qz-saas-home{min-height:100dvh;overflow:auto;color:#f7fbff;background:linear-gradient(100deg,rgba(2,7,22,.94) 0%,rgba(3,9,30,.78) 48%,rgba(4,11,31,.68) 100%),url("assets/background-home.png") center top / cover fixed no-repeat;}
+html[data-theme="light"] .qz-saas-home{color:#142033;background:linear-gradient(100deg,rgba(248,251,255,.96) 0%,rgba(245,249,254,.88) 52%,rgba(238,245,252,.82) 100%),url("assets/background-home.png") center top / cover fixed no-repeat;}
+.qz-saas-shell{width:min(1180px,92vw);margin:0 auto;padding:22px 0 58px;}
+.qz-saas-nav{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:3px 0 28px;}
+.qz-saas-logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-size:23px;font-weight:900;letter-spacing:-.055em;}
+.qz-saas-logo img{width:38px;height:38px;border-radius:11px;object-fit:cover;box-shadow:0 8px 20px rgba(0,0,0,.22);}
+.qz-saas-logo b{color:var(--signal);}
+.qz-saas-navlinks{display:flex;align-items:center;gap:6px;}
+.qz-saas-navbtn{border:0;background:transparent;color:inherit;padding:9px 11px;border-radius:10px;font:700 12px 'Inter',sans-serif;cursor:pointer;opacity:.82;}
+.qz-saas-navbtn:hover{background:rgba(255,255,255,.07);opacity:1;}
+html[data-theme="light"] .qz-saas-navbtn:hover{background:rgba(28,77,135,.06);}
+.qz-saas-hero{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(360px,.92fr);gap:54px;align-items:center;padding:64px 0 72px;}
+.qz-saas-kicker{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:rgba(0,212,255,.10);border:1px solid rgba(0,212,255,.22);color:#7ee9ff;font-size:10px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;}
+html[data-theme="light"] .qz-saas-kicker{color:#006cc7;background:rgba(0,119,255,.07);border-color:rgba(0,119,255,.16);}
+.qz-saas-hero h1{font-size:clamp(43px,6vw,75px);line-height:.98;letter-spacing:-.065em;margin:18px 0 20px;max-width:760px;}
+.qz-saas-hero h1 span{color:var(--signal);}
+.qz-saas-hero p{max-width:690px;font-size:clamp(16px,1.7vw,19px);color:rgba(228,237,252,.76);line-height:1.65;}
+html[data-theme="light"] .qz-saas-hero p{color:#5b6d85;}
+.qz-saas-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}.qz-saas-cta .btn{min-width:150px;}
+.qz-saas-trust{display:flex;gap:9px;flex-wrap:wrap;margin-top:23px}.qz-saas-trust span{font-size:10px;font-weight:800;padding:7px 9px;border-radius:999px;background:rgba(255,255,255,.055);border:1px solid rgba(143,169,216,.13);}
+html[data-theme="light"] .qz-saas-trust span{background:rgba(255,255,255,.65);border-color:rgba(50,85,135,.12);}
+.qz-product-mock{position:relative;border-radius:28px;padding:18px;background:linear-gradient(145deg,rgba(16,25,53,.91),rgba(7,13,30,.96));border:1px solid rgba(129,160,230,.18);box-shadow:0 35px 100px rgba(0,0,0,.38);backdrop-filter:blur(18px);}
+html[data-theme="light"] .qz-product-mock{background:rgba(255,255,255,.87);border-color:rgba(50,85,135,.14);box-shadow:0 30px 85px rgba(47,70,100,.17);}
+.qz-product-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.qz-product-dots{display:flex;gap:5px}.qz-product-dots i{display:block;width:7px;height:7px;border-radius:50%;background:#40516f}.qz-product-dots i:nth-child(1){background:#ff5277}.qz-product-dots i:nth-child(2){background:#ffd05b}.qz-product-dots i:nth-child(3){background:#4ee6ab}.qz-product-ai{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.qz-mock-card{padding:15px;border-radius:17px;background:rgba(255,255,255,.045);border:1px solid rgba(134,160,214,.11);margin-bottom:10px}html[data-theme="light"] .qz-mock-card{background:#f7faff;border-color:rgba(50,85,135,.10)}.qz-mock-label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;font-weight:800;color:var(--muted);margin-bottom:7px}.qz-mock-topic{font-size:14px;font-weight:800}.qz-mock-generate{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}.qz-mock-pills{display:flex;gap:6px;flex-wrap:wrap}.qz-mock-pills span{font-size:9px;padding:5px 7px;border-radius:999px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.14);color:#70e5ff}html[data-theme="light"] .qz-mock-pills span{color:#006bc2;background:rgba(0,119,255,.06);border-color:rgba(0,119,255,.12)}.qz-mock-question{display:grid;grid-template-columns:31px 1fr auto;align-items:center;gap:9px;padding:11px 12px;border-radius:13px;background:rgba(255,255,255,.035);margin-top:7px;font-size:11px;font-weight:700}html[data-theme="light"] .qz-mock-question{background:#f7faff}.qz-mock-question b{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:rgba(0,212,255,.09);color:var(--signal)}.qz-mock-question small{font-size:8px;color:var(--correct);white-space:nowrap}
+.qz-saas-section{padding:50px 0}.qz-saas-section-head{text-align:center;max-width:720px;margin:0 auto 27px}.qz-saas-section-head h2{font-size:clamp(29px,4vw,46px);letter-spacing:-.05em;margin-bottom:11px}.qz-saas-section-head p{font-size:15px;color:rgba(221,231,248,.68)}html[data-theme="light"] .qz-saas-section-head p{color:var(--muted)}
+.qz-market-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.qz-market-card{padding:20px;border-radius:21px;background:rgba(10,18,41,.72);border:1px solid rgba(128,156,216,.13);backdrop-filter:blur(14px)}html[data-theme="light"] .qz-market-card{background:rgba(255,255,255,.74);border-color:rgba(50,85,135,.11);box-shadow:0 12px 35px rgba(46,72,104,.07)}.qz-market-card img{width:48px;height:48px;object-fit:contain;margin-bottom:12px}.qz-market-card h3{font-size:16px;margin-bottom:7px}.qz-market-card p{font-size:12px;line-height:1.55}
+.qz-au-strip{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center;padding:28px;border-radius:26px;background:linear-gradient(120deg,rgba(0,212,255,.09),rgba(70,78,255,.08));border:1px solid rgba(0,212,255,.14)}.qz-au-strip h2{font-size:clamp(27px,3.5vw,42px);letter-spacing:-.05em}.qz-au-strip p{font-size:14px;margin-top:9px}.qz-au-points{display:grid;grid-template-columns:1fr 1fr;gap:9px}.qz-au-points div{padding:13px;border-radius:15px;background:rgba(255,255,255,.05);border:1px solid rgba(126,155,210,.11);font-size:11px;font-weight:750}html[data-theme="light"] .qz-au-points div{background:rgba(255,255,255,.65);border-color:rgba(50,85,135,.11)}
+.qz-saas-footer{padding:38px 0 10px;border-top:1px solid rgba(128,156,216,.12);display:flex;align-items:center;justify-content:space-between;gap:15px;color:var(--muted);font-size:11px}
+
+/* Account / Student */
+.qz-account-shell,.qz-student-shell{width:min(1080px,94vw);margin:0 auto;padding:10px 0 46px}.qz-account-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}.qz-account-brand{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:900}.qz-account-brand img{width:34px;height:34px;border-radius:10px}.qz-account-header{padding:23px;border-radius:25px;background:var(--surface);border:1px solid var(--line);margin-bottom:15px;backdrop-filter:blur(18px)}.qz-account-header h1{font-size:clamp(30px,4vw,45px);letter-spacing:-.05em;margin:6px 0}.qz-account-header p{max-width:700px}.qz-account-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:15px}.qz-account-card{padding:20px;border-radius:21px;background:var(--surface);border:1px solid var(--line);backdrop-filter:blur(16px)}.qz-account-card h3{font-size:16px;margin-bottom:15px}.qz-account-fields{display:grid;grid-template-columns:1fr 1fr;gap:11px}.qz-account-fields .wide{grid-column:1/-1}.qz-account-value{padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid var(--line);font-size:12px}html[data-theme="light"] .qz-account-value{background:#f7faff}.qz-plan-card{padding:18px;border-radius:18px;background:linear-gradient(135deg,rgba(0,212,255,.10),rgba(80,75,255,.09));border:1px solid rgba(0,212,255,.16);margin-bottom:12px}.qz-plan-card strong{display:block;font-size:19px;margin:4px 0}.qz-plan-card small{color:var(--muted)}.qz-theme-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}.qz-theme-choice button{padding:12px;border-radius:13px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font-weight:800;cursor:pointer}.qz-theme-choice button.active{border-color:var(--signal);box-shadow:0 0 0 2px rgba(0,212,255,.10)}.qz-student-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:20px}.qz-student-card{padding:22px;border-radius:23px;background:var(--surface);border:1px solid var(--line);backdrop-filter:blur(16px)}.qz-student-card h2{font-size:28px;letter-spacing:-.04em;margin:7px 0}.qz-student-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:17px}
+.qz-role-select{display:none;gap:8px;text-align:left}.qz-role-select.show{display:grid}.qz-role-choice{display:grid;grid-template-columns:32px 1fr;gap:9px;padding:11px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2);cursor:pointer}.qz-role-choice input{margin:4px 0 0}.qz-role-choice strong{display:block;font-size:12px}.qz-role-choice small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.qz-google-btn{display:flex;align-items:center;justify-content:center;gap:9px;background:#fff!important;color:#202124!important;border:1px solid #dadce0!important;font-weight:750!important}.qz-google-g{width:20px;height:20px;display:grid;place-items:center;border-radius:50%;font-size:15px;font-weight:900;color:#4285f4}.qz-auth-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:10px;margin:4px 0}.qz-auth-divider:before,.qz-auth-divider:after{content:"";height:1px;background:var(--line);flex:1}.qz-auth-name-role{display:none}.qz-auth-name-role.show{display:block}
+
+@media(max-width:900px){.qz-saas-navlinks .qz-hide-tablet{display:none}.qz-saas-hero{grid-template-columns:1fr;gap:28px;padding:35px 0 48px}.qz-product-mock{max-width:640px}.qz-market-grid{grid-template-columns:1fr 1fr}.qz-au-strip{grid-template-columns:1fr}.qz-account-grid,.qz-student-hero{grid-template-columns:1fr}}
+@media(max-width:600px){.qz-global-theme-toggle{width:40px;padding:0;justify-content:center}.qz-global-theme-toggle #qz-theme-label{display:none}.qz-saas-shell{width:min(94vw,1180px);padding-top:13px}.qz-saas-nav{padding-bottom:13px}.qz-saas-navlinks .qz-hide-mobile{display:none}.qz-saas-hero{padding-top:27px}.qz-saas-hero h1{font-size:44px}.qz-saas-cta{display:grid}.qz-saas-cta .btn{width:100%}.qz-market-grid{grid-template-columns:1fr}.qz-au-points{grid-template-columns:1fr}.qz-saas-footer{flex-direction:column;align-items:flex-start}.qz-account-fields{grid-template-columns:1fr}.qz-account-fields .wide{grid-column:auto}.qz-student-actions{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   QZMAX 3.13.1 — Bright Mode Refinement
+   Cool daylight, not white wash
+   ========================================================= */
+html[data-theme="light"]{
+  --void:#cedcea;
+  --surface:rgba(225,237,249,.86);
+  --surface-2:rgba(216,230,246,.93);
+  --line:rgba(35,73,119,.23);
+  --ink:#14253b;
+  --muted:#526a84;
+  --signal:#0875df;
+  --signal-ink:#ffffff;
+  --correct:#08795c;
+  --wrong:#cc315a;
+}
+html[data-theme="light"],html[data-theme="light"] body{background:#cedcea!important;}
+html[data-theme="light"] #quiz-root{
+  background:radial-gradient(circle at 20% 0%,rgba(225,239,253,.88),transparent 43%),linear-gradient(180deg,#d9e6f3 0%,#c7d7e7 100%)!important;
+  color:var(--ink)!important;
+}
+html[data-theme="light"] .card,
+html[data-theme="light"] .qlist-item,
+html[data-theme="light"] .opt-card,
+html[data-theme="light"] .lb-row,
+html[data-theme="light"] .chip{
+  background:rgba(225,236,248,.83)!important;
+  border-color:rgba(36,74,121,.19)!important;
+  box-shadow:0 12px 32px rgba(39,66,96,.09);
+}
+html[data-theme="light"] input[type=text],html[data-theme="light"] input[type=password],html[data-theme="light"] input[type=email],html[data-theme="light"] input[type=number],html[data-theme="light"] textarea,html[data-theme="light"] select{
+  background:rgba(239,246,253,.88)!important;border-color:rgba(36,74,121,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.62);
+}
+html[data-theme="light"] .btn-ghost{background:rgba(221,234,247,.84)!important;border-color:rgba(35,73,119,.21)!important;}
+
+/* Marketing page: retain the background atmosphere */
+html[data-theme="light"] .qz-saas-home{
+  background:radial-gradient(circle at 14% 4%,rgba(210,231,252,.72),transparent 36%),linear-gradient(105deg,rgba(205,222,241,.84) 0%,rgba(216,229,244,.70) 49%,rgba(188,210,234,.69) 100%),url("assets/background-home.png") center top / cover fixed no-repeat!important;
+}
+html[data-theme="light"] .qz-product-mock{
+  background:linear-gradient(145deg,rgba(16,25,53,.94),rgba(7,13,30,.97))!important;color:#f7fbff!important;border-color:rgba(125,162,236,.22)!important;box-shadow:0 28px 72px rgba(34,55,81,.22)!important;
+}
+html[data-theme="light"] .qz-product-mock .qz-mock-card,html[data-theme="light"] .qz-product-mock .qz-mock-question{background:rgba(255,255,255,.055)!important;color:#f7fbff!important;border-color:rgba(134,160,214,.13)!important;}
+html[data-theme="light"] .qz-product-mock .qz-mock-topic{color:#f7fbff!important;}
+html[data-theme="light"] .qz-product-mock .qz-mock-label,html[data-theme="light"] .qz-product-mock .qz-product-ai{color:#91a2c2!important;}
+html[data-theme="light"] .qz-product-mock .qz-mock-question b{background:rgba(0,212,255,.10)!important;color:#70e5ff!important;}
+
+/* Login */
+html[data-theme="light"] .qz-host-auth-stage{
+  background-image:radial-gradient(circle at 50% 10%,rgba(204,226,248,.50),transparent 40%),linear-gradient(180deg,rgba(182,205,232,.40),rgba(191,211,234,.64)),url("assets/background-home.png")!important;
+}
+html[data-theme="light"] .qz-host-auth-overlay{background:linear-gradient(180deg,rgba(181,202,227,.15),rgba(154,181,213,.27))!important;}
+html[data-theme="light"] .qz-host-auth-card{
+  background:linear-gradient(180deg,rgba(224,236,249,.92),rgba(211,227,244,.92))!important;border-color:rgba(35,73,119,.22)!important;box-shadow:0 28px 72px rgba(42,65,93,.19),inset 0 1px 0 rgba(255,255,255,.68)!important;
+}
+html[data-theme="light"] .qz-host-auth-back{color:#243b59!important;font-weight:800;}
+html[data-theme="light"] .qz-host-auth-back:hover{color:#071b34!important;text-decoration:underline;}
+
+.qz-google-logo{width:21px;height:21px;object-fit:contain;flex:0 0 auto;}
+.qz-google-btn{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background .18s ease!important;box-shadow:0 4px 12px rgba(32,33,36,.05);}
+.qz-google-btn:hover{transform:translateY(-2px);background:#f8faff!important;border-color:#aeb9c8!important;box-shadow:0 10px 25px rgba(32,49,74,.14);}
+.qz-google-btn:active{transform:translateY(0) scale(.992);}
+.qz-auth-secondary{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease!important;}
+.qz-auth-secondary:hover{transform:translateY(-2px);border-color:rgba(8,117,223,.48)!important;background:rgba(211,228,247,.98)!important;box-shadow:0 9px 24px rgba(31,73,118,.12);}
+html[data-theme="dark"] .qz-auth-secondary:hover{background:rgba(26,38,72,.94)!important;border-color:rgba(83,192,255,.40)!important;}
+
+/* Get Started keeps the premium dark container in Bright mode */
+html[data-theme="light"] .qz-premium-entry{
+  background-image:radial-gradient(circle at 50% 5%,rgba(206,227,249,.45),transparent 39%),linear-gradient(180deg,rgba(184,206,232,.38),rgba(191,211,234,.59)),url("assets/background-home.png")!important;color:#fff!important;
+}
+html[data-theme="light"] .qz-premium-entry-shade{background:linear-gradient(180deg,rgba(177,200,226,.10),rgba(155,182,214,.25))!important;}
+html[data-theme="light"] .qz-premium-entry-card{
+  background:linear-gradient(180deg,rgba(9,15,38,.84),rgba(7,11,29,.91))!important;color:#fff!important;border-color:rgba(149,166,255,.18)!important;box-shadow:0 32px 86px rgba(31,52,79,.28),inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+html[data-theme="light"] .qz-premium-entry-option{background:rgba(16,23,48,.76)!important;color:#fff!important;border-color:rgba(139,155,222,.19)!important;}
+html[data-theme="light"] .qz-premium-entry-option:hover{background:rgba(23,34,67,.94)!important;border-color:rgba(83,192,255,.48)!important;}
+html[data-theme="light"] .qz-premium-entry-option small{color:#aab6cd!important;}
+html[data-theme="light"] .qz-premium-back{
+  color:#152d4a!important;background:rgba(219,233,247,.94)!important;border:1px solid rgba(68,104,145,.18)!important;border-radius:999px;padding:7px 10px;font-weight:850;line-height:1;
+}
+html[data-theme="light"] .qz-premium-back:hover{background:#edf5fc!important;color:#06182e!important;}
+html[data-theme="light"] .qz-premium-entry-kicker{
+  display:inline-flex;width:auto;padding:6px 9px;border-radius:999px;background:rgba(214,230,247,.96);color:#1f3a5a!important;font-weight:900;
+}
+
+/* Dashboard: deeper blue glass instead of white cards */
+html[data-theme="light"] .host-dashboard::before{
+  background:radial-gradient(circle at 16% 0%,rgba(198,222,248,.40),transparent 40%),linear-gradient(180deg,rgba(170,197,228,.37),rgba(193,213,235,.62)),url("assets/background-home.png") center center / cover no-repeat!important;
+}
+html[data-theme="light"] .hd-card{background:linear-gradient(145deg,rgba(218,232,247,.88),rgba(203,221,241,.91))!important;border-color:rgba(36,74,121,.20)!important;box-shadow:0 16px 42px rgba(34,63,94,.12)!important;}
+html[data-theme="light"] .hd-stat,html[data-theme="light"] .hd-quick,html[data-theme="light"] .hd-active,html[data-theme="light"] .hd-empty,html[data-theme="light"] .hd-quiz-row,html[data-theme="light"] .hd-history-row{background:rgba(225,237,249,.72)!important;border-color:rgba(35,73,119,.16)!important;}
+html[data-theme="light"] .hd-quick:hover,html[data-theme="light"] .hd-quiz-row:hover,html[data-theme="light"] .hd-history-row:hover{background:rgba(236,244,252,.90)!important;border-color:rgba(8,117,223,.27)!important;}
+
+/* Studio / Launch */
+html[data-theme="light"] #screen-host-setup{
+  background:radial-gradient(circle at 15% 0%,rgba(198,222,248,.38),transparent 42%),linear-gradient(180deg,rgba(170,197,228,.36),rgba(193,213,235,.61)),url("assets/background-home.png") center center / cover fixed no-repeat!important;
+}
+
+/* Player screens */
+html[data-theme="light"] #screen-player-join::before,html[data-theme="light"] #screen-player-lobby::before,html[data-theme="light"] #screen-player-question::before,html[data-theme="light"] #screen-player-reveal::before,html[data-theme="light"] #screen-player-leaderboard::before,html[data-theme="light"] #screen-player-final::before,html[data-theme="light"] #screen-player-ended::before{
+  background:radial-gradient(circle at 50% 10%,rgba(203,226,249,.35),transparent 43%),linear-gradient(180deg,rgba(181,205,232,.44),rgba(193,214,237,.64))!important;
+}
+html[data-theme="light"] .qz-player-join-card,html[data-theme="light"] .player-reveal-card,html[data-theme="light"] .exam-player-shell,html[data-theme="light"] .exam-host-shell{background:linear-gradient(180deg,rgba(224,237,249,.89),rgba(210,227,244,.91))!important;}
+
+/* Australian callouts */
+.qz-saas-kicker{font-size:11px!important;min-height:31px;}
+.qz-kicker-icon{display:inline-grid;place-items:center;font-size:18px;line-height:1;letter-spacing:0;transform:translateY(-.5px);}
+.qz-au-points{gap:11px!important;}
+.qz-au-points div{display:flex;align-items:center;gap:11px;min-height:58px;padding:15px 16px!important;font-size:13px!important;font-weight:800!important;line-height:1.3;}
+.qz-au-point-icon{display:grid;place-items:center;width:31px;min-width:31px;height:31px;font-size:22px;line-height:1;}
+html[data-theme="light"] .qz-au-points div{background:rgba(218,232,247,.76)!important;border-color:rgba(35,73,119,.16)!important;}
+.qz-market-card img{width:54px!important;height:54px!important;}
+.qz-market-card h3{font-size:17px!important;}
+.qz-market-card p{font-size:13px!important;line-height:1.62!important;}
+
+@media(max-width:600px){
+  .qz-saas-kicker{font-size:10.5px!important;letter-spacing:.09em!important;}
+  .qz-kicker-icon{font-size:17px;}
+  .qz-au-points div{font-size:13px!important;}
+}
+
+
+/* =========================================================
+   QZMAX 3.13.2 — Bright Theme Contrast Audit
+   Fixes hard-coded Dark-mode colours on pale Bright surfaces
+   ========================================================= */
+
+/* ---------- Dashboard ---------- */
+html[data-theme="light"] .host-dashboard{
+  color:#12243b!important;
+}
+html[data-theme="light"] .host-dashboard .eyebrow{
+  color:#4b3db8!important;
+  font-weight:900!important;
+  text-shadow:none!important;
+}
+html[data-theme="light"] .hd-welcome h1{
+  color:#102238!important;
+}
+html[data-theme="light"] .hd-welcome p{
+  color:#49627e!important;
+  font-weight:560;
+}
+html[data-theme="light"] .hd-card-head h3,
+html[data-theme="light"] .hd-row-title,
+html[data-theme="light"] .hd-stat strong,
+html[data-theme="light"] .hd-active strong{
+  color:#13263e!important;
+}
+html[data-theme="light"] .hd-stat span{
+  color:#58718d!important;
+}
+html[data-theme="light"] .hd-quick{
+  color:#13263e!important;
+}
+html[data-theme="light"] .hd-quick strong{
+  color:#13263e!important;
+  font-weight:850!important;
+}
+html[data-theme="light"] .hd-quick span{
+  color:#4f6985!important;
+  font-size:10.5px!important;
+}
+html[data-theme="light"] .hd-quick-icon{
+  color:#0875df!important;
+}
+html[data-theme="light"] .hd-empty{
+  color:#4f6985!important;
+}
+html[data-theme="light"] .hd-row-sub,
+html[data-theme="light"] .hd-card-head span{
+  color:#5b7189!important;
+}
+
+/* ---------- Host top bar / room code ---------- */
+html[data-theme="light"] #screen-host-setup .topbar .chip{
+  color:#1d314a!important;
+  background:rgba(222,235,248,.90)!important;
+  border-color:rgba(36,74,121,.20)!important;
+}
+html[data-theme="light"] #screen-host-setup .code-text{
+  color:#0072a8!important;
+  text-shadow:none!important;
+  font-weight:900!important;
+}
+html[data-theme="light"] #screen-host-setup #host-setup-playercount{
+  color:#1d314a!important;
+}
+
+/* ---------- Dark premium header inside Bright mode ---------- */
+html[data-theme="light"] #screen-host-setup .host-workspace-header{
+  background:linear-gradient(180deg,rgba(15,23,48,.90),rgba(10,16,34,.88))!important;
+  border-color:rgba(118,144,215,.24)!important;
+  color:#f7f9ff!important;
+}
+html[data-theme="light"] #screen-host-setup .host-workspace-header h2{
+  color:#f6f8ff!important;
+}
+html[data-theme="light"] #screen-host-setup .host-workspace-header p{
+  color:#aebdd3!important;
+}
+html[data-theme="light"] #screen-host-setup .host-workspace-header .eyebrow{
+  color:#ab95ff!important;
+  font-weight:900!important;
+}
+html[data-theme="light"] #screen-host-setup .host-workspace-tab{
+  background:rgba(11,18,40,.88)!important;
+  color:#b8c4d8!important;
+  border-color:rgba(118,144,215,.24)!important;
+}
+html[data-theme="light"] #screen-host-setup .host-workspace-tab.active{
+  color:#fff!important;
+  border-color:rgba(72,205,255,.48)!important;
+  background:linear-gradient(135deg,rgba(37,198,255,.18),rgba(89,90,255,.24),rgba(178,43,255,.15))!important;
+}
+
+/* ---------- Launch mode cards remain dark, with correct light text ---------- */
+html[data-theme="light"] #screen-host-setup .mode-card{
+  background:linear-gradient(145deg,rgba(17,26,48,.94),rgba(9,15,29,.97))!important;
+  border-color:rgba(126,151,216,.22)!important;
+  color:#f4f7ff!important;
+}
+html[data-theme="light"] #screen-host-setup .mode-card h3,
+html[data-theme="light"] #screen-host-setup .mode-card strong{
+  color:#f4f7ff!important;
+}
+html[data-theme="light"] #screen-host-setup .mode-card p,
+html[data-theme="light"] #screen-host-setup .mode-card .qtype-hint,
+html[data-theme="light"] #screen-host-setup .mode-card .team-mode-note{
+  color:#98aac3!important;
+}
+html[data-theme="light"] #screen-host-setup .mode-card .eyebrow{
+  color:#aa94ff!important;
+}
+html[data-theme="light"] #screen-host-setup .mode-btn{
+  color:#aebbd0!important;
+  background:rgba(255,255,255,.035)!important;
+}
+html[data-theme="light"] #screen-host-setup .mode-btn.active{
+  color:#fff!important;
+}
+
+/* ---------- Join/invite card ---------- */
+html[data-theme="light"] #screen-host-setup > .card:first-of-type{
+  color:#172b44!important;
+}
+html[data-theme="light"] #screen-host-setup > .card:first-of-type .eyebrow{
+  color:#6556cf!important;
+  font-weight:900!important;
+}
+html[data-theme="light"] #screen-host-setup > .card:first-of-type label{
+  color:#48627e!important;
+}
+html[data-theme="light"] #host-link-msg{
+  font-weight:650;
+}
+
+/* ---------- Quiz Studio main generator card ---------- */
+html[data-theme="light"] .verified-ai-card{
+  color:#14273f!important;
+}
+html[data-theme="light"] .verified-ai-card h3{
+  color:#12243a!important;
+}
+html[data-theme="light"] .verified-ai-card p{
+  color:#526a84!important;
+}
+html[data-theme="light"] .verified-engine-badge{
+  color:#006d99!important;
+  background:rgba(18,170,214,.08)!important;
+  border-color:rgba(18,150,195,.22)!important;
+}
+html[data-theme="light"] .ai-source-tab{
+  color:#2e4764!important;
+  background:rgba(202,219,238,.72)!important;
+  border-color:rgba(43,79,123,.18)!important;
+}
+html[data-theme="light"] .ai-source-tab:hover{
+  background:rgba(214,229,244,.94)!important;
+  border-color:rgba(8,117,223,.31)!important;
+}
+html[data-theme="light"] .ai-source-tab.active{
+  color:#173250!important;
+  font-weight:900!important;
+  background:linear-gradient(135deg,rgba(94,204,242,.25),rgba(132,126,236,.20),rgba(197,105,235,.17))!important;
+  border-color:rgba(65,125,209,.38)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.52)!important;
+}
+html[data-theme="light"] .ai-source-notice{
+  color:#2b435e!important;
+}
+html[data-theme="light"] .ai-source-notice span{
+  color:#506984!important;
+}
+html[data-theme="light"] .ai-source-notice.trusted strong{
+  color:#006f9d!important;
+}
+html[data-theme="light"] .ai-source-notice.document strong{
+  color:#6c43a8!important;
+}
+html[data-theme="light"] .accuracy-note{
+  color:#53677e!important;
+  background:rgba(224,183,86,.12)!important;
+  border-color:rgba(164,119,28,.18)!important;
+}
+html[data-theme="light"] .accuracy-note strong{
+  color:#805d16!important;
+}
+html[data-theme="light"] .verification-legend{
+  color:#536b86!important;
+}
+
+/* ---------- AI metric cards: Bright-mode blue-glass, not Dark leftovers ---------- */
+html[data-theme="light"] .ai-metric-card{
+  background:linear-gradient(180deg,rgba(209,225,243,.94),rgba(195,216,238,.94))!important;
+  border-color:rgba(48,83,129,.21)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.58),0 10px 24px rgba(42,68,100,.10)!important;
+}
+html[data-theme="light"] .ai-metric-card::before{
+  background:linear-gradient(135deg,rgba(35,164,217,.08),rgba(98,91,208,.07) 60%,transparent 78%)!important;
+}
+html[data-theme="light"] .ai-metric-card label{
+  color:#4c6380!important;
+}
+html[data-theme="light"] .ai-metric-card input[type="number"]{
+  background:rgba(235,243,251,.92)!important;
+  color:#10243b!important;
+  border-color:rgba(50,88,136,.22)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72)!important;
+}
+html[data-theme="light"] .ai-metric-card .qtype-hint{
+  color:#526a83!important;
+}
+html[data-theme="light"] .ai-metric-card input[type="number"]:focus{
+  border-color:rgba(0,120,220,.52)!important;
+  box-shadow:0 0 0 3px rgba(0,120,220,.10)!important;
+}
+
+/* ---------- Format helper strip ---------- */
+html[data-theme="light"] .ai-format-note{
+  color:#4f6681!important;
+  background:rgba(113,91,255,.07)!important;
+  border-color:rgba(91,72,183,.18)!important;
+}
+html[data-theme="light"] .ai-format-note strong{
+  color:#5d46aa!important;
+}
+
+/* ---------- Manual Add Question ---------- */
+html[data-theme="light"] #host-question-editor-pane > h2,
+html[data-theme="light"] #host-queue-pane > h3,
+html[data-theme="light"] #host-queue-title{
+  color:#10243b!important;
+  font-weight:900!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.30);
+}
+html[data-theme="light"] #host-question-editor-pane label{
+  color:#506983!important;
+}
+html[data-theme="light"] #qf-clear-queue{
+  color:#b11f4a!important;
+  border-color:rgba(177,31,74,.27)!important;
+  background:rgba(255,227,235,.77)!important;
+  font-weight:800!important;
+}
+html[data-theme="light"] #qf-clear-queue:hover{
+  color:#8e1239!important;
+  border-color:rgba(177,31,74,.45)!important;
+  background:rgba(255,215,226,.96)!important;
+}
+
+/* ---------- Question queue / preview ---------- */
+html[data-theme="light"] .qlist-item{
+  color:#152a43!important;
+  background:linear-gradient(180deg,rgba(220,233,247,.91),rgba(209,225,242,.91))!important;
+  border-color:rgba(40,77,122,.17)!important;
+}
+html[data-theme="light"] .qlist-item:hover{
+  border-color:rgba(8,117,223,.25)!important;
+}
+html[data-theme="light"] .qlist-item .qtxt{
+  color:#172c45!important;
+  font-weight:700!important;
+}
+html[data-theme="light"] .qtype-pill{
+  color:#5a43ac!important;
+  background:rgba(113,91,255,.10)!important;
+  border-color:rgba(91,72,183,.19)!important;
+}
+html[data-theme="light"] .qlist-points{
+  color:#19304b!important;
+  background:rgba(230,240,250,.88)!important;
+  border-color:rgba(43,79,123,.16)!important;
+}
+html[data-theme="light"] .q-verify-badge.source{
+  color:#006e91!important;
+  background:rgba(35,177,217,.10)!important;
+  border-color:rgba(20,139,178,.18)!important;
+}
+html[data-theme="light"] .q-verify-badge.document{
+  color:#68409f!important;
+  background:rgba(143,93,208,.10)!important;
+  border-color:rgba(113,71,170,.17)!important;
+}
+html[data-theme="light"] .q-verify-badge.review{
+  color:#8a5b00!important;
+  background:rgba(224,165,50,.13)!important;
+  border-color:rgba(162,110,15,.19)!important;
+}
+html[data-theme="light"] .qlist-actions .small-edit{
+  color:#0069bd!important;
+  background:rgba(218,233,249,.90)!important;
+  border-color:rgba(8,117,223,.18)!important;
+}
+html[data-theme="light"] .qlist-actions .small-x{
+  color:#bd2750!important;
+  background:rgba(250,226,234,.80)!important;
+  border-color:rgba(189,39,80,.16)!important;
+}
+
+/* ---------- Quiz Studio main panels ---------- */
+html[data-theme="light"] #screen-host-setup .card:not(.mode-card){
+  color:#14273f!important;
+}
+html[data-theme="light"] #screen-host-setup .card:not(.mode-card) h2,
+html[data-theme="light"] #screen-host-setup .card:not(.mode-card) h3,
+html[data-theme="light"] #screen-host-setup .card:not(.mode-card) strong{
+  color:#14273f;
+}
+html[data-theme="light"] #screen-host-setup .card:not(.mode-card) p{
+  color:#526a84;
+}
+
+/* ---------- Ensure labels/eyebrows on pale Bright surfaces remain legible ---------- */
+html[data-theme="light"] #screen-host-setup .card:not(.mode-card) .eyebrow,
+html[data-theme="light"] .verified-ai-card .eyebrow{
+  color:#6556c7!important;
+  font-weight:900!important;
+}
+
+/* ---------- Mobile keeps contrast ---------- */
+@media(max-width:650px){
+  html[data-theme="light"] .qlist-item .qtxt{
+    font-size:13px!important;
+    line-height:1.45!important;
+  }
+  html[data-theme="light"] .q-verify-badge{
+    font-size:8px!important;
+  }
+}
+
+
+/* =========================================================
+   QZMAX 3.13.3 — Consolidated Bright Visual Refinement
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   SHARED BRANDING
+   --------------------------------------------------------- */
+.hd-brand img,
+.qz-saas-logo img,
+.qz-premium-entry-icon,
+.qz-account-brand img{
+  object-fit:contain!important;
+  object-position:center!important;
+}
+html[data-theme="light"] .hd-brand .qz-wordmark .qz{
+  color:#102841!important;
+  text-shadow:none!important;
+}
+html[data-theme="light"] .hd-brand .qz-wordmark .max{
+  filter:none!important;
+}
+.hd-brand .qz-wordmark{
+  font-size:23px;
+}
+
+/* ---------------------------------------------------------
+   MAIN COMMERCIAL SCREEN — darker secondary typography
+   --------------------------------------------------------- */
+html[data-theme="light"] .qz-saas-hero p{
+  color:#3c5672!important;
+  font-weight:570;
+}
+html[data-theme="light"] .qz-saas-section-head p{
+  color:#415d79!important;
+  font-weight:560;
+}
+html[data-theme="light"] .qz-au-strip p{
+  color:#425d78!important;
+  font-weight:560;
+}
+html[data-theme="light"] .qz-saas-footer{
+  color:#334e6a!important;
+  font-weight:650;
+}
+html[data-theme="light"] .qz-saas-footer strong{
+  color:#152a43!important;
+}
+html[data-theme="light"] .qz-saas-kicker{
+  color:#006cae!important;
+  background:rgba(108,181,232,.13)!important;
+  border-color:rgba(26,122,188,.22)!important;
+}
+
+/* ---------------------------------------------------------
+   HOST DASHBOARD — readability
+   --------------------------------------------------------- */
+html[data-theme="light"] .hd-welcome p{
+  color:#36516d!important;
+  font-weight:610!important;
+}
+html[data-theme="light"] .hd-active{
+  background:linear-gradient(145deg,rgba(223,237,250,.90),rgba(210,228,246,.91))!important;
+  border-color:rgba(48,91,142,.18)!important;
+}
+html[data-theme="light"] .hd-room-code{
+  color:#006e9d!important;
+  text-shadow:none!important;
+  font-weight:950!important;
+}
+html[data-theme="light"] .hd-status{
+  background:rgba(22,137,123,.10)!important;
+  color:#116d65!important;
+  border-color:rgba(17,109,101,.24)!important;
+  text-shadow:none!important;
+  font-weight:900!important;
+}
+html[data-theme="light"] .hd-status .hd-dot{
+  box-shadow:none!important;
+  background:#138277!important;
+}
+html[data-theme="light"] .hd-mini{
+  background:rgba(225,237,249,.90)!important;
+  border-color:rgba(49,88,134,.18)!important;
+  color:#405b77!important;
+  font-weight:680!important;
+}
+html[data-theme="light"] .hd-mini:nth-child(3){
+  color:#4b417c!important;
+}
+html[data-theme="light"] .hd-mini:nth-child(4){
+  color:#3f5d78!important;
+}
+html[data-theme="light"] .hd-card-head span{
+  color:#506983!important;
+}
+
+/* ---------------------------------------------------------
+   MY QUIZZES / LAUNCH — make the large panels truly Bright
+   --------------------------------------------------------- */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-header{
+  background:
+    linear-gradient(145deg,rgba(214,231,248,.91),rgba(197,220,243,.92))!important;
+  border-color:rgba(44,83,130,.18)!important;
+  box-shadow:
+    0 14px 38px rgba(38,65,96,.10),
+    inset 0 1px 0 rgba(255,255,255,.62)!important;
+  color:#14273f!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-header h2{
+  color:#12253c!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-header p{
+  color:#48637f!important;
+  font-weight:570;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-header .eyebrow{
+  color:#5b45bc!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-tab{
+  background:rgba(224,236,249,.84)!important;
+  color:#2d4764!important;
+  border-color:rgba(44,83,130,.18)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-tab:hover{
+  background:rgba(232,242,251,.96)!important;
+  border-color:rgba(8,117,223,.30)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-tab.active{
+  color:#fff!important;
+  border-color:rgba(50,111,218,.48)!important;
+  background:
+    linear-gradient(135deg,#177ec5 0%,#5e66e8 58%,#7747bf 100%)!important;
+  box-shadow:0 7px 18px rgba(64,81,180,.16)!important;
+}
+
+/* Session Mode + Live Scoring containers */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-card{
+  background:
+    linear-gradient(145deg,rgba(215,231,247,.93),rgba(201,222,243,.94))!important;
+  border-color:rgba(43,81,126,.19)!important;
+  box-shadow:
+    0 13px 34px rgba(36,62,94,.10),
+    inset 0 1px 0 rgba(255,255,255,.58)!important;
+  color:#14273f!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-card .eyebrow{
+  color:#5c46b7!important;
+  font-weight:900!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-card p{
+  color:#49647f!important;
+  font-weight:560;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .team-badge{
+  background:rgba(105,87,202,.09)!important;
+  color:#53439a!important;
+  border-color:rgba(92,70,178,.19)!important;
+  font-weight:850!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-segment{
+  gap:9px;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-btn{
+  background:rgba(229,239,249,.88)!important;
+  color:#3b5571!important;
+  border-color:rgba(48,86,132,.17)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-btn:hover{
+  color:#193650!important;
+  background:rgba(237,246,253,.98)!important;
+  border-color:rgba(8,117,223,.28)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-btn.active{
+  color:#fff!important;
+  background:
+    linear-gradient(135deg,#1b82c8 0%,#5a68e9 55%,#784abb 100%)!important;
+  border-color:rgba(68,92,213,.50)!important;
+  box-shadow:0 7px 19px rgba(67,79,182,.16)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .exam-config,
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .team-config{
+  background:rgba(227,238,249,.78)!important;
+  border-color:rgba(48,86,132,.16)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .exam-config strong,
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .team-config strong{
+  color:#18314d!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .exam-config p,
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .team-config p,
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .exam-mode-note,
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .team-mode-note{
+  color:#4b6681!important;
+}
+
+/* Keep invite card aligned visually with the new Launch panels */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-invite-card{
+  background:
+    linear-gradient(145deg,rgba(218,233,248,.91),rgba(204,224,244,.93))!important;
+  border-color:rgba(43,81,126,.17)!important;
+  box-shadow:0 13px 34px rgba(36,62,94,.09)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-invite-card .code-text{
+  color:#006f9f!important;
+}
+
+/* ---------------------------------------------------------
+   Small screen continuity
+   --------------------------------------------------------- */
+@media(max-width:760px){
+  html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-workspace-header,
+  html[data-theme="light"] #screen-host-setup.host-workspace-launch .mode-card{
+    border-radius:18px!important;
+  }
+}
+
+
+/* =========================================================
+   QZMAX 3.13.4 — Bright Workspace Polish
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   QUIZ STUDIO HEADER — match the intentional Bright system
+   --------------------------------------------------------- */
+html[data-theme="light"] #screen-host-setup.host-workspace-studio .host-workspace-header{
+  background:
+    linear-gradient(145deg,rgba(214,231,248,.91),rgba(197,220,243,.92))!important;
+  border-color:rgba(44,83,130,.18)!important;
+  box-shadow:
+    0 14px 38px rgba(38,65,96,.10),
+    inset 0 1px 0 rgba(255,255,255,.62)!important;
+  color:#14273f!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-studio .host-workspace-header h2{
+  color:#12253c!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-studio .host-workspace-header p{
+  color:#48637f!important;
+  font-weight:570!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-studio .host-workspace-header .eyebrow{
+  color:#5b45bc!important;
+  font-weight:900!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-studio .host-workspace-tab{
+  background:rgba(224,236,249,.84)!important;
+  color:#2d4764!important;
+  border-color:rgba(44,83,130,.18)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-studio .host-workspace-tab:hover{
+  background:rgba(232,242,251,.96)!important;
+  border-color:rgba(8,117,223,.30)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-studio .host-workspace-tab.active{
+  color:#fff!important;
+  border-color:rgba(50,111,218,.48)!important;
+  background:linear-gradient(135deg,#177ec5 0%,#5e66e8 58%,#7747bf 100%)!important;
+  box-shadow:0 7px 18px rgba(64,81,180,.16)!important;
+}
+
+/* ---------------------------------------------------------
+   ADD / EDIT + QUESTION QUEUE HEADERS
+   Give the two-column workspace deliberate pane headers
+   --------------------------------------------------------- */
+html[data-theme="light"] .host-workspace-studio .host-pane-heading{
+  min-height:48px;
+  margin-bottom:10px!important;
+  padding:10px 14px;
+  border:1px solid rgba(44,82,128,.17);
+  border-radius:15px;
+  background:
+    linear-gradient(145deg,rgba(217,232,247,.86),rgba(205,225,244,.88));
+  box-shadow:
+    0 8px 22px rgba(38,65,96,.07),
+    inset 0 1px 0 rgba(255,255,255,.58);
+}
+html[data-theme="light"] .host-workspace-studio .host-pane-heading h3{
+  color:#11263f!important;
+  font-weight:900!important;
+  text-shadow:none!important;
+}
+html[data-theme="light"] .host-workspace-studio .host-editor-heading::before{
+  content:"✎";
+  display:grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  margin-right:9px;
+  border-radius:9px;
+  background:rgba(22,128,195,.11);
+  color:#0877bb;
+  font-size:14px;
+  font-weight:900;
+}
+html[data-theme="light"] .host-workspace-studio .host-editor-heading{
+  justify-content:flex-start!important;
+}
+html[data-theme="light"] .host-workspace-studio .host-editor-heading #qf-cancel-edit{
+  margin-left:auto;
+}
+html[data-theme="light"] .host-workspace-studio .host-queue-heading::before{
+  content:"≡";
+  display:grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  margin-right:9px;
+  border-radius:9px;
+  background:rgba(101,78,195,.10);
+  color:#5c46b5;
+  font-size:19px;
+  line-height:1;
+  font-weight:900;
+}
+html[data-theme="light"] .host-workspace-studio .host-queue-heading{
+  justify-content:flex-start!important;
+}
+html[data-theme="light"] .host-workspace-studio .host-queue-heading #qf-clear-queue{
+  margin-left:auto;
+}
+
+/* ---------------------------------------------------------
+   SAVE / UPDATE SAVED QUIZ PANEL
+   Replace the Dark-mode sticky block in Bright mode
+   --------------------------------------------------------- */
+html[data-theme="light"] .host-workspace-studio .host-save-row{
+  background:
+    linear-gradient(145deg,rgba(207,225,243,.95),rgba(192,216,239,.96))!important;
+  border-color:rgba(43,82,129,.20)!important;
+  box-shadow:
+    0 16px 36px rgba(36,65,98,.13),
+    inset 0 1px 0 rgba(255,255,255,.60)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+  padding:11px!important;
+}
+html[data-theme="light"] .host-workspace-studio .host-save-row input{
+  background:rgba(239,246,253,.96)!important;
+  color:#17304c!important;
+  border-color:rgba(47,87,136,.22)!important;
+}
+html[data-theme="light"] .host-workspace-studio .host-save-row input::placeholder{
+  color:#56708c!important;
+}
+html[data-theme="light"] .host-workspace-studio #qf-save-quiz{
+  color:#fff!important;
+  background:linear-gradient(135deg,#197fc5 0%,#5b68e8 57%,#7648bd 100%)!important;
+  border-color:rgba(66,92,211,.45)!important;
+  box-shadow:0 8px 19px rgba(67,79,182,.14)!important;
+  font-weight:850!important;
+}
+html[data-theme="light"] .host-workspace-studio #qf-save-quiz:hover{
+  transform:translateY(-1px);
+  box-shadow:0 11px 24px rgba(67,79,182,.19)!important;
+}
+html[data-theme="light"] .host-workspace-studio #qf-save-as-new{
+  color:#385a7d!important;
+  font-weight:700!important;
+}
+
+/* ---------------------------------------------------------
+   LAUNCH — unified Saved Quiz → Preview → Start card
+   --------------------------------------------------------- */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-queue-pane{
+  width:100%;
+  max-width:920px;
+  margin:0 auto;
+  padding:16px;
+  border-radius:22px;
+  border:1px solid rgba(42,80,126,.18);
+  background:
+    linear-gradient(145deg,rgba(213,230,247,.92),rgba(199,220,242,.93));
+  box-shadow:
+    0 16px 40px rgba(35,62,94,.11),
+    inset 0 1px 0 rgba(255,255,255,.60);
+  overflow:visible;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-saved-library-card{
+  margin:0 0 14px!important;
+  padding:14px!important;
+  background:rgba(229,239,249,.80)!important;
+  border-color:rgba(44,82,128,.15)!important;
+  box-shadow:none!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-saved-library-card label{
+  color:#4c6380!important;
+  font-weight:850!important;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #qf-toggle-archive{
+  color:#46637f!important;
+  font-weight:700!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #qf-saved-select{
+  background:rgba(241,247,253,.96)!important;
+  color:#16304c!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #qf-load-saved{
+  background:rgba(232,242,251,.95)!important;
+  color:#1d3a58!important;
+  border-color:rgba(46,85,133,.18)!important;
+  font-weight:800!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #qf-delete-saved{
+  background:rgba(251,226,234,.75)!important;
+  color:#b42650!important;
+  border-color:rgba(180,40,81,.19)!important;
+  font-weight:800!important;
+}
+
+/* Quiz Preview heading inside the same connected card */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-queue-heading{
+  margin:2px 0 10px!important;
+  padding:11px 13px;
+  border-radius:14px;
+  border:1px solid rgba(44,82,128,.14);
+  background:rgba(223,236,248,.66);
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch .host-queue-heading h3{
+  color:#12283f!important;
+  font-weight:900!important;
+}
+
+/* Empty preview gets a real state, rather than floating copy */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-qlist{
+  min-height:118px;
+  display:block;
+  padding:0;
+}
+.launch-preview-empty{
+  min-height:118px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+  padding:20px;
+  border:1px dashed rgba(54,93,138,.24);
+  border-radius:16px;
+  background:rgba(232,241,250,.67);
+  text-align:left;
+}
+.launch-preview-empty-icon{
+  display:grid;
+  place-items:center;
+  width:43px;
+  height:43px;
+  border-radius:13px;
+  background:linear-gradient(145deg,rgba(41,148,205,.13),rgba(104,86,201,.10));
+  color:#3e63a5;
+  font-size:19px;
+  font-weight:900;
+  flex:0 0 auto;
+}
+.launch-preview-empty strong{
+  display:block;
+  color:#18314d;
+  font-size:14px;
+  margin-bottom:4px;
+}
+.launch-preview-empty span{
+  display:block;
+  color:#536d87;
+  font-size:12px;
+  line-height:1.45;
+}
+html[data-theme="light"] .studio-empty-queue{
+  color:#4d6883!important;
+}
+
+/* Existing loaded question cards sit naturally inside Preview */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-qlist .qlist-item{
+  box-shadow:none!important;
+  background:rgba(231,241,250,.78)!important;
+  border-color:rgba(44,82,128,.15)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-qlist .qlist-item + .qlist-item{
+  margin-top:8px;
+}
+
+/* Start quiz becomes the defined footer CTA of the preview card */
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #btn-start-quiz{
+  position:sticky;
+  bottom:max(12px,env(safe-area-inset-bottom));
+  margin-top:14px!important;
+  min-height:52px;
+  border-radius:14px;
+  font-weight:900!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #btn-start-quiz:not(:disabled){
+  color:#fff!important;
+  background:linear-gradient(135deg,#1980c7 0%,#5b68e9 57%,#7748bd 100%)!important;
+  border-color:rgba(66,92,211,.45)!important;
+  box-shadow:0 12px 27px rgba(67,79,182,.20)!important;
+}
+html[data-theme="light"] #screen-host-setup.host-workspace-launch #btn-start-quiz:disabled{
+  opacity:1!important;
+  color:#758ba2!important;
+  background:rgba(190,211,232,.80)!important;
+  border:1px solid rgba(60,96,138,.14)!important;
+  box-shadow:none!important;
+  cursor:not-allowed!important;
+}
+
+/* Responsive: preserve connected visual flow */
+@media(max-width:760px){
+  html[data-theme="light"] #screen-host-setup.host-workspace-launch #host-queue-pane{
+    padding:12px;
+    border-radius:18px;
+  }
+  html[data-theme="light"] .host-workspace-studio .host-pane-heading{
+    min-height:44px;
+    padding:9px 11px;
+  }
+}
+
+
+/* =========================================================
+   QZMAX 3.14.0 — Source Link Generation
+   ========================================================= */
+.ai-source-tabs{grid-template-columns:repeat(4,1fr);}
+.source-link-notice{
+  background:rgba(27,185,164,.07);
+  border:1px solid rgba(27,185,164,.15);
+}
+.source-link-notice strong{color:#6be5d3;}
+.source-link-entry{margin-top:12px;}
+.source-link-input-group{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  align-items:stretch;
+}
+.source-link-input-group input{min-width:0;}
+.source-link-input-group .btn{
+  min-width:120px;
+  white-space:nowrap;
+}
+.source-link-status{
+  margin-top:9px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(12,19,39,.55);
+  border:1px solid rgba(132,153,212,.12);
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.45;
+}
+.source-link-status.loading{
+  color:#76dfff;
+  border-color:rgba(41,190,229,.18);
+}
+.source-link-status.ready{
+  color:#a6ead7;
+  border-color:rgba(37,196,159,.20);
+  background:rgba(23,125,108,.08);
+}
+.source-link-status.error{
+  color:#ff9caf;
+  border-color:rgba(255,92,122,.20);
+  background:rgba(156,35,66,.07);
+}
+.source-link-preview{
+  margin-top:10px;
+  padding:13px;
+  border-radius:15px;
+  border:1px solid rgba(91,211,191,.15);
+  background:linear-gradient(145deg,rgba(11,26,44,.68),rgba(12,21,41,.62));
+}
+.source-link-preview-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.source-link-preview-head strong{
+  display:block;
+  margin-top:3px;
+  color:#f5f9ff;
+  font-size:13px;
+}
+.source-link-preview-head span{
+  display:block;
+  margin-top:3px;
+  color:#8fa3be;
+  font-size:10px;
+}
+.source-link-facts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:11px;
+}
+.source-link-facts span{
+  padding:6px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(131,155,210,.11);
+  color:#93a7c1;
+  font-size:9px;
+}
+.source-link-facts b{color:#dce8f7;}
+.source-link-details{
+  margin-top:10px;
+  border-top:1px solid rgba(127,151,204,.10);
+  padding-top:9px;
+}
+.source-link-details summary{
+  color:#93a8c2;
+  font-size:10px;
+  font-weight:750;
+  cursor:pointer;
+}
+.source-link-details pre{
+  max-height:180px;
+  overflow:auto;
+  margin:9px 0 0;
+  padding:10px;
+  border-radius:10px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:rgba(4,10,24,.44);
+  color:#b9c8da;
+  font:500 9.5px/1.55 'Inter',sans-serif;
+}
+.verify-dot.link{background:#2cc5aa;}
+
+/* Link Grounded uses its own teal badge */
+.q-verify-badge.link{
+  color:#8be7d7;
+  background:rgba(44,197,170,.08);
+  border:1px solid rgba(44,197,170,.14);
+}
+
+/* Bright mode */
+html[data-theme="light"] .source-link-notice{
+  background:rgba(16,143,125,.07)!important;
+  border-color:rgba(16,126,111,.17)!important;
+  color:#28485b!important;
+}
+html[data-theme="light"] .source-link-notice strong{color:#087466!important;}
+html[data-theme="light"] .source-link-notice span{color:#4b687f!important;}
+html[data-theme="light"] .source-link-status{
+  background:rgba(225,237,249,.77);
+  border-color:rgba(44,82,128,.15);
+  color:#506a84;
+}
+html[data-theme="light"] .source-link-status.loading{
+  color:#086e9e;
+  border-color:rgba(8,110,158,.20);
+}
+html[data-theme="light"] .source-link-status.ready{
+  color:#126c61;
+  border-color:rgba(18,108,97,.20);
+  background:rgba(45,163,142,.08);
+}
+html[data-theme="light"] .source-link-status.error{
+  color:#b1264d;
+  border-color:rgba(177,38,77,.18);
+  background:rgba(224,78,111,.07);
+}
+html[data-theme="light"] .source-link-preview{
+  background:linear-gradient(145deg,rgba(218,233,247,.89),rgba(205,225,243,.91));
+  border-color:rgba(27,126,111,.17);
+}
+html[data-theme="light"] .source-link-preview-head strong{color:#16304c;}
+html[data-theme="light"] .source-link-preview-head span{color:#526b85;}
+html[data-theme="light"] .source-link-facts span{
+  background:rgba(235,244,252,.82);
+  border-color:rgba(45,82,127,.13);
+  color:#526b85;
+}
+html[data-theme="light"] .source-link-facts b{color:#19334f;}
+html[data-theme="light"] .source-link-details{
+  border-color:rgba(45,82,127,.12);
+}
+html[data-theme="light"] .source-link-details summary{color:#46627e;}
+html[data-theme="light"] .source-link-details pre{
+  background:rgba(238,246,252,.78);
+  color:#38536f;
+  border:1px solid rgba(45,82,127,.10);
+}
+html[data-theme="light"] .q-verify-badge.link{
+  color:#087565!important;
+  background:rgba(35,166,143,.09)!important;
+  border-color:rgba(22,125,108,.17)!important;
+}
+
+@media(max-width:900px){
+  .ai-source-tabs{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:600px){
+  .ai-source-tabs{grid-template-columns:1fr;}
+  .source-link-input-group{grid-template-columns:1fr;}
+  .source-link-input-group .btn{width:100%;}
+  .source-link-preview-head{flex-direction:column;}
+}
+
 </style>
 </head>
 <body>
@@ -2833,13 +4122,16 @@ input[type=text]:focus,input[type=password]:focus,input[type=email]:focus,select
   <div id="screen-player-leaderboard" class="screen"></div>
   <div id="screen-player-final" class="screen"></div>
   <div id="screen-player-ended" class="screen"></div>
+  <button id="qz-global-theme-toggle" class="qz-global-theme-toggle" type="button" aria-label="Switch colour theme" title="Switch colour theme">
+    <span id="qz-theme-icon">☀</span><span id="qz-theme-label">Bright</span>
+  </button>
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.12.3";
+  const APP_VERSION = "3.14.0";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_aPS2yxVt802ZrrPqcDA7dyF5vfK_xI4",
@@ -2851,6 +4143,38 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+
+const QZ_THEME_KEY = 'qzmaxThemeV1';
+function qzGetTheme(){
+  try{
+    const saved = localStorage.getItem(QZ_THEME_KEY);
+    return saved === 'light' ? 'light' : 'dark';
+  }catch(e){ return 'dark'; }
+}
+function qzApplyTheme(theme, persist=true){
+  const selected = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = selected;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', selected === 'light' ? '#F3F6FB' : '#070914');
+  const icon = document.getElementById('qz-theme-icon');
+  const label = document.getElementById('qz-theme-label');
+  const btn = document.getElementById('qz-global-theme-toggle');
+  if(icon) icon.textContent = selected === 'light' ? '☾' : '☀';
+  if(label) label.textContent = selected === 'light' ? 'Dark' : 'Bright';
+  if(btn) btn.title = selected === 'light' ? 'Switch to Dark mode' : 'Switch to Bright mode';
+  if(persist){
+    try{ localStorage.setItem(QZ_THEME_KEY,selected); }catch(e){}
+  }
+  document.querySelectorAll('[data-theme-choice]').forEach(el=>{
+    el.classList.toggle('active',el.dataset.themeChoice===selected);
+  });
+}
+function qzToggleTheme(){
+  qzApplyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+}
+qzApplyTheme(qzGetTheme(),false);
+const qzThemeButton = document.getElementById('qz-global-theme-toggle');
+if(qzThemeButton) qzThemeButton.addEventListener('click',qzToggleTheme);
 
 let serverTimeOffset = 0;
 const offsetRef = ref(db, '.info/serverTimeOffset');
@@ -3161,7 +4485,7 @@ authPromise.then(() => {
   }
 
   const HOME_BG = 'assets/background-home.png';
-  const BRAND_ICON = 'assets/qzmax-app-icon.png';
+  const BRAND_ICON = 'assets/qzmax-app-icon-square.png';
   const BRAND_WORDMARK = 'assets/qzmax-wordmark.png';
   const ICON_AI = 'assets/feature-ai-powered.png';
   const ICON_LIVE = 'assets/feature-live-interactive.png';
@@ -3177,57 +4501,79 @@ authPromise.then(() => {
 
   function buildRoleScreen(){
     $('screen-role').innerHTML = `
-      <main class="qz-premium-home">
-        <div class="qz-premium-shade"></div>
-        <div class="qz-premium-shell">
-          <header class="qz-premium-nav">
-            <button class="qz-premium-link" id="qz-features-btn">Features</button>
-            <button class="qz-premium-start" id="qz-get-started-btn">Get Started <span>→</span></button>
+      <main class="qz-saas-home">
+        <div class="qz-saas-shell">
+          <header class="qz-saas-nav">
+            <div class="qz-saas-logo"><img src="${BRAND_ICON}" alt="QZMAX"><span>QZ<b>MAX</b></span></div>
+            <nav class="qz-saas-navlinks">
+              <button class="qz-saas-navbtn qz-hide-tablet" id="qz-market-features">Features</button>
+              <button class="qz-saas-navbtn qz-hide-tablet" id="qz-market-australia">For Australia</button>
+              <button class="qz-saas-navbtn qz-hide-mobile" id="qz-market-join">Join a game</button>
+              <button class="btn btn-ghost" id="qz-market-signin" style="padding:9px 13px;font-size:11px;">Sign in</button>
+              <button class="btn btn-primary" id="qz-market-start" style="padding:9px 14px;font-size:11px;">Get started</button>
+            </nav>
           </header>
 
-          <section class="qz-premium-brand">
-            <img class="qz-premium-wordmark" src="${BRAND_WORDMARK}" alt="QZMAX — Get smart. Play smarter.">
+          <section class="qz-saas-hero">
+            <div>
+              <div class="qz-saas-kicker"><span>BUILT WITH AUSTRALIAN CLASSROOMS IN MIND</span></div>
+              <h1>Create <span>accurate quizzes</span>, exams and live games in seconds.</h1>
+              <p>Turn a topic or document into engaging questions, run a live classroom game, or deliver a timed exam — all from one simple QZMAX workspace.</p>
+              <div class="qz-saas-cta">
+                <button class="btn btn-primary" id="qz-hero-create">✦ Create a quiz</button>
+                <button class="btn btn-ghost" id="qz-hero-join">Join a live game</button>
+              </div>
+              <div class="qz-saas-trust">
+                <span>✓ Topic-isolated generation</span><span>✓ Document-grounded questions</span><span>✓ Live Quiz + Exam Mode</span><span>✓ Educator & Student accounts</span>
+              </div>
+            </div>
+
+            <div class="qz-product-mock" aria-label="QZMAX product preview">
+              <div class="qz-product-head"><div class="qz-product-dots"><i></i><i></i><i></i></div><div class="qz-product-ai">QZMAX QUIZ STUDIO</div></div>
+              <div class="qz-mock-card">
+                <div class="qz-mock-label">Topic / instructions</div>
+                <div class="qz-mock-topic">Year 7 Australian Science — ecosystems</div>
+                <div class="qz-mock-generate"><div class="qz-mock-pills"><span>10 questions</span><span>Mixed</span><span>Medium</span></div><span style="font-size:18px;color:var(--signal);">✦</span></div>
+              </div>
+              <div class="qz-mock-question"><b>1</b><span>Which relationship best describes a food web?</span><small>2-source checked</small></div>
+              <div class="qz-mock-question"><b>2</b><span>What role do decomposers play in an ecosystem?</span><small>2-source checked</small></div>
+              <div class="qz-mock-question"><b>3</b><span>Which change could reduce biodiversity?</span><small>2-source checked</small></div>
+            </div>
           </section>
 
-          <section class="qz-premium-features" id="qz-home-features" aria-label="QZMAX features">
-            <article class="qz-premium-feature">
-              <div class="qz-premium-icon-wrap"><img src="${ICON_AI}" alt="AI Powered"></div>
-              <div class="qz-premium-feature-copy"><h3>AI POWERED</h3><p>Create Smarter<br>quizzes in seconds</p></div>
-            </article>
-            <article class="qz-premium-feature">
-              <div class="qz-premium-icon-wrap"><img src="${ICON_LIVE}" alt="Live and Interactive"></div>
-              <div class="qz-premium-feature-copy"><h3>LIVE &amp;<br>INTERACTIVE</h3><p>Real-time play<br>for any audience</p></div>
-            </article>
-            <article class="qz-premium-feature">
-              <div class="qz-premium-icon-wrap"><img src="${ICON_COMPETE}" alt="Compete and Win"></div>
-              <div class="qz-premium-feature-copy"><h3>COMPETE &amp;<br>WIN</h3><p>Leaderboards,<br>points and prizes</p></div>
-            </article>
-            <article class="qz-premium-feature">
-              <div class="qz-premium-icon-wrap"><img src="${ICON_INSIGHTS}" alt="Insights"></div>
-              <div class="qz-premium-feature-copy"><h3>INSIGHTS</h3><p>Track performance<br>and engagement</p></div>
-            </article>
+          <section class="qz-saas-section" id="qz-commercial-features">
+            <div class="qz-saas-section-head"><h2>One platform. More ways to learn.</h2><p>Simple enough for students, powerful enough for teachers, and energetic enough for a live room.</p></div>
+            <div class="qz-market-grid">
+              <article class="qz-market-card"><img src="${ICON_AI}" alt=""><h3>AI Quiz Studio</h3><p>Generate by topic, mix multiple topics in one quiz, or create more questions without repeating the same facts.</p></article>
+              <article class="qz-market-card"><img src="${ICON_EDUCATION}" alt=""><h3>Document → Quiz</h3><p>Upload PDF, DOCX or TXT material and create natural stand-alone questions grounded in that content.</p></article>
+              <article class="qz-market-card"><img src="${ICON_LIVE}" alt=""><h3>Live + Exam</h3><p>Switch from high-energy classroom competition to a timed exam workflow without changing platforms.</p></article>
+              <article class="qz-market-card"><img src="${ICON_INSIGHTS}" alt=""><h3>Results & Insights</h3><p>See performance, accuracy and question-level results so the activity produces useful teaching feedback.</p></article>
+            </div>
           </section>
 
-          <section class="qz-premium-message-art" aria-label="Turn any topic into an unforgettable game">
-            <img src="${HERO_TEXT_ART}" alt="Turn any topic into an unforgettable game.">
+          <section class="qz-saas-section" id="qz-commercial-australia">
+            <div class="qz-au-strip">
+              <div><div class="qz-saas-kicker"><span>AUSTRALIAN-FIRST ROADMAP</span></div><h2>Designed to become genuinely useful in Australian education.</h2><p>QZMAX is being structured for Australian educators and students first — with curriculum-aware generation and a verified knowledge layer planned as the next data phase.</p></div>
+              <div class="qz-au-points">
+                <div><span class="qz-au-point-icon">🌏</span><span>Australian-first product direction</span></div>
+                <div><span class="qz-au-point-icon">👩‍🏫</span><span>Educator accounts</span></div>
+                <div><span class="qz-au-point-icon">🎓</span><span>Student accounts</span></div>
+                <div><span class="qz-au-point-icon">📚</span><span>Verified knowledge base foundation</span></div>
+              </div>
+            </div>
           </section>
 
-          <section class="qz-premium-audiences" aria-label="QZMAX audiences">
-            <article><img src="${ICON_EVENTS}" alt="For Events"><span>FOR EVENTS</span></article>
-            <article><img src="${ICON_TEAMS}" alt="For Teams"><span>FOR TEAMS</span></article>
-            <article><img src="${ICON_EDUCATION}" alt="For Education"><span>FOR EDUCATION</span></article>
-            <article><img src="${ICON_EVERYONE}" alt="For Everyone"><span>FOR EVERYONE</span></article>
-          </section>
-
-          <p class="qz-premium-footer-copy">Create with AI, invite players in seconds, compete live and turn any classroom, team or event into a game everyone can join.</p>
+          <footer class="qz-saas-footer"><div><strong style="color:var(--ink);">QZMAX</strong> · Get smart. Play smarter.</div><div>Commercial preview · Australia</div></footer>
         </div>
       </main>`;
 
-    $('qz-get-started-btn').onclick = ()=>buildGetStartedScreen();
-    $('qz-features-btn').onclick = ()=>{
-      const el = $('qz-home-features');
-      if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
-    };
+    $('qz-market-features').onclick=()=>$('qz-commercial-features')?.scrollIntoView({behavior:'smooth',block:'start'});
+    $('qz-market-australia').onclick=()=>$('qz-commercial-australia')?.scrollIntoView({behavior:'smooth',block:'center'});
+    $('qz-market-join').onclick=()=>{ buildPlayerJoin(); showScreen('screen-player-join'); };
+    $('qz-hero-join').onclick=()=>{ buildPlayerJoin(); showScreen('screen-player-join'); };
+    $('qz-market-start').onclick=buildGetStartedScreen;
+    $('qz-hero-create').onclick=()=>{ if(auth.currentUser && !auth.currentUser.isAnonymous) routeAuthenticatedAccount(); else buildHostAuthScreen(); };
+    $('qz-market-signin').onclick=()=>{ if(auth.currentUser && !auth.currentUser.isAnonymous) routeAuthenticatedAccount(); else buildHostAuthScreen(); };
   }
 
   function buildGetStartedScreen(){
@@ -3235,20 +4581,20 @@ authPromise.then(() => {
       <main class="qz-premium-entry">
         <div class="qz-premium-entry-shade"></div>
         <section class="qz-premium-entry-card">
-          <button class="qz-premium-back" id="qz-back-home">← Home</button>
+          <button class="qz-premium-back" id="qz-back-home">← Back</button>
           <div class="qz-premium-entry-brand">
             <img class="qz-premium-entry-icon" src="${BRAND_ICON}" alt="QZMAX app icon">
             <img class="qz-premium-entry-wordmark" src="${BRAND_WORDMARK}" alt="QZMAX — Get smart. Play smarter.">
           </div>
           <div class="qz-premium-entry-copy">
             <div class="qz-premium-entry-kicker">WELCOME TO QZMAX</div>
-            <h1>How would you like to play?</h1>
-            <p>Choose an option to continue.</p>
+            <h1>What would you like to do?</h1>
+            <p>Sign in to your QZMAX account or join a live game instantly.</p>
           </div>
           <div class="qz-premium-entry-options">
             <button class="qz-premium-entry-option" id="qz-start-host">
               <span class="qz-premium-option-symbol">✦</span>
-              <span><strong>Log in as a host</strong><small>Create, manage and run live games.</small></span>
+              <span><strong>Sign in / Create account</strong><small>For educators and students.</small></span>
               <b>→</b>
             </button>
             <button class="qz-premium-entry-option" id="qz-start-player">
@@ -3261,7 +4607,7 @@ authPromise.then(() => {
       </main>`;
 
     $('qz-start-host').onclick = ()=>{
-      if(auth.currentUser && !auth.currentUser.isAnonymous) buildHostDashboard();
+      if(auth.currentUser && !auth.currentUser.isAnonymous) routeAuthenticatedAccount();
       else buildHostAuthScreen();
     };
     $('qz-start-player').onclick = ()=>{ buildPlayerJoin(); showScreen('screen-player-join'); };
@@ -3277,6 +4623,59 @@ authPromise.then(() => {
   function lsGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
   function lsSet(key,val){ try{ localStorage.setItem(key,val); }catch(e){ } }
   function lsRemove(key){ try{ localStorage.removeItem(key); }catch(e){ } }
+
+  const ACCOUNT_PROFILE_PREFIX = 'qzmaxAccountProfileV1:';
+  function accountProfilePath(uid){ return 'profiles/' + uid; }
+  function accountProfileLocalKey(uid){ return ACCOUNT_PROFILE_PREFIX + String(uid||''); }
+
+  async function loadAccountProfile(){
+    const user = auth.currentUser;
+    if(!user || user.isAnonymous) return null;
+    let local = null;
+    try{
+      const raw = lsGet(accountProfileLocalKey(user.uid));
+      local = raw ? JSON.parse(raw) : null;
+    }catch(e){}
+    let remote = null;
+    try{ remote = await fbGet(accountProfilePath(user.uid)); }catch(e){}
+    const merged = {...(local||{}),...(remote||{})};
+    if(!merged.email) merged.email = user.email || '';
+    if(!merged.displayName) merged.displayName = user.displayName || (user.email ? user.email.split('@')[0] : '');
+    return merged;
+  }
+
+  async function saveAccountProfile(patch){
+    const user = auth.currentUser;
+    if(!user || user.isAnonymous) return null;
+    const current = await loadAccountProfile() || {};
+    const profile = {...current,...patch,uid:user.uid,email:user.email || current.email || '',updatedAt:Date.now()};
+    try{ lsSet(accountProfileLocalKey(user.uid),JSON.stringify(profile)); }catch(e){}
+    try{ await fbSet(accountProfilePath(user.uid),profile); }catch(e){}
+    return profile;
+  }
+
+  function accountProviderLabel(){
+    const user = auth.currentUser;
+    if(!user) return '—';
+    const providers = (user.providerData||[]).map(p=>p.providerId);
+    if(providers.includes('google.com')) return 'Google';
+    if(providers.includes('password')) return 'Email & password';
+    return user.isAnonymous ? 'Guest' : 'QZMAX account';
+  }
+
+  function accountDisplayName(profile){
+    const user = auth.currentUser;
+    return String(profile?.displayName || user?.displayName || (user?.email ? user.email.split('@')[0] : '') || 'QZMAX user').trim();
+  }
+
+  async function routeAuthenticatedAccount(){
+    const user = auth.currentUser;
+    if(!user || user.isAnonymous){ buildHostAuthScreen(); return; }
+    const profile = await loadAccountProfile();
+    if(!profile || !profile.role){ buildAccountRoleOnboarding(profile||{}); return; }
+    if(profile.role === 'student') buildStudentDashboard(profile);
+    else buildHostDashboard();
+  }
 
   const HOST_CONTROLLER_KEY = 'triviaHostControllerV1';
 
@@ -3766,15 +5165,16 @@ authPromise.then(() => {
 
   async function buildHostDashboard(){
     clearInterval(S.hostPollHandle);
+    const profile = await loadAccountProfile() || {};
     const userEmail = auth.currentUser && auth.currentUser.email ? auth.currentUser.email : 'Host';
-    const displayName = userEmail.includes('@') ? userEmail.split('@')[0] : userEmail;
+    const displayName = accountDisplayName(profile) || (userEmail.includes('@') ? userEmail.split('@')[0] : userEmail);
 
     $('screen-role').innerHTML =
       '<div class="host-dashboard">'+
         '<div class="hd-nav">'+
           '<div class="hd-brand"><img src="'+BRAND_ICON+'" alt="QZMAX" style="width:36px;height:36px;border-radius:11px;object-fit:cover;box-shadow:0 7px 18px rgba(0,0,0,.25);"><span class="qz-wordmark"><span class="qz">QZ</span><span class="max">MAX</span></span></div>'+
           '<div class="hd-nav-actions">'+
-            '<button class="btn btn-ghost" id="hd-home" style="padding:8px 12px;font-size:11px;">Home</button>'+
+            '<button class="btn btn-ghost" id="hd-account" style="padding:8px 12px;font-size:11px;">My Account</button>'+
             '<button class="btn btn-ghost" id="hd-logout" style="padding:8px 12px;font-size:11px;">Log out</button>'+
           '</div>'+
         '</div>'+
@@ -3834,7 +5234,7 @@ authPromise.then(() => {
     $('hd-quick-new').onclick = ()=>startHostFlow('launch');
     $('hd-ai-studio').onclick = startQuizStudioFromDashboard;
     $('hd-quick-ai').onclick = startQuizStudioFromDashboard;
-    $('hd-home').onclick = buildRoleScreen;
+    $('hd-account').onclick = ()=>buildMyAccountScreen('host');
     $('hd-logout').onclick = async ()=>{
       stopHostControlWatch();
       await signOut(auth);
@@ -4183,106 +5583,197 @@ authPromise.then(() => {
   });
 
   function buildHostAuthScreen(){
-    isLoginMode = true; 
-
+    isLoginMode = true;
     $('screen-role').innerHTML =
       '<div class="qz-host-auth-stage">'+
         '<div class="qz-host-auth-overlay"></div>'+
         '<div class="qz-host-auth-card">'+
           '<button class="qz-host-auth-back" id="host-auth-back">← Back</button>'+
-          '<div class="qz-host-auth-brand">'+
-            '<img class="qz-host-auth-icon" src="'+BRAND_ICON+'" alt="QZMAX icon">'+
-            '<img class="qz-host-auth-wordmark" src="'+BRAND_WORDMARK+'" alt="QZMAX — Get smart. Play smarter.">'+
-          '</div>'+
-          '<div class="eyebrow">Host access</div>'+
-          '<h2 class="qz-host-auth-title" id="auth-title">Log in to host</h2>'+
-          '<p class="qz-host-auth-subtitle" id="auth-subtitle">Welcome back, let\'s get your game ready.</p>'+
+          '<div class="qz-host-auth-brand"><img class="qz-host-auth-icon" src="'+BRAND_ICON+'" alt="QZMAX icon"><div class="qz-saas-logo" style="justify-content:center;"><span>QZ<b>MAX</b></span></div></div>'+
+          '<div class="eyebrow">QZMAX account</div>'+
+          '<h2 class="qz-host-auth-title" id="auth-title">Log in to QZMAX</h2>'+
+          '<p class="qz-host-auth-subtitle" id="auth-subtitle">Continue as an educator or student.</p>'+
           '<div class="qz-host-auth-form">'+
+            '<button class="btn btn-block qz-google-btn" id="host-auth-google"><img class="qz-google-logo" src="assets/google-g.png" alt="">Continue with Google</button>'+
+            '<div class="qz-auth-divider">or use email</div>'+
+            '<div class="qz-auth-name-role" id="qz-auth-name-role">'+
+              '<input type="text" id="host-name-input" placeholder="Your name" autocomplete="name" style="margin-bottom:9px;">'+
+              '<div class="qz-role-select" id="qz-signup-role">'+
+                '<label class="qz-role-choice"><input type="radio" name="signup-role" value="educator" checked><span><strong>Educator</strong><small>Create quizzes, exams and live games.</small></span></label>'+
+                '<label class="qz-role-choice"><input type="radio" name="signup-role" value="student"><span><strong>Student</strong><small>Join games and build your learning profile.</small></span></label>'+
+              '</div>'+
+            '</div>'+
             '<input type="email" id="host-email-input" placeholder="Email address" autocomplete="email">'+
             '<input type="password" id="host-pass-input" placeholder="Password">'+
             '<div class="err-msg" id="host-auth-err" style="color:var(--wrong);"></div>'+
             '<button class="btn btn-primary btn-block" id="host-auth-submit">Log in</button>'+
             '<button class="qz-auth-text-btn" id="host-auth-reset">Forgot password?</button>'+
-            '<button class="btn btn-ghost btn-block" id="host-auth-toggle">Create an account instead</button>'+
+            '<button class="btn btn-ghost btn-block qz-auth-secondary" id="host-auth-toggle">Create an account instead</button>'+
           '</div>'+
         '</div>'+
       '</div>';
 
-    const submitBtn = $('host-auth-submit');
-    const toggleBtn = $('host-auth-toggle');
-    const resetBtn = $('host-auth-reset');
-    const errEl = $('host-auth-err');
-    const emailInp = $('host-email-input');
-    const passInp = $('host-pass-input');
+    const submitBtn=$('host-auth-submit'),toggleBtn=$('host-auth-toggle'),googleBtn=$('host-auth-google'),resetBtn=$('host-auth-reset');
+    const errEl=$('host-auth-err'),emailInp=$('host-email-input'),passInp=$('host-pass-input'),nameInp=$('host-name-input');
+    const nameRole=$('qz-auth-name-role'),roleWrap=$('qz-signup-role');
 
-    toggleBtn.onclick = () => {
-      isLoginMode = !isLoginMode;
-      $('auth-title').textContent = isLoginMode ? 'Log in to host' : 'Create host account';
-      $('auth-subtitle').textContent = isLoginMode ? 'Welcome back, let\'s get your game ready.' : 'Sign up to start hosting live events.';
-      submitBtn.textContent = isLoginMode ? 'Log in' : 'Sign up';
-      toggleBtn.textContent = isLoginMode ? 'Create an account instead' : 'Already have an account? Log in';
-      resetBtn.style.display = isLoginMode ? 'block' : 'none';
-      errEl.textContent = '';
+    function selectedSignupRole(){
+      return document.querySelector('input[name="signup-role"]:checked')?.value || 'educator';
+    }
+    function syncAuthMode(){
+      $('auth-title').textContent=isLoginMode?'Log in to QZMAX':'Create your QZMAX account';
+      $('auth-subtitle').textContent=isLoginMode?'Welcome back. Continue as an educator or student.':'Choose your account type. You can change your profile later.';
+      submitBtn.textContent=isLoginMode?'Log in':'Create account';
+      toggleBtn.textContent=isLoginMode?'Create an account instead':'Already have an account? Log in';
+      resetBtn.style.display=isLoginMode?'block':'none';
+      nameRole.classList.toggle('show',!isLoginMode);
+      roleWrap.classList.toggle('show',!isLoginMode);
+      errEl.textContent='';
+    }
+
+    toggleBtn.onclick=()=>{ isLoginMode=!isLoginMode; syncAuthMode(); };
+
+    googleBtn.onclick=async()=>{
+      googleBtn.disabled=true;errEl.textContent='';
+      try{
+        const provider=new GoogleAuthProvider();
+        provider.setCustomParameters({prompt:'select_account'});
+        await signInWithPopup(auth,provider);
+        currentUserUid=auth.currentUser.uid;
+        const profile=await loadAccountProfile();
+        if(!profile || !profile.role){
+          buildAccountRoleOnboarding({displayName:auth.currentUser.displayName||'',email:auth.currentUser.email||''});
+        }else await routeAuthenticatedAccount();
+      }catch(error){
+        errEl.style.color='var(--wrong)';
+        errEl.textContent=(error.message||'Google sign-in failed.').replace('Firebase: ','');
+        googleBtn.disabled=false;
+      }
     };
 
-    resetBtn.onclick = async () => {
-      const email = emailInp.value.trim();
-      if(!email){
-        errEl.style.color = 'var(--wrong)';
-        errEl.textContent = 'Type your email address in the box above first, then click this again.';
-        return;
-      }
-      
-      submitBtn.disabled = true;
-      errEl.style.color = 'var(--muted)';
-      errEl.textContent = 'Sending reset link...';
-      
-      try {
-        await sendPasswordResetEmail(auth, email);
-        errEl.style.color = 'var(--correct)';
-        errEl.textContent = 'Password reset email sent! Check your inbox.';
-      } catch (error) {
-        errEl.style.color = 'var(--wrong)';
-        errEl.textContent = error.message.replace('Firebase: ', '');
-      }
-      submitBtn.disabled = false;
+    resetBtn.onclick=async()=>{
+      const email=emailInp.value.trim();
+      if(!email){errEl.style.color='var(--wrong)';errEl.textContent='Type your email address above first.';return;}
+      resetBtn.disabled=true;errEl.style.color='var(--muted)';errEl.textContent='Sending reset link…';
+      try{await sendPasswordResetEmail(auth,email);errEl.style.color='var(--correct)';errEl.textContent='Password reset email sent. Check your inbox.';}
+      catch(error){errEl.style.color='var(--wrong)';errEl.textContent=(error.message||'Could not send reset email.').replace('Firebase: ','');}
+      resetBtn.disabled=false;
     };
 
-    const submit = async ()=>{
-      const email = emailInp.value.trim();
-      const pass = passInp.value;
-      if(!email || !pass){ 
-        errEl.style.color = 'var(--wrong)'; 
-        errEl.textContent = 'Please enter both email and password.'; 
-        return; 
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Please wait...';
-      errEl.textContent = '';
-      errEl.style.color = 'var(--wrong)'; 
-
-      try {
-        if(isLoginMode) {
-          await signInWithEmailAndPassword(auth, email, pass);
-        } else {
-          await createUserWithEmailAndPassword(auth, email, pass);
+    const submit=async()=>{
+      const email=emailInp.value.trim(),pass=passInp.value,name=(nameInp?.value||'').trim();
+      if(!email||!pass){errEl.style.color='var(--wrong)';errEl.textContent='Please enter both email and password.';return;}
+      if(!isLoginMode&&!name){errEl.style.color='var(--wrong)';errEl.textContent='Please enter your name.';return;}
+      submitBtn.disabled=true;submitBtn.textContent='Please wait…';errEl.textContent='';
+      try{
+        if(isLoginMode) await signInWithEmailAndPassword(auth,email,pass);
+        else{
+          await createUserWithEmailAndPassword(auth,email,pass);
+          currentUserUid=auth.currentUser.uid;
+          await saveAccountProfile({displayName:name,role:selectedSignupRole(),country:'Australia',plan:'free',createdAt:Date.now()});
         }
-        
-        currentUserUid = auth.currentUser.uid;
-        buildHostDashboard();
-      } catch (error) {
-        errEl.textContent = error.message.replace('Firebase: ', '');
-        submitBtn.disabled = false;
-        submitBtn.textContent = isLoginMode ? 'Log in' : 'Sign up';
+        currentUserUid=auth.currentUser.uid;
+        await routeAuthenticatedAccount();
+      }catch(error){
+        errEl.style.color='var(--wrong)';
+        errEl.textContent=(error.message||'Account sign-in failed.').replace('Firebase: ','');
+        submitBtn.disabled=false;
+        syncAuthMode();
       }
     };
 
-    submitBtn.onclick = submit;
-    passInp.addEventListener('keydown', (e)=>{ if(e.key==='Enter') submit(); });
-    emailInp.addEventListener('keydown', (e)=>{ if(e.key==='Enter') passInp.focus(); });
-    $('host-auth-back').onclick = buildGetStartedScreen;
+    submitBtn.onclick=submit;
+    passInp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+    emailInp.addEventListener('keydown',e=>{if(e.key==='Enter')passInp.focus();});
+    $('host-auth-back').onclick=buildGetStartedScreen;
+    syncAuthMode();
     emailInp.focus();
+  }
+
+  function buildAccountRoleOnboarding(seed={}){
+    $('screen-role').innerHTML =
+      '<div class="qz-host-auth-stage"><div class="qz-host-auth-overlay"></div><div class="qz-host-auth-card">'+
+        '<div class="qz-host-auth-brand"><img class="qz-host-auth-icon" src="'+BRAND_ICON+'" alt="QZMAX"></div>'+
+        '<div class="eyebrow">One quick step</div><h2 class="qz-host-auth-title">How will you use QZMAX?</h2>'+
+        '<p class="qz-host-auth-subtitle">This helps us tailor your workspace. You can update it later in My Account.</p>'+
+        '<div class="qz-role-select show" style="margin:18px 0;">'+
+          '<label class="qz-role-choice"><input type="radio" name="onboard-role" value="educator" checked><span><strong>Educator</strong><small>Create, teach, assess and host live games.</small></span></label>'+
+          '<label class="qz-role-choice"><input type="radio" name="onboard-role" value="student"><span><strong>Student</strong><small>Join games and build a personal learning space.</small></span></label>'+
+        '</div><button class="btn btn-primary btn-block" id="qz-role-continue">Continue</button>'+
+      '</div></div>';
+
+    $('qz-role-continue').onclick=async()=>{
+      const selected=document.querySelector('input[name="onboard-role"]:checked')?.value||'educator';
+      await saveAccountProfile({displayName:seed.displayName||auth.currentUser?.displayName||'',email:seed.email||auth.currentUser?.email||'',role:selected,country:'Australia',plan:'free',createdAt:Date.now()});
+      routeAuthenticatedAccount();
+    };
+    showScreen('screen-role');
+  }
+
+  async function buildStudentDashboard(profileArg=null){
+    clearInterval(S.hostPollHandle);
+    const profile=profileArg||await loadAccountProfile()||{};
+    const name=accountDisplayName(profile);
+    $('screen-role').innerHTML =
+      '<div class="qz-student-shell">'+
+        '<div class="qz-account-nav"><div class="qz-account-brand"><img src="'+BRAND_ICON+'" alt="QZMAX"><span>QZMAX Student</span></div><div style="display:flex;gap:8px;"><button class="btn btn-ghost" id="student-account" style="padding:8px 12px;font-size:11px;">My Account</button><button class="btn btn-ghost" id="student-logout" style="padding:8px 12px;font-size:11px;">Log out</button></div></div>'+
+        '<div class="qz-account-header"><div class="eyebrow">Student workspace</div><h1>Hi, '+escapeHtml(name)+'.</h1><p>Join a live QZMAX game now. Personal practice and learning history are being prepared for the next student release.</p></div>'+
+        '<div class="qz-student-hero">'+
+          '<div class="qz-student-card"><div class="eyebrow">Live game</div><h2>Ready to play?</h2><p>Enter a room code and join your class, group or event.</p><div class="qz-student-actions"><button class="btn btn-primary" id="student-join">Join a game</button><button class="btn btn-ghost" id="student-home">QZMAX home</button></div></div>'+
+          '<div class="qz-student-card"><div class="eyebrow">Coming next</div><h2 style="font-size:23px;">Personal practice</h2><p>Saved practice, progress history and Australian learning pathways will live here as the student experience expands.</p><div class="qz-plan-card" style="margin-top:16px;"><small>YOUR PLAN</small><strong>Free Student</strong><small>Commercial preview</small></div></div>'+
+        '</div>'+
+      '</div>';
+    $('student-join').onclick=()=>{buildPlayerJoin();showScreen('screen-player-join');};
+    $('student-home').onclick=buildRoleScreen;
+    $('student-account').onclick=()=>buildMyAccountScreen('student');
+    $('student-logout').onclick=async()=>{await signOut(auth);currentUserUid=null;buildRoleScreen();};
+    showScreen('screen-role');
+  }
+
+  async function buildMyAccountScreen(returnArea='host'){
+    const profile=await loadAccountProfile()||{};
+    const user=auth.currentUser;
+    if(!user||user.isAnonymous){buildHostAuthScreen();return;}
+    const name=accountDisplayName(profile);
+    const role=profile.role==='student'?'student':'educator';
+
+    const stateOptions=['','ACT','NSW','NT','QLD','SA','TAS','VIC','WA'].map(v=>
+      '<option value="'+v+'"'+((profile.state||'')===v?' selected':'')+'>'+(v||'Select')+'</option>'
+    ).join('');
+
+    $('screen-role').innerHTML =
+      '<div class="qz-account-shell">'+
+        '<div class="qz-account-nav"><div class="qz-account-brand"><img src="'+BRAND_ICON+'" alt="QZMAX"><span>My Account</span></div><button class="btn btn-ghost" id="account-back" style="padding:8px 12px;font-size:11px;">← Back</button></div>'+
+        '<div class="qz-account-header"><div class="eyebrow">Account & preferences</div><h1>'+escapeHtml(name)+'</h1><p>Manage your QZMAX profile, account type, appearance and commercial plan foundation.</p></div>'+
+        '<div class="qz-account-grid">'+
+          '<section class="qz-account-card"><h3>Profile</h3><div class="qz-account-fields">'+
+            '<div class="qform-row"><label>Name</label><input id="account-name" type="text" value="'+escapeHtml(name)+'"></div>'+
+            '<div class="qform-row"><label>Account type</label><select id="account-role"><option value="educator"'+(role==='educator'?' selected':'')+'>Educator</option><option value="student"'+(role==='student'?' selected':'')+'>Student</option></select></div>'+
+            '<div class="qform-row"><label>Organisation / School</label><input id="account-org" type="text" value="'+escapeHtml(profile.organisation||'')+'" placeholder="Optional"></div>'+
+            '<div class="qform-row"><label>State / Territory</label><select id="account-state">'+stateOptions+'</select></div>'+
+            '<div class="qform-row wide"><label>Email</label><div class="qz-account-value">'+escapeHtml(user.email||'')+'</div></div>'+
+            '<div class="qform-row wide"><label>Sign-in method</label><div class="qz-account-value">'+escapeHtml(accountProviderLabel())+'</div></div>'+
+          '</div><div class="err-msg" id="account-msg"></div><button class="btn btn-primary" id="account-save" style="margin-top:8px;">Save profile</button></section>'+
+          '<div style="display:flex;flex-direction:column;gap:15px;">'+
+            '<section class="qz-account-card"><h3>Plan</h3><div class="qz-plan-card"><small>CURRENT PLAN</small><strong>Free</strong><small>Billing and educator plans will be introduced when QZMAX is ready for commercial release.</small></div><div class="qz-account-value">Australia-first commercial preview</div></section>'+
+            '<section class="qz-account-card"><h3>Appearance</h3><div class="qz-theme-choice"><button data-theme-choice="dark">☾ Dark</button><button data-theme-choice="light">☀ Bright</button></div><p style="font-size:11px;margin-top:10px;">Your theme follows you across Host and Player screens on this device.</p></section>'+
+            '<section class="qz-account-card"><h3>Account</h3><button class="btn btn-ghost btn-block" id="account-logout">Log out</button></section>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+
+    document.querySelectorAll('[data-theme-choice]').forEach(btn=>{btn.onclick=()=>qzApplyTheme(btn.dataset.themeChoice);});
+    qzApplyTheme(qzGetTheme(),false);
+
+    $('account-save').onclick=async()=>{
+      const msg=$('account-msg');msg.style.color='var(--muted)';msg.textContent='Saving…';
+      const saved=await saveAccountProfile({displayName:$('account-name').value.trim(),role:$('account-role').value,organisation:$('account-org').value.trim(),state:$('account-state').value,country:'Australia',plan:'free'});
+      msg.style.color='var(--correct)';msg.textContent='Profile saved.';
+      setTimeout(()=>{if(saved?.role==='student')buildStudentDashboard(saved);else buildHostDashboard();},450);
+    };
+    $('account-back').onclick=()=>{if(returnArea==='student'||role==='student')buildStudentDashboard(profile);else buildHostDashboard();};
+    $('account-logout').onclick=async()=>{await signOut(auth);currentUserUid=null;buildRoleScreen();};
+    showScreen('screen-role');
   }
 
   async function startHostFlow(workspaceMode='launch'){
@@ -4397,6 +5888,7 @@ authPromise.then(() => {
         '<div class="ai-source-tabs" role="tablist" aria-label="Quiz creation source">'+
           '<button type="button" class="ai-source-tab active" id="ai-source-trusted">✦ AI Knowledge + Search</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-document">▣ My Document</button>'+
+          '<button type="button" class="ai-source-tab" id="ai-source-link">↗ Source Link</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-manual">✎ Manual</button>'+
         '</div>'+
 
@@ -4435,6 +5927,28 @@ authPromise.then(() => {
           '<div class="document-privacy-note">Your document is parsed in your browser. Relevant extracted text is then sent to your configured QZMAX AI generation endpoint to create the questions. QZMAX does not automatically save the source document with the quiz.</div>'+
         '</div>'+
 
+        '<div id="ai-source-panel-link" class="ai-source-panel" style="display:none;">'+
+          '<div class="ai-source-notice source-link-notice"><strong>Exact page grounding</strong><span>Paste one public webpage or public content URL. QZMAX extracts that page and generates questions only from the extracted content — it does not silently add outside facts.</span></div>'+
+          '<div class="source-link-entry">'+
+            '<div class="qform-row source-link-url-row"><label>Source URL</label><div class="source-link-input-group"><input type="url" id="ai-link-url" placeholder="https://example.com/article" autocomplete="url" spellcheck="false"><button type="button" class="btn btn-ghost" id="ai-link-fetch">Fetch source</button></div></div>'+
+          '</div>'+
+          '<div class="source-link-status" id="ai-link-status">Paste a public link, then click Fetch source.</div>'+
+          '<div class="source-link-preview" id="ai-link-preview" style="display:none;">'+
+            '<div class="source-link-preview-head">'+
+              '<div><div class="eyebrow">SOURCE DETECTED</div><strong id="ai-link-title">Source page</strong><span id="ai-link-domain"></span></div>'+
+              '<a id="ai-link-open" class="ai-text-link" href="#" target="_blank" rel="noopener noreferrer">Open source ↗</a>'+
+            '</div>'+
+            '<div class="source-link-facts">'+
+              '<span><b id="ai-link-words">0</b> words</span>'+
+              '<span><b id="ai-link-chars">0</b> characters</span>'+
+              '<span id="ai-link-depth">Basic extraction</span>'+
+            '</div>'+
+            '<details class="source-link-details"><summary>Preview extracted content</summary><pre id="ai-link-excerpt"></pre></details>'+
+          '</div>'+
+          '<div class="qform-row" style="margin-top:10px;"><label>Focus / instructions (optional)</label><input type="text" id="ai-link-focus" placeholder="e.g. Focus on causes and effects, key dates, definitions"></div>'+
+          '<div class="document-privacy-note">Public links only. Some paywalled, login-only, highly dynamic or blocked pages may not be extractable. Questions are grounded in the selected page, but QZMAX does not independently certify that the page itself is factually correct.</div>'+
+        '</div>'+
+
         '<div id="ai-source-panel-manual" class="ai-source-panel" style="display:none;">'+
           '<div class="manual-create-panel"><div class="manual-create-icon">✎</div><div><strong>Create questions yourself</strong><p>Use the question editor below for Multiple Choice, True / False, Select Multiple or Typed Answer questions.</p></div><button type="button" class="btn btn-ghost" id="ai-manual-jump">Open editor ↓</button></div>'+
         '</div>'+
@@ -4452,14 +5966,14 @@ authPromise.then(() => {
           '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate with Free Multi-AI</button>'+
           '<div class="ai-progress-shell" id="ai-progress-shell" style="display:none;"><div class="ai-progress-bar"><span id="ai-progress-fill"></span></div><div class="ai-progress-label" id="ai-progress-label">Preparing…</div></div>'+
           '<div class="err-msg" id="ai-msg"></div>'+
-          '<div class="verification-legend"><span><b class="verify-dot source"></b> 2-Source Checked</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
-          '<div class="accuracy-note"><strong>Accuracy safeguard:</strong> Custom Topic questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.</div>'+
+          '<div class="verification-legend"><span><b class="verify-dot source"></b> 2-Source Checked</span><span><b class="verify-dot link"></b> Link Grounded</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
+          '<div class="accuracy-note" id="ai-accuracy-note"><strong>Accuracy safeguard:</strong> Custom Topic questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.</div>'+
         '</div>'+
       '</div>'+
 
       '<div class="host-workspace-columns" style="display:flex; gap:20px; flex:1; min-height:0;">'+
         '<div class="host-studio-only" id="host-question-editor-pane" style="flex:1; display:flex; flex-direction:column; min-height:0;">'+
-          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">'+
+          '<div class="host-pane-heading host-editor-heading" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">'+
             '<h3 id="qf-heading" style="margin:0;">Add a question</h3>'+
             '<button class="btn btn-ghost" id="qf-cancel-edit" type="button" style="display:none; padding:6px 12px; font-size:12px;">Cancel edit</button>'+
           '</div>'+
@@ -4504,7 +6018,7 @@ authPromise.then(() => {
             '</div>'+
           '</div>'+
           
-          '<div class="host-queue-heading" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">'+
+          '<div class="host-pane-heading host-queue-heading" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">'+
             '<h3 id="host-queue-title" style="margin:0;">Question queue</h3>'+
             '<button class="btn btn-danger host-studio-only" id="qf-clear-queue" style="padding:6px 12px; font-size:12px;">Clear Queue</button>'+
           '</div>'+
@@ -4665,10 +6179,11 @@ authPromise.then(() => {
     let isSchoolMode = false;
     let aiSourceMode = 'trusted';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
+    let aiLinkState = { url:'', title:'', domain:'', text:'', chars:0, words:0, truncated:false, extractDepth:'basic' };
 
     function setAISourceMode(mode){
-      aiSourceMode = ['trusted','document','manual'].includes(mode) ? mode : 'trusted';
-      ['trusted','document','manual'].forEach(m=>{
+      aiSourceMode = ['trusted','document','link','manual'].includes(mode) ? mode : 'trusted';
+      ['trusted','document','link','manual'].forEach(m=>{
         const tab = $('ai-source-'+m);
         const panel = $('ai-source-panel-'+m);
         if(tab) tab.classList.toggle('active', m===aiSourceMode);
@@ -4684,12 +6199,27 @@ authPromise.then(() => {
       const btn = $('ai-generate');
       if(!btn) return;
       if(aiSourceMode==='document') btn.textContent = 'Generate from Document';
+      else if(aiSourceMode==='link') btn.textContent = 'Generate from Source Link';
       else if(isSchoolMode) btn.textContent = 'Generate Year-Level Exam Questions';
       else btn.textContent = 'Generate with Free Multi-AI';
+
+      const note = $('ai-accuracy-note');
+      if(note){
+        if(aiSourceMode==='document'){
+          note.innerHTML = '<strong>Document grounding:</strong> QZMAX generates from the uploaded document only. The document itself is treated as the host-selected source of truth.';
+        }else if(aiSourceMode==='link'){
+          note.innerHTML = '<strong>Source Link grounding:</strong> Every accepted question must include supporting evidence found in the extracted page content. QZMAX does not independently certify the factual accuracy of the page itself.';
+        }else if(isSchoolMode){
+          note.innerHTML = '<strong>Curriculum-guided review:</strong> QZMAX follows the selected year, subject and difficulty guidance. Host review remains important because this mode is not an official curriculum certification.';
+        }else{
+          note.innerHTML = '<strong>Accuracy safeguard:</strong> Custom Topic questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.';
+        }
+      }
     }
 
     $('ai-source-trusted').onclick = ()=>setAISourceMode('trusted');
     $('ai-source-document').onclick = ()=>setAISourceMode('document');
+    $('ai-source-link').onclick = ()=>setAISourceMode('link');
     $('ai-source-manual').onclick = ()=>setAISourceMode('manual');
     $('ai-manual-jump').onclick = ()=>{
       const pane = $('host-question-editor-pane');
@@ -4766,6 +6296,114 @@ authPromise.then(() => {
     };
 
 
+
+    function resetSourceLinkState(message='Paste a public link, then click Fetch source.'){
+      aiLinkState = {url:'',title:'',domain:'',text:'',chars:0,words:0,truncated:false,extractDepth:'basic'};
+      const status = $('ai-link-status');
+      const preview = $('ai-link-preview');
+      if(status){
+        status.className='source-link-status';
+        status.textContent=message;
+      }
+      if(preview) preview.style.display='none';
+    }
+
+    function sourceLinkUrlLooksValid(value){
+      try{
+        const u = new URL(String(value||'').trim());
+        return ['http:','https:'].includes(u.protocol);
+      }catch(e){
+        return false;
+      }
+    }
+
+    async function fetchSourceLink(){
+      const input = $('ai-link-url');
+      const status = $('ai-link-status');
+      const fetchBtn = $('ai-link-fetch');
+      const value = input ? input.value.trim() : '';
+
+      if(!sourceLinkUrlLooksValid(value)){
+        resetSourceLinkState('Enter a valid public http:// or https:// URL.');
+        status.className='source-link-status error';
+        return;
+      }
+
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = 'Fetching…';
+      status.className = 'source-link-status loading';
+      status.textContent = 'Extracting the source page…';
+      $('ai-link-preview').style.display='none';
+
+      try{
+        const res = await fetch('/.netlify/functions/generate',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({action:'extract_source',url:value})
+        });
+
+        let data = null;
+        try{ data = await res.json(); }catch(e){}
+
+        if(!res.ok){
+          throw new Error(
+            data && data.error
+              ? data.error
+              : 'Source extraction requires QZMAX Full Local Preview (Netlify Dev) or the deployed backend.'
+          );
+        }
+        if(!data || !data.content){
+          throw new Error('No usable page content was returned from this link.');
+        }
+
+        aiLinkState = {
+          url:data.url || value,
+          title:data.title || data.domain || 'Source page',
+          domain:data.domain || '',
+          text:data.content,
+          chars:Number(data.chars)||data.content.length,
+          words:Number(data.words)||0,
+          truncated:data.truncated===true,
+          extractDepth:data.extractDepth||'basic'
+        };
+
+        status.className='source-link-status ready';
+        status.textContent =
+          '✓ Source ready · '+aiLinkState.words.toLocaleString()+' words'+
+          (aiLinkState.truncated?' · long page trimmed for QZMAX':'')+'.';
+
+        $('ai-link-title').textContent=aiLinkState.title;
+        $('ai-link-domain').textContent=aiLinkState.domain;
+        $('ai-link-words').textContent=aiLinkState.words.toLocaleString();
+        $('ai-link-chars').textContent=aiLinkState.chars.toLocaleString();
+        $('ai-link-depth').textContent=(aiLinkState.extractDepth==='advanced'?'Advanced':'Basic')+' extraction';
+        $('ai-link-open').href=aiLinkState.url;
+        $('ai-link-excerpt').textContent=aiLinkState.text.slice(0,1800)+(aiLinkState.text.length>1800?'…':'');
+        $('ai-link-preview').style.display='';
+      }catch(err){
+        aiLinkState = {url:'',title:'',domain:'',text:'',chars:0,words:0,truncated:false,extractDepth:'basic'};
+        status.className='source-link-status error';
+        status.textContent=err.message || 'Could not extract this source link.';
+      }finally{
+        fetchBtn.disabled=false;
+        fetchBtn.textContent='Fetch source';
+      }
+    }
+
+    $('ai-link-fetch').onclick = fetchSourceLink;
+    $('ai-link-url').addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        e.preventDefault();
+        fetchSourceLink();
+      }
+    });
+    $('ai-link-url').addEventListener('input',()=>{
+      const value=$('ai-link-url').value.trim();
+      if(aiLinkState.url && value!==aiLinkState.url){
+        resetSourceLinkState('Link changed — click Fetch source to extract the new page.');
+      }
+    });
+
     function buildSchoolExamTopic(grade, subject, diff){
       const subjectGuidance = {
         'Mathematics': 'Test mathematical knowledge and skills directly: number operations, place value, fractions, decimals, percentages where year-appropriate, patterns/algebraic thinking, measurement, geometry/space, data/statistics, probability, and practical problem solving.',
@@ -4811,6 +6449,18 @@ authPromise.then(() => {
         topic = focus || ('Create a quiz from '+aiDocumentState.name);
         sourceText = aiDocumentState.text;
         sourceName = aiDocumentState.name;
+      }else if(aiSourceMode==='link'){
+        if(!aiLinkState.text){
+          $('ai-msg').style.color='var(--wrong)';
+          $('ai-msg').textContent = 'Fetch a source link successfully before generating questions.';
+          return;
+        }
+        const focus = $('ai-link-focus').value.trim();
+        topic = focus || ('Create a quiz from '+aiLinkState.title);
+        sourceText = aiLinkState.text;
+        sourceName = aiLinkState.title || aiLinkState.domain || 'Source link';
+        sourceUrls = [aiLinkState.url];
+        sourceType = 'link';
       }else{
         if(isSchoolMode){
           const grade = $('ai-grade').value;
@@ -4848,7 +6498,14 @@ authPromise.then(() => {
       const msg = $('ai-msg');
       btn.disabled = true;
       $('ai-progress-shell').style.display = '';
-      setAIProgress(2, aiSourceMode==='document' ? 'Preparing document source…' : 'Preparing AI request…');
+      setAIProgress(
+        2,
+        aiSourceMode==='document'
+          ? 'Preparing document source…'
+          : aiSourceMode==='link'
+          ? 'Preparing extracted source link…'
+          : 'Preparing AI request…'
+      );
       msg.textContent = '';
       msg.style.color = 'var(--muted)';
 
@@ -4867,7 +6524,12 @@ authPromise.then(() => {
           sourceType = 'school';
           setAIProgress(8, 'Year-level subject guidance ready — starting generation…');
         }else{
-          setAIProgress(8, 'Document ready — starting generation…');
+          setAIProgress(
+            8,
+            aiSourceMode==='link'
+              ? 'Source link grounded content ready — starting generation…'
+              : 'Document ready — starting generation…'
+          );
         }
 
         const generated = await generateVerifiedQuestionBatches({
@@ -4905,6 +6567,8 @@ authPromise.then(() => {
           ? 'web-verified'
           : aiSourceMode==='document'
           ? 'document-grounded'
+          : aiSourceMode==='link'
+          ? 'link-grounded'
           : sourceType==='trusted'
           ? 'source-grounded'
           : sourceType==='school'
@@ -5021,14 +6685,21 @@ authPromise.then(() => {
       }
 
       $('qf-err').textContent = '';
-      if(S.editingQuestionIndex !== null) S.questionsDraft[S.editingQuestionIndex] = question;
+      const editedIndex = S.editingQuestionIndex;
+      if(editedIndex !== null) S.questionsDraft[editedIndex] = question;
       else S.questionsDraft.push(question);
 
       cancelEditQuestion();
       renderHostQList();
       pushQuestionsToState();
+      if(editedIndex !== null) qzScrollBackToQuestion(editedIndex);
     };
-    $('qf-cancel-edit').onclick = cancelEditQuestion;
+    $('qf-cancel-edit').onclick = ()=>{
+      const editedIndex = S.editingQuestionIndex;
+      cancelEditQuestion();
+      renderHostQList();
+      if(editedIndex !== null) qzScrollBackToQuestion(editedIndex);
+    };
     renderHostQList();
     $('btn-start-quiz').onclick = beginQuiz;
 
@@ -5176,6 +6847,23 @@ authPromise.then(() => {
     saveBtn.textContent = S.loadedQuizId ? 'Update saved quiz' : 'Save';
   }
 
+  function qzScrollToEditor(){
+    const pane=$('host-question-editor-pane');
+    if(!pane)return;
+    pane.scrollIntoView({behavior:'smooth',block:'start'});
+    const card=pane.querySelector('.card');
+    if(card){card.classList.remove('qz-edit-focus');void card.offsetWidth;card.classList.add('qz-edit-focus');}
+  }
+
+  function qzScrollBackToQuestion(i){
+    requestAnimationFrame(()=>setTimeout(()=>{
+      const card=document.getElementById('qz-question-card-'+i);
+      if(!card)return;
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+      card.classList.remove('qz-return-focus');void card.offsetWidth;card.classList.add('qz-return-focus');
+    },100));
+  }
+
   function startEditQuestion(i){
     const q = S.questionsDraft[i];
     if(!q) return;
@@ -5201,6 +6889,7 @@ authPromise.then(() => {
     $('qf-heading').textContent = 'Edit question';
     $('qf-add').textContent = 'Save changes';
     $('qf-cancel-edit').style.display = '';
+    requestAnimationFrame(()=>setTimeout(qzScrollToEditor,80));
   }
 
   function cancelEditQuestion(){
@@ -5575,6 +7264,15 @@ authPromise.then(() => {
         sourcePage:item.sourcePage||''
       };
     }
+    if(sourceType==='link'){
+      return {
+        kind:'link',
+        label:'Link Grounded',
+        sourceName:sourceName||'Source link',
+        sourceUrls:Array.isArray(sourceUrls)?sourceUrls.slice(0,1):[],
+        evidence:typeof item.sourceEvidence==='string' ? item.sourceEvidence.slice(0,700) : ''
+      };
+    }
     if(sourceType==='trusted'){
       return {
         kind:'source',
@@ -5708,8 +7406,23 @@ authPromise.then(() => {
         ].join(' ');
 
     const flexibleReference = context.sourceType==='reference';
+    const sourceLinkMode = context.sourceType==='link';
     const sourceRule = sourceExcerpt
-      ? flexibleReference
+      ? sourceLinkMode
+        ? [
+            'SOURCE LINK GROUNDING — STRICT MODE.',
+            'Use ONLY facts explicitly supported by the extracted content from the host-selected URL below.',
+            'Do not use model memory, general web knowledge, or assumptions to fill gaps.',
+            'Write each visible question as a natural stand-alone question. Do not say "According to the source", "According to the webpage", "According to the link", "According to the text", or equivalent wording.',
+            'For EVERY question include sourceEvidence as an EXACT copied supporting phrase of roughly 8–45 words from the extracted content.',
+            'For EVERY question also include factKey: a concise canonical identity of the tested fact in the form relationship|subject|answer.',
+            'If the extracted content does not explicitly support a safe answer, do not create that question.',
+            'The host-selected source itself is treated as the authority for this mode; do not independently rewrite or correct its claims with outside knowledge.',
+            context.sourceUrls && context.sourceUrls[0] ? 'SOURCE URL: '+context.sourceUrls[0] : '',
+            'EXTRACTED SOURCE CONTENT:',
+            sourceExcerpt
+          ].filter(Boolean).join('\n')
+        : flexibleReference
         ? [
             'REFERENCE GUIDANCE: The material below is useful supporting reference, but this host request intentionally spans a broad scope.',
             'Use the reference material whenever it supports the requested category, and you MAY use well-established factual knowledge for requested categories not covered by the excerpt.',
@@ -5723,6 +7436,9 @@ authPromise.then(() => {
             'Do not use outside memory to fill gaps.',
             'If a fact is uncertain, controversial, time-sensitive, or not directly supported by the source, do not make a question about it.',
             'Every correct answer must be defensible from the source.',
+            'Write every visible question as a natural stand-alone question.',
+            'NEVER begin a visible question with phrases such as "According to the source", "According to the text", "According to the document", "Based on the source", "From the text", or equivalent wording in another language.',
+            'Do not mention the source, text, document, passage, or uploaded file in the visible question unless that wording is itself essential to the subject being tested.',
             'Avoid ambiguous distractors that could also be correct.',
             'When possible include sourceEvidence as a short supporting phrase and sourcePage if a page marker is visible.',
             'SOURCE MATERIAL:',
@@ -5777,6 +7493,8 @@ authPromise.then(() => {
           formatInstruction,
           sourceType:context.sourceType||'',
           sourceName:context.sourceName||'',
+          sourceUrls:Array.isArray(context.sourceUrls)?context.sourceUrls.slice(0,2):[],
+          sourceEvidenceText:context.sourceType==='link' ? sourceExcerpt : '',
           preferSearch:context.sourceType==='ai',
           questionLanguage,
           generationId:context.generationId||'',
@@ -5960,12 +7678,15 @@ authPromise.then(() => {
   function questionVerificationBadge(q){
     const meta = q && q.aiMeta;
     if(!meta) return '';
-    const kind = meta.kind==='document'?'document':meta.kind==='source'?'source':'review';
+    const kind = meta.kind==='document'?'document':meta.kind==='source'?'source':meta.kind==='link'?'link':'review';
     const sourceCount = Array.isArray(meta.sourceUrls) ? meta.sourceUrls.length : 0;
+    const sourceCountLabel = meta.kind==='link'
+      ? (sourceCount ? sourceCount+' selected source link' : '')
+      : (sourceCount ? sourceCount+' independent source'+(sourceCount===1?'':'s') : '');
     const verifyTitle = [
       meta.sourceName||meta.label||'',
       meta.verificationProvider ? 'Blind verifier: '+meta.verificationProvider : '',
-      sourceCount ? sourceCount+' independent source'+(sourceCount===1?'':'s') : ''
+      sourceCountLabel
     ].filter(Boolean).join(' · ');
     return '<span class="q-verify-badge '+kind+'" title="'+escapeHtml(verifyTitle)+'">'+
       (kind==='review'?'!':'✓')+' '+escapeHtml(meta.label||'AI • Review')+
@@ -6091,10 +7812,18 @@ authPromise.then(() => {
     const list = $('host-qlist');
     if(!list) return;
     if(S.questionsDraft.length===0){
-      list.innerHTML = '<p>No questions yet. Add at least one to start.</p>';
+      if(S.hostWorkspaceMode==='launch'){
+        list.innerHTML =
+          '<div class="launch-preview-empty">'+
+            '<div class="launch-preview-empty-icon">▣</div>'+
+            '<div><strong>No quiz loaded</strong><span>Load a saved quiz above to preview its questions.</span></div>'+
+          '</div>';
+      }else{
+        list.innerHTML = '<p class="studio-empty-queue">No questions yet. Add at least one to start.</p>';
+      }
     } else {
       list.innerHTML = S.questionsDraft.map((qq,i)=>
-        '<div class="qlist-item'+(i===S.editingQuestionIndex?' editing':'')+'">'+
+        '<div id="qz-question-card-'+i+'" class="qlist-item'+(i===S.editingQuestionIndex?' editing':'')+'">'+
           '<div class="qtxt">'+(i+1)+'. '+escapeHtml(qq.q)+'</div>'+
           '<div class="qlist-meta">'+
             '<span class="qtype-pill">'+questionTypeLabel(qq)+(safeImageUrl(qq.imageUrl)?' · 🖼':'')+'</span>'+
