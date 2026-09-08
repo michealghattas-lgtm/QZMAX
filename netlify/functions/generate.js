@@ -1,6 +1,6 @@
 'use strict';
 
-// QZMAX 3.14.0 — Source Link Generation
+// QZMAX 3.14.3 — Theme Button Bottom Right
 //
 // No paid OpenAI, Claude or xAI API is used.
 // The router keeps the requested batch size and switches providers on rate limit.
@@ -1441,7 +1441,7 @@ exports.handler = async function handler(event) {
   // Lightweight status endpoint — does not spend AI quota.
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      version:'3.14.0',
+      version:'3.14.3',
       freeOnly:true,
       factualRetrieval:'Tavily search + Tavily Extract for host-selected Source Links',
       sourceLinkExtraction:'Tavily Extract · exact selected page only',
@@ -1545,6 +1545,7 @@ exports.handler = async function handler(event) {
 
   const order = parseProviderOrder(request);
   const errors = [];
+  let bestLinkPartial = null;
 
   for (const route of order) {
     if (route !== 'local' && routeOnCooldown(route)) {
@@ -1590,6 +1591,31 @@ exports.handler = async function handler(event) {
         }
 
         console.log(`[QZMAX AI] route=${route} provider=${provider} model=${model} valid=${structurallyValid.length}/${request.count}`);
+
+        if (request.sourceType === 'link' && structurallyValid.length < request.count) {
+          if (!bestLinkPartial || structurallyValid.length > bestLinkPartial.items.length) {
+            bestLinkPartial = {
+              items:structurallyValid.slice(),
+              provider,
+              model,
+              route
+            };
+          }
+
+          errors.push(`${route}: link-grounded partial ${structurallyValid.length}/${request.count}`);
+
+          // If time remains, try another configured free model for a more complete
+          // verbatim-evidence batch rather than immediately returning 1–2 items.
+          if (Date.now() < deadline - 4500) continue;
+
+          return jsonResponse(200, bestLinkPartial.items.slice(0, request.count), {
+            'X-QZMAX-AI-Provider':bestLinkPartial.provider,
+            'X-QZMAX-AI-Model':bestLinkPartial.model,
+            'X-QZMAX-AI-Route':bestLinkPartial.route,
+            'X-QZMAX-AI-Partial':`${bestLinkPartial.items.length}/${request.count}`
+          });
+        }
+
         return jsonResponse(200, structurallyValid.slice(0, request.count), {
           'X-QZMAX-AI-Provider':provider,
           'X-QZMAX-AI-Model':model,
@@ -1609,6 +1635,15 @@ exports.handler = async function handler(event) {
       errors.push(`${route}: ${status} ${String(err?.message || err).slice(0,240)}`);
       console.warn(`[QZMAX AI] ${route} failed ${status}`, String(err?.message || err).slice(0,500));
     }
+  }
+
+  if (request.sourceType === 'link' && bestLinkPartial && bestLinkPartial.items.length) {
+    return jsonResponse(200, bestLinkPartial.items.slice(0, request.count), {
+      'X-QZMAX-AI-Provider':bestLinkPartial.provider,
+      'X-QZMAX-AI-Model':bestLinkPartial.model,
+      'X-QZMAX-AI-Route':bestLinkPartial.route,
+      'X-QZMAX-AI-Partial':`${bestLinkPartial.items.length}/${request.count}`
+    });
   }
 
   return jsonResponse(503, {

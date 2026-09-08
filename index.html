@@ -4104,6 +4104,135 @@ html[data-theme="light"] .q-verify-badge.link{
   .source-link-preview-head{flex-direction:column;}
 }
 
+
+/* =========================================================
+   QZMAX 3.14.2 — UI Polish + Session Terminology
+   ========================================================= */
+
+/* 1. Empty Studio queue: readable over the photographic Bright background */
+html[data-theme="light"] .studio-empty-queue{
+  display:inline-block;
+  margin:2px 0 0!important;
+  padding:8px 12px;
+  border-radius:11px;
+  color:#f7fbff!important;
+  background:rgba(18,38,67,.58)!important;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 7px 20px rgba(23,45,74,.10);
+  text-shadow:0 1px 2px rgba(0,0,0,.28);
+  font-weight:650;
+}
+
+/* 2. Save quiz button: same visual family/height as Add question */
+.host-save-row #qf-save-quiz{
+  min-width:138px;
+  min-height:50px;
+  padding:0 24px!important;
+  border-radius:14px!important;
+  font-weight:850!important;
+  color:#fff!important;
+  background:linear-gradient(135deg,#7661ff 0%,#597fff 100%)!important;
+  border:1px solid rgba(118,115,255,.44)!important;
+  box-shadow:0 9px 22px rgba(75,83,210,.18)!important;
+  transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.host-save-row #qf-save-quiz:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+  box-shadow:0 12px 28px rgba(75,83,210,.24)!important;
+}
+.host-save-row #qf-save-quiz:active{transform:translateY(0) scale(.992);}
+
+/* 4. Dashboard Bright-mode hero copy: light against the photographic background */
+html[data-theme="light"] .hd-welcome p{
+  color:rgba(246,250,255,.91)!important;
+  font-weight:620!important;
+  text-shadow:0 1px 3px rgba(18,40,72,.42)!important;
+}
+
+/* 5. Global theme control: top-positioned, descriptive text */
+.qz-global-theme-toggle{
+  top:max(12px,env(safe-area-inset-top))!important;
+  bottom:auto!important;
+  right:max(14px,env(safe-area-inset-right))!important;
+  left:auto;
+  min-width:104px;
+  height:38px;
+  padding:0 12px;
+  justify-content:center;
+  white-space:nowrap;
+  z-index:10050;
+}
+.qz-global-theme-toggle.qz-theme-positioned{
+  right:auto!important;
+}
+@media(max-width:600px){
+  .qz-global-theme-toggle{
+    width:auto!important;
+    min-width:92px;
+    height:36px;
+    padding:0 10px!important;
+  }
+  .qz-global-theme-toggle #qz-theme-label{display:inline!important;}
+}
+
+/* 6. My Account now uses the same QZMAX photographic environment */
+.qz-account-stage{
+  min-height:100dvh;
+  width:100%;
+  padding:12px 0 46px;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 17% 0%,rgba(34,176,235,.10),transparent 38%),
+    linear-gradient(180deg,rgba(4,9,27,.76),rgba(5,8,23,.86)),
+    url("assets/background-home.png") center center / cover fixed no-repeat;
+}
+html[data-theme="light"] .qz-account-stage{
+  background:
+    radial-gradient(circle at 15% 0%,rgba(198,222,248,.38),transparent 42%),
+    linear-gradient(180deg,rgba(170,197,228,.36),rgba(193,213,235,.61)),
+    url("assets/background-home.png") center center / cover fixed no-repeat!important;
+}
+.qz-account-stage .qz-account-shell{
+  margin:0 auto;
+  padding-top:0;
+}
+html[data-theme="light"] .qz-account-stage .qz-account-header,
+html[data-theme="light"] .qz-account-stage .qz-account-card{
+  background:linear-gradient(145deg,rgba(218,232,247,.90),rgba(204,223,243,.92))!important;
+  border-color:rgba(36,74,121,.18)!important;
+  box-shadow:0 15px 38px rgba(35,61,92,.10)!important;
+}
+html[data-theme="light"] .qz-account-stage .qz-account-header p,
+html[data-theme="light"] .qz-account-stage .qz-account-card p{
+  color:#46617d!important;
+}
+
+
+/* QZMAX 3.14.3 — Theme control returned to bottom-right */
+.qz-global-theme-toggle,
+.qz-global-theme-toggle.qz-theme-positioned{
+  position:fixed!important;
+  top:auto!important;
+  left:auto!important;
+  right:max(14px,env(safe-area-inset-right))!important;
+  bottom:max(14px,env(safe-area-inset-bottom))!important;
+  min-width:104px;
+  height:40px;
+  padding:0 13px!important;
+  justify-content:center;
+  z-index:10050;
+}
+@media(max-width:600px){
+  .qz-global-theme-toggle,
+  .qz-global-theme-toggle.qz-theme-positioned{
+    min-width:96px;
+    height:38px;
+    right:max(10px,env(safe-area-inset-right))!important;
+    bottom:max(10px,env(safe-area-inset-bottom))!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4123,12 +4252,12 @@ html[data-theme="light"] .q-verify-badge.link{
   <div id="screen-player-final" class="screen"></div>
   <div id="screen-player-ended" class="screen"></div>
   <button id="qz-global-theme-toggle" class="qz-global-theme-toggle" type="button" aria-label="Switch colour theme" title="Switch colour theme">
-    <span id="qz-theme-icon">☀</span><span id="qz-theme-label">Bright</span>
+    <span id="qz-theme-icon">☀</span><span id="qz-theme-label">Bright Mode</span>
   </button>
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.14.0";
+  const APP_VERSION = "3.14.3";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4160,8 +4289,11 @@ function qzApplyTheme(theme, persist=true){
   const label = document.getElementById('qz-theme-label');
   const btn = document.getElementById('qz-global-theme-toggle');
   if(icon) icon.textContent = selected === 'light' ? '☾' : '☀';
-  if(label) label.textContent = selected === 'light' ? 'Dark' : 'Bright';
-  if(btn) btn.title = selected === 'light' ? 'Switch to Dark mode' : 'Switch to Bright mode';
+  if(label) label.textContent = selected === 'light' ? 'Dark Mode' : 'Bright Mode';
+  if(btn) {
+    btn.title = selected === 'light' ? 'Switch to Dark Mode' : 'Switch to Bright Mode';
+    btn.setAttribute('aria-label', btn.title);
+  }
   if(persist){
     try{ localStorage.setItem(QZ_THEME_KEY,selected); }catch(e){}
   }
@@ -4462,10 +4594,31 @@ authPromise.then(() => {
   }
 
 
+
+  function qzPositionThemeToggle(id){
+    const btn = document.getElementById('qz-global-theme-toggle');
+    if(!btn) return;
+    btn.classList.remove('qz-theme-positioned');
+    btn.style.left = '';
+    btn.style.top = '';
+    btn.style.right = '';
+    btn.style.bottom = '';
+  }
+
+  let qzThemeResizeTimer = null;
+  window.addEventListener('resize',()=>{
+    clearTimeout(qzThemeResizeTimer);
+    qzThemeResizeTimer = setTimeout(()=>{
+      const active = document.querySelector('#quiz-root .screen.active');
+      if(active) qzPositionThemeToggle(active.id);
+    },80);
+  });
+
   function showScreen(id){
     document.querySelectorAll('#quiz-root .screen').forEach(s=>s.classList.remove('active'));
     $(id).classList.add('active');
     if(id !== 'screen-host-final') stopFinalConfetti();
+    requestAnimationFrame(()=>setTimeout(()=>qzPositionThemeToggle(id),0));
   }
 
   function ringSvg(prefix){
@@ -4542,7 +4695,7 @@ authPromise.then(() => {
           </section>
 
           <section class="qz-saas-section" id="qz-commercial-features">
-            <div class="qz-saas-section-head"><h2>One platform. More ways to learn.</h2><p>Simple enough for students, powerful enough for teachers, and energetic enough for a live room.</p></div>
+            <div class="qz-saas-section-head"><h2>One platform. More ways to learn.</h2><p>Simple enough for students, powerful enough for teachers, and energetic enough for a live session.</p></div>
             <div class="qz-market-grid">
               <article class="qz-market-card"><img src="${ICON_AI}" alt=""><h3>AI Quiz Studio</h3><p>Generate by topic, mix multiple topics in one quiz, or create more questions without repeating the same facts.</p></article>
               <article class="qz-market-card"><img src="${ICON_EDUCATION}" alt=""><h3>Document → Quiz</h3><p>Upload PDF, DOCX or TXT material and create natural stand-alone questions grounded in that content.</p></article>
@@ -4599,7 +4752,7 @@ authPromise.then(() => {
             </button>
             <button class="qz-premium-entry-option" id="qz-start-player">
               <span class="qz-premium-option-symbol">↗</span>
-              <span><strong>Join a game</strong><small>Enter a room code and play instantly.</small></span>
+              <span><strong>Join a game</strong><small>Enter a session code and play instantly.</small></span>
               <b>→</b>
             </button>
           </div>
@@ -4704,8 +4857,8 @@ authPromise.then(() => {
         '<div class="host-control-card">'+
           '<div class="host-control-icon">⌁</div>'+
           '<div class="eyebrow">Host control moved</div>'+
-          '<h2 style="font-size:28px;margin-top:8px;">Another host device is controlling this room</h2>'+
-          '<p class="host-control-note">Room '+escapeHtml(code || '')+' is still live and your players are unaffected. Only one host device can control a room at a time.</p>'+
+          '<h2 style="font-size:28px;margin-top:8px;">Another host device is controlling this session</h2>'+
+          '<p class="host-control-note">Session '+escapeHtml(code || '')+' is still live and your players are unaffected. Only one host device can control a session at a time.</p>'+
           '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px;">'+
             '<button class="btn btn-primary" id="btn-take-control-back">Take back control</button>'+
             '<button class="btn btn-ghost" id="btn-host-control-exit">Exit host view</button>'+
@@ -4773,23 +4926,23 @@ authPromise.then(() => {
     const err = $('host-launch-err');
     if(err) err.textContent = '';
     if(code.length !== 5){
-      if(err) err.textContent = 'Enter the 5-character room code.';
+      if(err) err.textContent = 'Enter the 5-character session code.';
       return;
     }
     try{
       const st = await fbGetStrict(statePath(code));
       if(!st){
-        if(err) err.textContent = 'No active room found with that code.';
+        if(err) err.textContent = 'No active session found with that code.';
         return;
       }
       if(!currentUserUid || st.hostUid !== currentUserUid){
-        if(err) err.textContent = 'This room belongs to a different host account.';
+        if(err) err.textContent = 'This session belongs to a different host account.';
         return;
       }
       if(await claimHostControl(code)) await tryResumeHostSession(true);
-      else if(err) err.textContent = 'Could not take control of this room.';
+      else if(err) err.textContent = 'Could not take control of this session.';
     }catch(e){
-      if(err) err.textContent = 'Could not reach the room. Check your connection and try again.';
+      if(err) err.textContent = 'Could not reach the session. Check your connection and try again.';
     }
   }
 
@@ -5022,7 +5175,7 @@ authPromise.then(() => {
     const rows = [];
     const esc = v => '"' + String(v===null||v===undefined?'':v).replace(/"/g,'""') + '"';
     rows.push(['QZMAX Game Analytics']);
-    rows.push(['Room', game.roomCode || '']);
+    rows.push(['Session', game.roomCode || '']);
     rows.push(['Completed', game.completedAt ? new Date(game.completedAt).toISOString() : '']);
     rows.push([game.gameMode==='teams' ? 'Winning Team' : 'Winner', game.winnerName || '']);
     rows.push(['Winning Score', game.winningScore || 0]);
@@ -5079,8 +5232,8 @@ authPromise.then(() => {
         '</div>'+
         '<div class="analytics-title">'+
           '<div class="eyebrow">Game analytics</div>'+
-          '<h1>Room '+escapeHtml(game.roomCode||'—')+'</h1>'+
-          '<p>Understand how players performed, which questions challenged the room, and where the game moved fastest.</p>'+
+          '<h1>Session '+escapeHtml(game.roomCode||'—')+'</h1>'+
+          '<p>Understand how players performed, which questions challenged the session, and where the game moved fastest.</p>'+
           '<div class="analytics-meta">'+
             '<span class="hd-mini">'+formatDashboardDate(game.completedAt)+'</span>'+
             '<span class="hd-mini">'+(game.playerCount||0)+' players</span>'+
@@ -5182,7 +5335,7 @@ authPromise.then(() => {
           '<div>'+
             '<div class="eyebrow">Host dashboard</div>'+
             '<h1>Welcome back, '+escapeHtml(displayName)+'.</h1>'+
-            '<p>Create your next game, resume a live room, or launch one of your saved quizzes.</p>'+
+            '<p>Create your next game, resume a live session, or launch one of your saved quizzes.</p>'+
           '</div>'+
           '<div class="hd-primary-actions">'+
             '<button class="btn btn-ghost" id="hd-ai-studio">✦ Quiz Studio</button>'+
@@ -5198,7 +5351,7 @@ authPromise.then(() => {
         '<div class="hd-grid">'+
           '<div style="display:flex;flex-direction:column;gap:16px;">'+
             '<div class="hd-card">'+
-              '<div class="hd-card-head"><h3>Active room</h3><span>Your current session</span></div>'+
+              '<div class="hd-card-head"><h3>Active session</h3><span>Your current session</span></div>'+
               '<div class="hd-card-body" id="hd-active-room"><div class="hd-loading"></div></div>'+
             '</div>'+
             '<div class="hd-card">'+
@@ -5215,7 +5368,7 @@ authPromise.then(() => {
                   '<button class="hd-quick" id="hd-quick-new"><div class="hd-quick-icon">🎮</div><strong>Start a quiz</strong><span>Choose a saved quiz, set the game mode and go live.</span></button>'+
                 '</div>'+
                 '<div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(130,160,220,.1);">'+
-                  '<label>Recover / take over a room</label>'+
+                  '<label>Recover / take over a session</label>'+
                   '<div class="hd-recover"><input type="text" id="hd-recover-code" maxlength="5" placeholder="AB12C"><button class="btn btn-ghost" id="hd-recover-btn">Take over</button></div>'+
                   '<div class="err-msg" id="host-launch-err" style="margin-top:7px;"></div>'+
                 '</div>'+
@@ -5289,11 +5442,11 @@ authPromise.then(() => {
       activeEl.innerHTML =
         '<div class="hd-active">'+
           '<div class="hd-active-top">'+
-            '<div><div class="eyebrow">Room code</div><div class="hd-room-code">'+escapeHtml(savedSession.code)+'</div></div>'+
+            '<div><div class="eyebrow">Session code</div><div class="hd-room-code">'+escapeHtml(savedSession.code)+'</div></div>'+
             '<div class="hd-status"><span class="hd-dot"></span>'+escapeHtml(hostPhaseLabel(activeSt))+'</div>'+
           '</div>'+
-          '<div class="hd-active-meta"><span class="hd-mini">'+playerCount+' player'+(playerCount===1?'':'s')+'</span><span class="hd-mini">'+((activeSt.questions||[]).length)+' questions</span><span class="hd-mini">'+(activeSt.gameMode==='teams'?'👥 Team Battle':'👤 Individual')+'</span><span class="hd-mini">'+(sameController?'This device controls room':'Another device controls room')+'</span></div>'+
-          '<button class="btn btn-primary btn-block" id="hd-resume-room">'+(sameController?'Resume room':'Take over & resume')+'</button>'+
+          '<div class="hd-active-meta"><span class="hd-mini">'+playerCount+' player'+(playerCount===1?'':'s')+'</span><span class="hd-mini">'+((activeSt.questions||[]).length)+' questions</span><span class="hd-mini">'+(activeSt.gameMode==='teams'?'👥 Team Battle':'👤 Individual')+'</span><span class="hd-mini">'+(sameController?'This device controls session':'Another device controls session')+'</span></div>'+
+          '<button class="btn btn-primary btn-block" id="hd-resume-room">'+(sameController?'Resume session':'Take over & resume')+'</button>'+
         '</div>';
       $('hd-resume-room').onclick = async ()=>{
         if(!sameController) await recoverHostRoomByCode(savedSession.code);
@@ -5302,7 +5455,7 @@ authPromise.then(() => {
     }else{
       if(savedSession && !activeSt) clearHostSession();
       activeEl.innerHTML =
-        '<div class="hd-empty"><div style="font-size:24px;margin-bottom:7px;">⌁</div><strong style="color:var(--ink);">No active room</strong><p style="margin-top:5px;">Start a new live room when you’re ready to play.</p></div>';
+        '<div class="hd-empty"><div style="font-size:24px;margin-bottom:7px;">⌁</div><strong style="color:var(--ink);">No active session</strong><p style="margin-top:5px;">Start a new live session when you’re ready to play.</p></div>';
     }
 
     $('hd-saved-count-label').textContent = saved.length ? saved.length+' available' : 'None yet';
@@ -5393,8 +5546,8 @@ authPromise.then(() => {
           '<div class="host-recovery-icon">↻</div>'+
           '<div class="eyebrow">Host session recovery</div>'+
           '<h2 style="font-size:28px;margin-top:8px;">Reconnecting your live game</h2>'+
-          '<p style="margin-top:8px;">'+escapeHtml(message || 'Your room is still safe. QZMAX is reconnecting to Firebase and will restore the current game screen automatically.')+'</p>'+
-          '<div class="chip host-recovery-room">Room <span class="code-text">'+escapeHtml(code || '')+'</span></div>'+
+          '<p style="margin-top:8px;">'+escapeHtml(message || 'Your session is still safe. QZMAX is reconnecting to Firebase and will restore the current game screen automatically.')+'</p>'+
+          '<div class="chip host-recovery-room">Session <span class="code-text">'+escapeHtml(code || '')+'</span></div>'+
         '</div>'+
       '</div>';
     showScreen('screen-role');
@@ -5468,8 +5621,8 @@ authPromise.then(() => {
     }catch(e){
       console.error('host recovery read failed', e);
       firebaseConnected = false;
-      buildHostRecoveryScreen(code, 'Connection interrupted. Your room and players remain in place while QZMAX reconnects.');
-      showConnectionBanner('Host offline — room preserved. Reconnecting…', false);
+      buildHostRecoveryScreen(code, 'Connection interrupted. Your session and players remain in place while QZMAX reconnects.');
+      showConnectionBanner('Host offline — session preserved. Reconnecting…', false);
       scheduleHostRecovery(code);
       return true;
     }
@@ -5487,7 +5640,7 @@ authPromise.then(() => {
         const err = $('host-auth-err');
         if(err){
           err.style.color = 'var(--muted)';
-          err.textContent = 'Log in with the host account that owns room '+code+' to recover it.';
+          err.textContent = 'Log in with the host account that owns session '+code+' to recover it.';
         }
         return true;
       }
@@ -5511,7 +5664,7 @@ authPromise.then(() => {
         });
         st.hostControllerId = controllerId;
       }catch(e){
-        buildHostRecoveryScreen(code, 'QZMAX found your room but could not confirm host control yet. Reconnecting…');
+        buildHostRecoveryScreen(code, 'QZMAX found your session but could not confirm host control yet. Reconnecting…');
         scheduleHostRecovery(code);
         return true;
       }
@@ -5533,7 +5686,7 @@ authPromise.then(() => {
     S.viewingArchive = false;
     S.hostRevealing = false;
 
-    showConnectionBanner('Host reconnected — room '+code+' restored.', true);
+    showConnectionBanner('Host reconnected — session '+code+' restored.', true);
 
     if(st.status === 'setup'){
       buildHostSetup('launch');
@@ -5563,7 +5716,7 @@ authPromise.then(() => {
     firebaseConnected = snap.val() === true;
     const savedHost = getSavedHostSession();
     if(!firebaseConnected && savedHost && S.code === savedHost.code){
-      showConnectionBanner('Connection interrupted — your live room is preserved.', false);
+      showConnectionBanner('Connection interrupted — your live session is preserved.', false);
     } else if(firebaseConnected && savedHost && S.code === savedHost.code){
       showConnectionBanner('Connection restored.', true);
     }
@@ -5572,7 +5725,7 @@ authPromise.then(() => {
   window.addEventListener('offline', ()=>{
     const savedHost = getSavedHostSession();
     if(savedHost && S.code === savedHost.code){
-      showConnectionBanner('Internet connection lost — your room is preserved.', false);
+      showConnectionBanner('Internet connection lost — your session is preserved.', false);
     }
   });
   window.addEventListener('online', ()=>{
@@ -5719,7 +5872,7 @@ authPromise.then(() => {
         '<div class="qz-account-nav"><div class="qz-account-brand"><img src="'+BRAND_ICON+'" alt="QZMAX"><span>QZMAX Student</span></div><div style="display:flex;gap:8px;"><button class="btn btn-ghost" id="student-account" style="padding:8px 12px;font-size:11px;">My Account</button><button class="btn btn-ghost" id="student-logout" style="padding:8px 12px;font-size:11px;">Log out</button></div></div>'+
         '<div class="qz-account-header"><div class="eyebrow">Student workspace</div><h1>Hi, '+escapeHtml(name)+'.</h1><p>Join a live QZMAX game now. Personal practice and learning history are being prepared for the next student release.</p></div>'+
         '<div class="qz-student-hero">'+
-          '<div class="qz-student-card"><div class="eyebrow">Live game</div><h2>Ready to play?</h2><p>Enter a room code and join your class, group or event.</p><div class="qz-student-actions"><button class="btn btn-primary" id="student-join">Join a game</button><button class="btn btn-ghost" id="student-home">QZMAX home</button></div></div>'+
+          '<div class="qz-student-card"><div class="eyebrow">Live game</div><h2>Ready to play?</h2><p>Enter a session code and join your class, group or event.</p><div class="qz-student-actions"><button class="btn btn-primary" id="student-join">Join a game</button><button class="btn btn-ghost" id="student-home">QZMAX home</button></div></div>'+
           '<div class="qz-student-card"><div class="eyebrow">Coming next</div><h2 style="font-size:23px;">Personal practice</h2><p>Saved practice, progress history and Australian learning pathways will live here as the student experience expands.</p><div class="qz-plan-card" style="margin-top:16px;"><small>YOUR PLAN</small><strong>Free Student</strong><small>Commercial preview</small></div></div>'+
         '</div>'+
       '</div>';
@@ -5742,6 +5895,7 @@ authPromise.then(() => {
     ).join('');
 
     $('screen-role').innerHTML =
+      '<div class="qz-account-stage">'+
       '<div class="qz-account-shell">'+
         '<div class="qz-account-nav"><div class="qz-account-brand"><img src="'+BRAND_ICON+'" alt="QZMAX"><span>My Account</span></div><button class="btn btn-ghost" id="account-back" style="padding:8px 12px;font-size:11px;">← Back</button></div>'+
         '<div class="qz-account-header"><div class="eyebrow">Account & preferences</div><h1>'+escapeHtml(name)+'</h1><p>Manage your QZMAX profile, account type, appearance and commercial plan foundation.</p></div>'+
@@ -5760,6 +5914,7 @@ authPromise.then(() => {
             '<section class="qz-account-card"><h3>Account</h3><button class="btn btn-ghost btn-block" id="account-logout">Log out</button></section>'+
           '</div>'+
         '</div>'+
+      '</div>'+
       '</div>';
 
     document.querySelectorAll('[data-theme-choice]').forEach(btn=>{btn.onclick=()=>qzApplyTheme(btn.dataset.themeChoice);});
@@ -5812,7 +5967,7 @@ authPromise.then(() => {
     $('screen-host-setup').innerHTML =
       '<div class="topbar">'+
         '<div style="display:flex; gap:10px; align-items:center;">'+
-          '<div class="chip">Room code <span class="code-text">'+S.code+'</span></div>'+
+          '<div class="chip">Session code <span class="code-text">'+S.code+'</span></div>'+
           '<button class="btn btn-ghost" id="btn-host-dashboard" style="padding:6px 12px; font-size:12px;">Dashboard</button>'+
           '<button class="btn btn-ghost" id="btn-host-device-info" style="padding:6px 12px; font-size:12px;">Move host</button>'+
           '<button class="btn btn-ghost" id="btn-host-logout" style="padding:6px 12px; font-size:12px;">Log out</button>'+
@@ -6026,7 +6181,7 @@ authPromise.then(() => {
           
           '<div class="host-studio-only host-save-row" id="host-save-row" style="display:flex; gap:8px; margin-top:12px;">'+
             '<input type="text" id="qf-save-name" placeholder="Name this quiz to save it">'+
-            '<button class="btn btn-ghost" id="qf-save-quiz">Save</button>'+
+            '<button class="btn btn-primary" id="qf-save-quiz">Save</button>'+
           '</div>'+
           '<button class="host-studio-only" id="qf-save-as-new" style="display:none; background:none; border:none; color:var(--muted); font-size:12px; text-decoration:underline; cursor:pointer; margin-top:6px; align-self:flex-start;">Save as a new copy instead</button>'+
           '<div class="err-msg" id="qf-save-msg"></div>'+
@@ -6140,7 +6295,7 @@ authPromise.then(() => {
     };
 
     $('btn-host-device-info').onclick = ()=>{
-      alert('To move host control: open QZMAX on the other device, log in with this same host account, choose “Recover / take over room”, and enter room '+S.code+'. This device will lock automatically when the other device takes control.');
+      alert('To move host control: open QZMAX on the other device, log in with this same host account, choose “Recover / take over session”, and enter session '+S.code+'. This device will lock automatically when the other device takes control.');
     };
 
     $('btn-host-logout').onclick = async () => {
@@ -7207,6 +7362,106 @@ authPromise.then(() => {
     return chosen.map(x=>x.p).join('\n\n').slice(0,maxChars);
   }
 
+
+  function sourceFocusTerms(topic){
+    return normalizeQuestionFingerprint(topic)
+      .split(' ')
+      .filter(w=>w.length>2)
+      .filter(w=>!['focus','question','questions','quiz','general','knowledge','about','from','source','page'].includes(w));
+  }
+
+  function findFocusedSourceSection(sourceText, topic){
+    const text = cleanSourceText(sourceText);
+    const terms = sourceFocusTerms(topic);
+    if(!text || !terms.length) return {text, label:''};
+
+    const headingRe = /^(#{1,6})\s+(.+)$/gm;
+    const headings = [];
+    let m;
+    while((m = headingRe.exec(text))){
+      const title = String(m[2]||'').replace(/\s+/g,' ').trim();
+      const titleNorm = normalizeQuestionFingerprint(title);
+      let score = 0;
+      for(const term of terms){
+        if(titleNorm === term) score += 10;
+        else if(titleNorm.includes(term)) score += 6;
+      }
+      if(score>0){
+        headings.push({
+          start:m.index,
+          contentStart:headingRe.lastIndex,
+          level:m[1].length,
+          title,
+          score
+        });
+      }
+    }
+
+    if(!headings.length) return {text, label:''};
+
+    headings.sort((a,b)=>b.score-a.score || a.start-b.start);
+    const best = headings[0];
+
+    // End at the next heading of the same or higher level.
+    headingRe.lastIndex = best.contentStart;
+    let end = text.length;
+    while((m = headingRe.exec(text))){
+      if(m[1].length <= best.level){
+        end = m.index;
+        break;
+      }
+    }
+
+    const section = text.slice(best.start,end).trim();
+    if(section.length < 500) return {text, label:''};
+    return {text:section, label:best.title};
+  }
+
+  function selectRotatingSourceWindow(text, batchNumber, maxChars=19000){
+    const clean = cleanSourceText(text);
+    if(clean.length <= maxChars) return clean;
+
+    // Use overlapping windows so a fact near a boundary is not lost.
+    const overlap = Math.min(2200, Math.floor(maxChars * .14));
+    const step = Math.max(3000, maxChars - overlap);
+    const starts = [];
+    for(let start=0; start<clean.length; start+=step){
+      starts.push(start);
+      if(start + maxChars >= clean.length) break;
+    }
+
+    const index = Math.max(0,Number(batchNumber)||0) % Math.max(1,starts.length);
+    let start = starts[index] || 0;
+
+    // Prefer a paragraph / heading boundary near the start.
+    if(start>0){
+      const boundary = clean.indexOf('\n\n',start);
+      if(boundary>=start && boundary<start+700) start=boundary+2;
+    }
+
+    return clean.slice(start,start+maxChars).trim();
+  }
+
+  function selectSourceLinkExcerpt(sourceText, topic, batchNumber, maxChars=19000){
+    const clean = cleanSourceText(sourceText);
+    if(clean.length <= maxChars) return clean;
+
+    const focused = findFocusedSourceSection(clean,topic);
+    const working = focused.text || clean;
+
+    // Critical difference from the old selector:
+    // rotate on EVERY retry/batch, even when the focus term matched strongly.
+    const rotated = selectRotatingSourceWindow(working,batchNumber,maxChars);
+
+    // If the focused section is too small to provide multiple windows, later
+    // retries broaden into the surrounding full page rather than repeatedly
+    // asking about the same facts.
+    if(batchNumber>0 && working.length <= maxChars * 1.25){
+      return selectRotatingSourceWindow(clean,batchNumber,maxChars);
+    }
+    return rotated;
+  }
+
   function parseAICorrectIndexes(item, options){
     const max = options.length;
     let raw = null;
@@ -7414,7 +7669,8 @@ authPromise.then(() => {
             'Use ONLY facts explicitly supported by the extracted content from the host-selected URL below.',
             'Do not use model memory, general web knowledge, or assumptions to fill gaps.',
             'Write each visible question as a natural stand-alone question. Do not say "According to the source", "According to the webpage", "According to the link", "According to the text", or equivalent wording.',
-            'For EVERY question include sourceEvidence as an EXACT copied supporting phrase of roughly 8–45 words from the extracted content.',
+            'For EVERY question include sourceEvidence as ONE CONTIGUOUS EXACT copied supporting phrase of roughly 8–45 words from the extracted content.',
+            'sourceEvidence must be verbatim from the extracted content: do not paraphrase it, translate it, add ellipses, combine separate sentences, or change names/numbers.',
             'For EVERY question also include factKey: a concise canonical identity of the tested fact in the form relationship|subject|answer.',
             'If the extracted content does not explicitly support a safe answer, do not create that question.',
             'The host-selected source itself is treated as the authority for this mode; do not independently rewrite or correct its claims with outside knowledge.',
@@ -7624,14 +7880,25 @@ authPromise.then(() => {
     }
     const accepted = [];
     const known = Array.isArray(existingQuestions) ? existingQuestions.slice() : [];
-    const maxAttempts = Math.ceil(target/10) + 8;
+    const internalBatchSize = sourceType==='link' ? 5 : 10;
+    const maxAttempts = sourceType==='link'
+      ? Math.ceil(target/internalBatchSize) + 10
+      : Math.ceil(target/10) + 8;
     let attempts = 0;
 
     while(accepted.length < target && attempts < maxAttempts){
       const remaining = target-accepted.length;
-      const batchCount = Math.min(10,remaining);
-      const excerpt = selectSourceExcerpt(sourceText,topic,attempts,15000);
-      if(onProgress) onProgress(accepted.length,target,'Generating '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…');
+      const batchCount = Math.min(internalBatchSize,remaining);
+      const excerpt = sourceType==='link'
+        ? selectSourceLinkExcerpt(sourceText,topic,attempts,19000)
+        : selectSourceExcerpt(sourceText,topic,attempts,15000);
+      if(onProgress) onProgress(
+        accepted.length,
+        target,
+        sourceType==='link'
+          ? 'Reading another relevant section of the source — building '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
+          : 'Generating '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
+      );
 
       let batch;
       try{
@@ -7661,15 +7928,32 @@ authPromise.then(() => {
       }
 
       attempts++;
-      if(onProgress) onProgress(accepted.length,target,
+      if(onProgress) onProgress(
+        accepted.length,
+        target,
         accepted.length<target
-          ? 'Checked topic scope, facts and duplicates — '+accepted.length+' of '+target+' unique questions ready…'
+          ? (
+              sourceType==='link'
+                ? 'Checked source evidence and duplicates — '+accepted.length+' of '+target+' Link Grounded questions ready…'
+                : 'Checked topic scope, facts and duplicates — '+accepted.length+' of '+target+' unique questions ready…'
+            )
           : 'All '+target+' questions ready.'
       );
     }
 
-    if(!accepted.length) throw new Error('QZMAX could not produce a reliable unique question set. Try a broader source or different topic.');
+    if(!accepted.length){
+      if(sourceType==='link'){
+        throw new Error('QZMAX could not produce any Link Grounded questions from the selected source and focus. The source was not used to invent unchecked questions. Try leaving Focus blank or use a broader focus.');
+      }
+      throw new Error('QZMAX could not produce a reliable unique question set. Try a broader source or different topic.');
+    }
     if(accepted.length < target){
+      if(sourceType==='link'){
+        throw new Error(
+          'QZMAX found '+accepted.length+' of '+target+
+          ' unique Link Grounded questions after cycling through the relevant source sections. No unchecked questions were added. Try leaving Focus blank, broadening the focus, or request a smaller additional batch.'
+        );
+      }
       throw new Error('Only '+accepted.length+' unique, in-scope questions could be produced after verification and duplicate checks. Try a broader document/topic or request fewer questions.');
     }
     return accepted.slice(0,target);
@@ -7964,7 +8248,7 @@ authPromise.then(() => {
         enterHostQuestion(st);
       }
     }catch(e){
-      showConnectionBanner('Could not start yet — reconnecting to the room.', false);
+      showConnectionBanner('Could not start yet — reconnecting to the session.', false);
       startHostSetupPoll();
     }
   }
@@ -8069,7 +8353,7 @@ authPromise.then(() => {
 
     $('screen-host-question').innerHTML =
       '<div class="exam-host-shell">'+
-        '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div><div class="team-badge">📝 Exam Mode</div></div>'+
+        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="team-badge">📝 Exam Mode</div></div>'+
         '<div class="exam-host-hero">'+
           '<div><div class="eyebrow">Timed assessment</div><h1>Exam in progress</h1><p>'+totalQuestions+' questions · '+durationMin+' minute'+(durationMin===1?'':'s')+' · no speed bonus</p></div>'+
           '<div class="exam-clock-card"><span>Time remaining</span><strong id="host-exam-clock">--:--</strong></div>'+
@@ -8141,7 +8425,7 @@ authPromise.then(() => {
         '<div class="live-game-top">'+
           '<div class="live-progress-wrap"><span class="live-q-meta">Question '+(st.currentIndex+1)+' of '+total+'</span><div class="live-progress"><span style="width:'+progress+'%;"></span></div></div>'+
           '<div class="live-timer-shell">'+ringSvg('host-ring')+'</div>'+
-          '<div class="live-room-pill"><span>Room</span><strong>'+S.code+'</strong></div>'+
+          '<div class="live-room-pill"><span>Session</span><strong>'+S.code+'</strong></div>'+
         '</div>'+
         '<div class="live-question-panel">'+
           '<div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap;"><div class="live-category">'+(st.gameMode==='teams'?'👥 Team Battle':'✦ Live host view')+'</div><span class="qtype-pill">'+questionTypeLabel(q)+'</span></div>'+
@@ -8195,7 +8479,7 @@ authPromise.then(() => {
 
     try{
       const freshState = await fbGetStrict(statePath(S.code));
-      if(!freshState) throw new Error('Room no longer exists');
+      if(!freshState) throw new Error('Session no longer exists');
 
       if(freshState.status !== 'question' || freshState.currentIndex !== qi){
         if(freshState.status === 'reveal'){
@@ -8443,7 +8727,7 @@ authPromise.then(() => {
 
     $('screen-host-reveal').innerHTML =
       '<div class="reveal-shell">'+
-        '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div><div class="chip">Question '+(st.currentIndex+1)+' / '+st.questions.length+'</div></div>'+
+        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="chip">Question '+(st.currentIndex+1)+' / '+st.questions.length+'</div></div>'+
         '<div class="reveal-hero">'+
           '<div class="reveal-kicker">'+questionTypeLabel(q)+' · Answer reveal</div>'+
           '<div class="reveal-answer-big good">✓ '+escapeHtml(getCorrectAnswerDisplay(q))+'</div>'+
@@ -8521,7 +8805,7 @@ authPromise.then(() => {
       const roundStar = standings.slice().sort((a,b)=>b.lastPoints-a.lastPoints)[0];
       $('screen-host-leaderboard').innerHTML =
         '<div class="leader-shell">'+
-          '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div><div class="team-badge">👥 Team Battle · After Q'+(st.currentIndex+1)+'</div></div>'+
+          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="team-badge">👥 Team Battle · After Q'+(st.currentIndex+1)+'</div></div>'+
           '<div class="leader-head">'+
             '<div class="eyebrow">Team leaderboard</div>'+
             '<div class="leader-title">'+(standings.length?escapeHtml(standings[0].name)+' leads the battle':'Team standings')+'</div>'+
@@ -8544,10 +8828,10 @@ authPromise.then(() => {
       const roundStar = players.slice().sort((a,b)=>(b.lastPoints||0)-(a.lastPoints||0))[0];
       $('screen-host-leaderboard').innerHTML =
         '<div class="leader-shell">'+
-          '<div class="topbar"><div class="chip">Room <span class="code-text">'+S.code+'</span></div><div class="chip">After Q'+(st.currentIndex+1)+'</div></div>'+
+          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="chip">After Q'+(st.currentIndex+1)+'</div></div>'+
           '<div class="leader-head">'+
             '<div class="eyebrow">Leaderboard</div>'+
-            '<div class="leader-title">'+(players.length ? escapeHtml(players[0].name)+' leads the room' : 'Current standings')+'</div>'+
+            '<div class="leader-title">'+(players.length ? escapeHtml(players[0].name)+' leads the session' : 'Current standings')+'</div>'+
             (roundStar && roundStar.lastPoints>0 ? '<div class="leader-round-star">⚡ Round high score: '+escapeHtml(roundStar.name)+' +'+roundStar.lastPoints+'</div>' : '')+
           '</div>'+
           '<div class="momentum-list">'+
@@ -8744,10 +9028,10 @@ authPromise.then(() => {
       : (winner ? escapeHtml(winner.name) + ' takes the crown' : 'Nice game!');
 
     const heroSubtitle = teamMode
-      ? 'Your room finished with team standings and individual results ready for review.'
-      : 'A polished final leaderboard for your room, with the winner, podium and full standings in one place.';
+      ? 'Your session finished with team standings and individual results ready for review.'
+      : 'A polished final leaderboard for your session, with the winner, podium and full standings in one place.';
 
-    const roomMeta = '<span class="hf-room-pill">Room <strong style="margin-left:2px;">'+escapeHtml(S.code)+'</strong></span>';
+    const roomMeta = '<span class="hf-room-pill">Session <strong style="margin-left:2px;">'+escapeHtml(S.code)+'</strong></span>';
 
     function renderPodiumCard(name, sub, points, rank){
       return '<div class="hf-podium-card rank-'+rank+'">'+
@@ -8768,7 +9052,7 @@ authPromise.then(() => {
         '</div>'+
         '<div class="hf-kpis">'+
           '<div class="hf-kpi"><span>Teams</span><strong>'+Number(standings.length).toLocaleString()+'</strong><small>Teams reached the final</small></div>'+
-          '<div class="hf-kpi"><span>Players</span><strong>'+Number(totalPlayers).toLocaleString()+'</strong><small>Total participants in room</small></div>'+
+          '<div class="hf-kpi"><span>Players</span><strong>'+Number(totalPlayers).toLocaleString()+'</strong><small>Total participants in session</small></div>'+
           '<div class="hf-kpi"><span>Average individual score</span><strong>'+Number(avgScore).toLocaleString()+'</strong><small>Across all players</small></div>'+
           '<div class="hf-kpi"><span>Top player</span><strong>'+escapeHtml(winner ? winner.name : '—')+'</strong><small>'+Number(winner ? winner.score : 0).toLocaleString()+' points</small></div>'+
         '</div>'
@@ -8783,7 +9067,7 @@ authPromise.then(() => {
         '</div>'+
         '<div class="hf-kpis">'+
           '<div class="hf-kpi"><span>2nd place</span><strong>'+escapeHtml(second ? second.name : '—')+'</strong><small>'+Number(second ? second.score : 0).toLocaleString()+' points</small></div>'+
-          '<div class="hf-kpi"><span>Average score</span><strong>'+Number(avgScore).toLocaleString()+'</strong><small>Across the whole room</small></div>'+
+          '<div class="hf-kpi"><span>Average score</span><strong>'+Number(avgScore).toLocaleString()+'</strong><small>Across the whole session</small></div>'+
           '<div class="hf-kpi"><span>Top 3 covered</span><strong>'+Math.min(3,totalPlayers)+'</strong><small>Podium players highlighted below</small></div>'+
           '<div class="hf-kpi"><span>Completion</span><strong>100%</strong><small>The game reached final results</small></div>'+
         '</div>';
@@ -8817,7 +9101,7 @@ authPromise.then(() => {
       : players.slice(0,8).map((p,i)=>
           '<div class="hf-row'+(i===0?' top':'')+'">'+
             '<div class="hf-row-rank">'+(i+1)+'</div>'+
-            '<div><div class="hf-row-name">'+escapeHtml(p.name)+(teamMode?' · '+escapeHtml(teamName(st,p.teamId)):'')+'</div><div class="hf-row-sub">'+(i===0?'Winner of this quiz':i===1?'Strong finish in second place':i===2?'Rounded out the podium':'Final room standing')+'</div></div>'+
+            '<div><div class="hf-row-name">'+escapeHtml(p.name)+(teamMode?' · '+escapeHtml(teamName(st,p.teamId)):'')+'</div><div class="hf-row-sub">'+(i===0?'Winner of this quiz':i===1?'Strong finish in second place':i===2?'Rounded out the podium':'Final session standing')+'</div></div>'+
             '<div class="hf-row-score"><strong>'+Number(p.score||0).toLocaleString()+'</strong><span>points</span></div>'+
           '</div>'
         ).join('');
@@ -8833,7 +9117,7 @@ authPromise.then(() => {
         '</div>'+
 
         '<div class="hf-section">'+
-          '<div class="hf-section-head"><h3>'+(teamMode?'Final podium teams':'Podium finishers')+'</h3><span>'+(teamMode?'Top teams from this room':'Top players from this room')+'</span></div>'+
+          '<div class="hf-section-head"><h3>'+(teamMode?'Final podium teams':'Podium finishers')+'</h3><span>'+(teamMode?'Top teams from this session':'Top players from this session')+'</span></div>'+
           podiumHtml+
         '</div>'+
 
@@ -8843,7 +9127,7 @@ authPromise.then(() => {
         '</div>'+
 
         '<div class="hf-actions">'+
-          '<button class="btn btn-primary" id="btn-new-quiz">Play another quiz — same room</button>'+
+          '<button class="btn btn-primary" id="btn-new-quiz">Play another quiz — same session</button>'+
           '<button class="btn btn-ghost" id="btn-final-analytics">View game analytics</button>'+
           '<button class="btn btn-ghost" id="btn-final-dashboard">Return to dashboard</button>'+
         '</div>'+
@@ -8931,8 +9215,8 @@ authPromise.then(() => {
         S.teams = nextState.teams;
       }catch(e){
         btn.disabled = false;
-        btn.textContent = 'Play another quiz — same room';
-        showConnectionBanner('Connection interrupted — current room was not reset.', false);
+        btn.textContent = 'Play another quiz — same session';
+        showConnectionBanner('Connection interrupted — current session was not reset.', false);
         return;
       }
 
@@ -8954,11 +9238,11 @@ authPromise.then(() => {
       '<div class="center-stage qz-player-join-stage">'+
         '<div class="qz-player-join-card">'+
           '<div class="eyebrow">Join a quiz</div>'+
-          '<h2 style="font-size:27px;">Enter the room code</h2>'+
+          '<h2 style="font-size:27px;">Enter the session code</h2>'+
           '<p class="qz-player-join-sub">Jump straight into the live experience.</p>'+
           '<div style="width:100%; max-width:320px; display:flex; flex-direction:column; gap:14px;">'+
             '<div><label>Your name</label><input type="text" id="pj-name" placeholder="e.g. Sam" maxlength="18"></div>'+
-            '<div><label>Room code</label><input type="text" id="pj-code" placeholder="e.g. AB12C" maxlength="5" style="text-transform:uppercase;"></div>'+
+            '<div><label>Session code</label><input type="text" id="pj-code" placeholder="e.g. AB12C" maxlength="5" style="text-transform:uppercase;"></div>'+
             '<div class="err-msg" id="pj-err"></div>'+
             '<button class="btn btn-primary btn-block" id="pj-submit">Join</button>'+
           '</div>'+
@@ -8980,10 +9264,10 @@ authPromise.then(() => {
   async function playerAttemptJoin(){
     const name = $('pj-name').value.trim();
     const code = $('pj-code').value.trim().toUpperCase();
-    if(!name || !code){ $('pj-err').textContent = 'Enter your name and the room code.'; return; }
+    if(!name || !code){ $('pj-err').textContent = 'Enter your name and the session code.'; return; }
     $('pj-submit').disabled = true;
     const st = await fbGet(statePath(code));
-    if(!st){ $('pj-err').textContent = 'No room found with that code.'; $('pj-submit').disabled = false; return; }
+    if(!st){ $('pj-err').textContent = 'No session found with that code.'; $('pj-submit').disabled = false; return; }
     S.code = code; S.name = name; S.pid = genId(); S.teamId = null;
 
     // In a live Team Battle, late joiners are placed into the smallest team automatically.
@@ -8999,7 +9283,7 @@ authPromise.then(() => {
 
     const joined = await fbSet(playerPath(code, S.pid), { id:S.pid, name, teamId:S.teamId, score:0, lastPoints:0, lastCorrect:null, joinedAt:Date.now() });
     if(!joined){
-      $('pj-err').textContent = 'Could not join the room. Please try again.';
+      $('pj-err').textContent = 'Could not join the session. Please try again.';
       $('pj-submit').disabled = false;
       return;
     }
@@ -9025,9 +9309,9 @@ authPromise.then(() => {
             '<div class="team-lobby-grid">'+
               teams.map((t,i)=>'<button class="team-choice'+(S.teamId===t.id?' selected':'')+'" data-team-id="'+escapeHtml(t.id)+'"><span class="team-dot t'+i+'" style="display:inline-block;margin-right:7px;vertical-align:middle;"></span><strong style="display:inline;">'+escapeHtml(t.name)+'</strong><span>'+(S.teamId===t.id?'Selected':'Tap to join this team')+'</span></button>').join('')+
             '</div>'+
-            '<div class="chip" style="margin:15px auto 0;justify-content:center;">Room <span class="code-text">'+S.code+'</span></div>'+
+            '<div class="chip" style="margin:15px auto 0;justify-content:center;">Session <span class="code-text">'+S.code+'</span></div>'+
             '<p style="font-size:10px;margin-top:10px;">If you don’t choose, QZMAX will balance the teams automatically.</p>'+
-            '<button class="btn btn-ghost" id="player-leave-lobby" style="margin-top:12px;font-size:12px;">Leave this room</button>'+
+            '<button class="btn btn-ghost" id="player-leave-lobby" style="margin-top:12px;font-size:12px;">Leave this session</button>'+
           '</div>'
           :
           '<div>'+
@@ -9035,8 +9319,8 @@ authPromise.then(() => {
             '<h2 style="font-size:27px;">Hi '+escapeHtml(S.name)+' 👋</h2>'+
             '<p>'+(examMode?'Waiting for the host to start the exam…':'Waiting for the host to start the quiz…')+'</p>'+
             (examMode?'<div class="exam-lobby-note">📝 One timer will apply to the whole exam. You can move between questions and submit when ready.</div>':'')+
-            '<div class="chip" style="margin-top:12px;">Room <span class="code-text">'+S.code+'</span></div>'+
-            '<button class="btn btn-ghost" id="player-leave-lobby" style="margin-top:8px;font-size:12px;">Leave this room</button>'+
+            '<div class="chip" style="margin-top:12px;">Session <span class="code-text">'+S.code+'</span></div>'+
+            '<button class="btn btn-ghost" id="player-leave-lobby" style="margin-top:8px;font-size:12px;">Leave this session</button>'+
           '</div>'
         )+
       '</div>';
@@ -9094,7 +9378,7 @@ authPromise.then(() => {
     }
     S.hadRoom = true;
     if(st.appVersion && st.appVersion !== APP_VERSION){
-      showConnectionBanner('This room is using QZMAX v'+st.appVersion+'. Refresh this page if the question display looks out of date.', false);
+      showConnectionBanner('This session is using QZMAX v'+st.appVersion+'. Refresh this page if the question display looks out of date.', false);
     }
     const teamKey = st.gameMode==='teams' ? ':'+JSON.stringify(st.teams||[]) : '';
     const currentQ = st.questions && st.currentIndex>=0 ? st.questions[st.currentIndex] : null;
@@ -9368,7 +9652,7 @@ authPromise.then(() => {
         '<div class="live-game-top">'+
           '<div class="live-progress-wrap"><span class="live-q-meta">Question '+(st.currentIndex+1)+' of '+total+'</span><div class="live-progress"><span style="width:'+progress+'%;"></span></div></div>'+
           '<div class="live-timer-shell">'+ringSvg('player-ring')+'</div>'+
-          '<div class="live-room-pill"><span>Room</span><strong>'+S.code+'</strong></div>'+
+          '<div class="live-room-pill"><span>Session</span><strong>'+S.code+'</strong></div>'+
         '</div>'+
         '<div class="live-question-panel">'+
           '<div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap;"><div class="live-category qz-live-brand">✦ QZMAX</div><span class="qtype-pill">'+questionTypeLabel(q)+'</span><span class="qtype-pill">v'+APP_VERSION+'</span></div>'+
@@ -9570,8 +9854,8 @@ authPromise.then(() => {
           '</div>'+
           '<div class="team-leader-list">'+renderTeamRows(standings,S.teamId)+'</div>'+
           '<p style="margin-top:14px;">Stay here — if the host starts another quiz, you’ll rejoin automatically.</p>'+
-          '<div class="chip" style="margin-top:4px;">Room <span class="code-text">'+S.code+'</span></div>'+
-          '<button class="btn btn-ghost" id="player-leave-final" style="margin-top:8px;font-size:12px;">Leave this room</button>'+
+          '<div class="chip" style="margin-top:4px;">Session <span class="code-text">'+S.code+'</span></div>'+
+          '<button class="btn btn-ghost" id="player-leave-final" style="margin-top:8px;font-size:12px;">Leave this session</button>'+
         '</div>';
     }else{
       const myRank = players.findIndex(p=>p.id===S.pid)+1;
@@ -9584,8 +9868,8 @@ authPromise.then(() => {
             players.slice(0,5).map((p,i)=>'<div class="lb-row'+(p.id===S.pid?' me':'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+escapeHtml(p.name)+'</span><span class="lb-score">'+p.score+'</span></div>').join('')+
           '</div>'+
           '<p style="margin-top:14px;">Stay here — if the host starts another quiz, you’ll rejoin automatically.</p>'+
-          '<div class="chip" style="margin-top:4px;">Room <span class="code-text">'+S.code+'</span></div>'+
-          '<button class="btn btn-ghost" id="player-leave-final" style="margin-top:8px;font-size:12px;">Leave this room</button>'+
+          '<div class="chip" style="margin-top:4px;">Session <span class="code-text">'+S.code+'</span></div>'+
+          '<button class="btn btn-ghost" id="player-leave-final" style="margin-top:8px;font-size:12px;">Leave this session</button>'+
         '</div>';
     }
 
