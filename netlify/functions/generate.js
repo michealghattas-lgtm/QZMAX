@@ -1,6 +1,6 @@
 'use strict';
 
-// QZMAX 3.14.3 — Theme Button Bottom Right
+// QZMAX 3.15.0 — Guided AI Generator
 //
 // No paid OpenAI, Claude or xAI API is used.
 // The router keeps the requested batch size and switches providers on rate limit.
@@ -15,7 +15,7 @@
 const MAX_BATCH = 10;
 const MAX_OPTIONS = 8;
 const MAX_PROMPT_CHARS = 60000;
-const GLOBAL_BUDGET_MS = 28000;
+const GLOBAL_BUDGET_MS = 23000;
 
 const MODELS = {
   geminiSearch: process.env.GEMINI_SEARCH_MODEL || 'gemini-2.5-flash',
@@ -115,7 +115,18 @@ function parseProviderOrder(request) {
   if (!customAI) {
     order = order.filter(route => !['gemini_search','groq_compound'].includes(route));
   }
-  if (!order.includes('local')) order.push('local');
+
+  // Rotate the starting free provider between frontend passes.
+  const attempt = Math.max(0, Number(request?.generationAttempt) || 0);
+  const nonLocal = order.filter(route => route !== 'local');
+  if (nonLocal.length && attempt) {
+    const shift = attempt % nonLocal.length;
+    order = nonLocal.slice(shift).concat(nonLocal.slice(0, shift));
+  } else {
+    order = nonLocal;
+  }
+
+  order.push('local');
   return [...new Set(order)];
 }
 
@@ -258,6 +269,57 @@ function cleanDocumentQuestionFraming(value) {
   return q;
 }
 
+
+const LINK_EVIDENCE_STOPWORDS = new Set([
+  'what','which','who','whom','whose','when','where','why','how','does','did','was','were','are','is',
+  'the','a','an','of','to','in','on','for','from','with','and','or','as','by','at','into','about',
+  'after','before','this','that','these','those','according','source','page','link',
+  'ما','ماذا','من','متى','أين','اين','كيف','لماذا','هل','هو','هي','في','إلى','الى','على','عن','مع','و','أو','او','الذي','التي','هذا','هذه'
+]);
+
+function linkEvidenceTokens(value) {
+  return normalizeEvidenceText(value)
+    .split(' ')
+    .filter(t => t.length >= 3 && !LINK_EVIDENCE_STOPWORDS.has(t));
+}
+
+function splitLinkEvidenceUnits(source) {
+  return String(source || '')
+    .replace(/\r/g,'')
+    .split(/\n+|(?<=[.!?؟])\s+/u)
+    .map(s => s.replace(/^#{1,6}\s+/,'').replace(/\s+/g,' ').trim())
+    .filter(s => s.length >= 35 && s.length <= 700);
+}
+
+function recoverLinkEvidence(raw, question, options, request) {
+  if (request.questionType !== 'multiple_choice') return '';
+
+  const idx = Number.parseInt(raw?.correctIndex,10);
+  if (!Number.isInteger(idx) || idx < 0 || idx >= options.length) return '';
+
+  const answerNorm = normalizeEvidenceText(options[idx]);
+  if (answerNorm.length < 2) return '';
+
+  const qTokens = linkEvidenceTokens(question);
+  let best = null;
+
+  for (const unit of splitLinkEvidenceUnits(request.sourceEvidenceText || '')) {
+    const unitNorm = normalizeEvidenceText(unit);
+    if (!unitNorm.includes(answerNorm)) continue;
+
+    let overlap = 0;
+    for (const token of qTokens) if (unitNorm.includes(token)) overlap++;
+
+    const minOverlap = qTokens.length >= 4 ? 2 : 1;
+    if (overlap < minOverlap) continue;
+
+    const score = overlap * 10 + Math.min(10, answerNorm.length / 4);
+    if (!best || score > best.score) best = {unit,score};
+  }
+
+  return best ? best.unit.slice(0,600) : '';
+}
+
 function validateQuestions(items, request) {
   const { count, optsPerQ, questionType } = request;
   const out = [];
@@ -272,7 +334,7 @@ function validateQuestions(items, request) {
     if (new Set(options.map(v => v.toLocaleLowerCase())).size !== options.length) continue;
 
     const explanation = typeof raw.explanation === 'string' ? raw.explanation.trim() : '';
-    const sourceEvidence = typeof raw.sourceEvidence === 'string' ? raw.sourceEvidence.trim().slice(0, 600) : '';
+    let sourceEvidence = typeof raw.sourceEvidence === 'string' ? raw.sourceEvidence.trim().slice(0, 600) : '';
     const sourcePage = raw.sourcePage == null ? '' : String(raw.sourcePage).trim().slice(0, 80);
     const sourceId = raw.sourceId == null ? '' : String(raw.sourceId).trim().slice(0, 30);
     const sourceUrl = raw.sourceUrl == null ? '' : String(raw.sourceUrl).trim().slice(0, 1000);
@@ -281,9 +343,17 @@ function validateQuestions(items, request) {
     const factKey = raw.factKey == null ? '' : String(raw.factKey).trim().slice(0, 240);
 
     if (request.sourceType === 'link') {
-      const evidenceNorm = normalizeEvidenceText(sourceEvidence);
       const sourceNorm = normalizeEvidenceText(request.sourceEvidenceText || '');
-      if (evidenceNorm.length < 18 || !sourceNorm || !sourceNorm.includes(evidenceNorm)) continue;
+      let evidenceNorm = normalizeEvidenceText(sourceEvidence);
+
+      if (evidenceNorm.length < 18 || !sourceNorm || !sourceNorm.includes(evidenceNorm)) {
+        const recovered = recoverLinkEvidence(raw, question, options, request);
+        if (!recovered) continue;
+        sourceEvidence = recovered;
+        evidenceNorm = normalizeEvidenceText(sourceEvidence);
+      }
+
+      if (evidenceNorm.length < 18 || !sourceNorm.includes(evidenceNorm)) continue;
     }
 
     if (questionType === 'true_false') {
@@ -351,9 +421,10 @@ function buildMessages(request) {
     'Follow the current host scope, factual grounding, language, format, coverage, and same-topic fact-avoidance instructions in the user prompt exactly.',
     'Never infer subject matter from prior requests; only the current request is authoritative.',
     'Never invent a fact that is not supported when the prompt contains source material.',
+    structuredScopeText(request) ? 'STRUCTURED HOST SCOPE — TREAT EVERY POPULATED FIELD AS REQUIRED: '+structuredScopeText(request) : '',
     'When generating from supplied source material, write natural stand-alone question stems. Never start visible questions with "According to the source", "According to the text", "According to the document", "Based on the source", "From the text", or equivalent source-referencing phrases.',
     schemaInstruction(request),
-  ].join('\n\n');
+  ].filter(Boolean).join('\n\n');
 
   const userPrompt = String(request.topic || request.originalTopic || '').slice(0, MAX_PROMPT_CHARS);
   return [
@@ -655,13 +726,25 @@ function getLanguageLabels(language) {
 
 function extractSourceMaterial(topic) {
   const text = String(topic || '');
-  const marker = 'SOURCE MATERIAL:';
-  const i = text.indexOf(marker);
+  const markers = ['EXTRACTED SOURCE CONTENT:','SOURCE MATERIAL:'];
+  let marker = '';
+  let i = -1;
+
+  for (const candidate of markers) {
+    const found = text.indexOf(candidate);
+    if (found >= 0 && (i < 0 || found < i)) {
+      marker = candidate;
+      i = found;
+    }
+  }
+
   if (i < 0) return '';
   let source = text.slice(i + marker.length);
   const endMarkers = [
+    '\n\nSAME-TOPIC FACTS ALREADY USED:',
     '\n\nDO NOT repeat',
     '\n\nCreate distinct questions',
+    '\n\nGENERATION VARIATION TOKEN:',
     '\n\nReturn clean JSON',
   ];
   for (const endMarker of endMarkers) {
@@ -819,6 +902,48 @@ function normalizeEvidenceText(value) {
     .trim();
 }
 
+
+function sanitizeStructuredScope(value) {
+  const src = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  const field = (name,max=240) => String(src[name] || '').replace(/\s+/g,' ').trim().slice(0,max);
+  return {
+    mode:field('mode',40),
+    category:field('category'),
+    topic:field('topic',500),
+    region:field('region'),
+    timePeriod:field('timePeriod'),
+    focus:field('focus',600),
+    difficulty:field('difficulty',80),
+    year:field('year',80),
+    subject:field('subject',200)
+  };
+}
+
+function structuredScopeText(request) {
+  const s = request?.structuredScope || {};
+  return [
+    s.category ? `Category: ${s.category}` : '',
+    s.topic ? `Topic: ${s.topic}` : '',
+    s.region ? `Country / Region: ${s.region}` : '',
+    s.timePeriod ? `Time period: ${s.timePeriod}` : '',
+    s.focus ? `Specific focus: ${s.focus}` : '',
+    s.year ? `Year level: ${s.year}` : '',
+    s.subject ? `Subject: ${s.subject}` : '',
+    s.difficulty ? `Difficulty: ${s.difficulty}` : ''
+  ].filter(Boolean).join(' | ');
+}
+
+function structuredSearchScope(request) {
+  const s = request?.structuredScope || {};
+  return [
+    s.topic,
+    s.category && s.category !== 'General Knowledge' ? s.category : '',
+    s.region,
+    s.timePeriod,
+    s.focus
+  ].filter(Boolean).join(' ');
+}
+
 function evidencePackText(evidence) {
   return (evidence || []).map(src =>
     `[${src.id}]\nTITLE: ${src.title}\nURL: ${src.url}\nCONTENT: ${src.content}`
@@ -834,7 +959,12 @@ async function fetchTavilyEvidence(request, deadline) {
     );
   }
 
-  const query = String(request.originalTopic || request.topic || '')
+  const query = [
+    structuredSearchScope(request),
+    String(request.originalTopic || request.topic || '')
+  ]
+    .filter(Boolean)
+    .join(' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 900);
@@ -894,8 +1024,9 @@ function buildWebEvidenceMessages(baseMessages, request, evidence) {
   const pack = evidencePackText(evidence);
   const webRule = [
     'QZMAX WEB-VERIFIED MODE — MANDATORY RULES:',
+    structuredScopeText(request) ? 'STRUCTURED HOST SCOPE: '+structuredScopeText(request) : '',
     'Use ONLY the WEB EVIDENCE PACK below for factual claims. Do not use memory or unsupported outside knowledge.',
-    'Every question must be directly within the host topic and directly supported by one evidence source.',
+    'Every question must satisfy every populated structured scope field and be directly supported by one evidence source.',
     'For EACH question return sourceId, sourceUrl, sourceTitle and sourceEvidence.',
     'sourceId/sourceUrl/sourceTitle must exactly match one source below.',
     'sourceEvidence must be an EXACT copied phrase of roughly 8–45 words from that source CONTENT which directly supports the correct answer.',
@@ -905,7 +1036,7 @@ function buildWebEvidenceMessages(baseMessages, request, evidence) {
     'For translated visible answers, keep the factual identity identical to the cited source.',
     'WEB EVIDENCE PACK:',
     pack
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   return [...baseMessages, {role:'user', content:webRule}];
 }
@@ -1003,7 +1134,8 @@ async function fetchTargetedQuestionEvidence(candidate, request, deadline, candi
   const question = String(candidate?.question || '').replace(/\s+/g,' ').trim();
   const topic = String(request.originalTopic || '').replace(/\s+/g,' ').trim();
   const category = String(candidate?.category || '').replace(/\s+/g,' ').trim();
-  const query = [question,category,topic].filter(Boolean).join(' ').trim().slice(0, 900);
+  const query = [question,category,structuredSearchScope(request),topic]
+    .filter(Boolean).join(' ').replace(/\s+/g,' ').trim().slice(0, 900);
 
   const cacheKey = normalizeEvidenceText(query);
   const cached = TARGETED_FACT_CACHE.get(cacheKey);
@@ -1167,8 +1299,9 @@ async function verifyCandidatesWithIndependentModel(candidates, broadEvidence, r
     'Solve every question independently from its QUESTION-SPECIFIC WEB RESULTS only.',
     'Do not use memory, prior model knowledge, the broad topic evidence, or assumptions.',
     'CURRENT HOST SCOPE: '+String(request.originalTopic || '').trim(),
+    structuredScopeText(request) ? 'STRUCTURED HOST SCOPE: '+structuredScopeText(request) : '',
     request.scopeInstruction ? 'SCOPE/COVERAGE CONTRACT: '+request.scopeInstruction : '',
-    'First decide whether each candidate is directly in scope for the CURRENT HOST SCOPE. Ignore all prior topics because none are relevant to this audit.',
+    'First decide whether each candidate satisfies EVERY populated structured scope field and is directly in scope for the CURRENT HOST SCOPE. Ignore all prior topics because none are relevant to this audit.',
     'For each accepted candidate output scopeVerdict:"in_scope". Omit anything off-topic, over-specialised relative to the requested general-knowledge coverage, or outside the named timeframe/category.',
     'For each candidate, output it only when the web results establish exactly one defensible answer (or the exact complete set for Select Multiple).',
     'For every accepted candidate include verdict:"supported", confidence:"high", scopeVerdict:"in_scope", question, options, category when supplied, and your independently chosen correctIndex/correctIndexes.',
@@ -1347,6 +1480,23 @@ function validatePublicSourceUrl(value) {
   return parsed.toString();
 }
 
+
+function cleanExtractedSourceContent(value) {
+  return String(value || '')
+    .replace(/\u0000/g,'')
+    // Keep Markdown headings because the frontend uses them to find focused sections.
+    .replace(/!\[([^\]]*)\]\((?:[^()]|\([^)]*\))*\)/g, '$1')
+    .replace(/\[([^\]]+)\]\((?:[^()]|\([^)]*\))*\)/g, '$1')
+    .replace(/<https?:\/\/[^>]+>/gi, ' ')
+    .replace(/<[^>]{1,500}>/g, ' ')
+    .replace(/^\s*\[[0-9]+\]\s*$/gm, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n{4,}/g, '\n\n\n')
+    .trim();
+}
+
 function sourceTitleFromExtract(result, rawContent, url) {
   const direct = String(result?.title || '').replace(/\s+/g,' ').trim();
   if (direct && direct.length <= 220) return direct;
@@ -1402,9 +1552,7 @@ async function extractSourceLink(url) {
   if (!res.ok) throw await readErrorResponse(res);
   const data = await res.json();
   const result = Array.isArray(data?.results) ? data.results[0] : null;
-  const raw = String(result?.raw_content || result?.content || '')
-    .replace(/\u0000/g,'')
-    .trim();
+  const raw = cleanExtractedSourceContent(result?.raw_content || result?.content || '');
 
   if (raw.length < 120) {
     const failed = Array.isArray(data?.failed_results) ? data.failed_results[0] : null;
@@ -1441,7 +1589,7 @@ exports.handler = async function handler(event) {
   // Lightweight status endpoint — does not spend AI quota.
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      version:'3.14.3',
+      version:'3.15.0',
       freeOnly:true,
       factualRetrieval:'Tavily search + Tavily Extract for host-selected Source Links',
       sourceLinkExtraction:'Tavily Extract · exact selected page only',
@@ -1496,7 +1644,10 @@ exports.handler = async function handler(event) {
     sourceEvidenceText:String(body.sourceEvidenceText || '').slice(0,20000),
     preferSearch:body.preferSearch === true,
     generationId:String(body.generationId || '').trim().slice(0,100),
+    generationAttempt:safeInt(body.generationAttempt,0,0,1000),
     scopeInstruction:String(body.scopeInstruction || '').trim().slice(0,5000),
+    structuredScope:sanitizeStructuredScope(body.structuredScope),
+    difficulty:['Easy','Medium','Hard'].includes(body.difficulty) ? body.difficulty : 'Medium',
     generalKnowledge:body.generalKnowledge === true,
     coverageCategories:Array.isArray(body.coverageCategories)
       ? body.coverageCategories.map(v=>String(v).trim().slice(0,120)).filter(Boolean).slice(0,12)
@@ -1604,16 +1755,19 @@ exports.handler = async function handler(event) {
 
           errors.push(`${route}: link-grounded partial ${structurallyValid.length}/${request.count}`);
 
-          // If time remains, try another configured free model for a more complete
-          // verbatim-evidence batch rather than immediately returning 1–2 items.
-          if (Date.now() < deadline - 4500) continue;
+          // Link mode is aggregated by the frontend across rotating source windows.
+          // Return a useful grounded partial quickly; later passes rotate both
+          // source window and free provider.
+          if (structurallyValid.length >= Math.min(2, request.count)) {
+            return jsonResponse(200, structurallyValid.slice(0, request.count), {
+              'X-QZMAX-AI-Provider':provider,
+              'X-QZMAX-AI-Model':model,
+              'X-QZMAX-AI-Route':route,
+              'X-QZMAX-AI-Partial':`${structurallyValid.length}/${request.count}`
+            });
+          }
 
-          return jsonResponse(200, bestLinkPartial.items.slice(0, request.count), {
-            'X-QZMAX-AI-Provider':bestLinkPartial.provider,
-            'X-QZMAX-AI-Model':bestLinkPartial.model,
-            'X-QZMAX-AI-Route':bestLinkPartial.route,
-            'X-QZMAX-AI-Partial':`${bestLinkPartial.items.length}/${request.count}`
-          });
+          continue;
         }
 
         return jsonResponse(200, structurallyValid.slice(0, request.count), {

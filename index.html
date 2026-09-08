@@ -4233,6 +4233,95 @@ html[data-theme="light"] .qz-account-stage .qz-account-card p{
   }
 }
 
+
+/* =========================================================
+   QZMAX 3.15.0 — Guided AI Generator
+   ========================================================= */
+.ai-source-tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important;}
+.guided-ai-panel{
+  margin-top:12px;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid rgba(123,150,210,.13);
+  background:linear-gradient(145deg,rgba(12,21,43,.58),rgba(11,18,37,.46));
+}
+.guided-ai-kicker{margin-bottom:10px;}
+.guided-ai-grid,
+.guided-other-grid,
+.guided-scope-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.guided-other-grid:empty{display:none;}
+.guided-scope-details{
+  margin-top:11px;
+  padding:10px 11px;
+  border-radius:13px;
+  border:1px solid rgba(126,151,208,.12);
+  background:rgba(5,11,27,.26);
+}
+.guided-scope-details summary{
+  cursor:pointer;
+  color:#9baaca;
+  font-size:11px;
+  font-weight:800;
+  user-select:none;
+}
+.guided-scope-details[open] summary{margin-bottom:10px;}
+.guided-scope-focus{grid-column:1/-1;}
+.guided-scope-preview{
+  margin-top:10px;
+  min-height:34px;
+  padding:8px 10px;
+  border-radius:11px;
+  border:1px solid rgba(41,190,229,.12);
+  background:rgba(30,132,185,.055);
+  color:#9fb0c9;
+  font-size:10px;
+  line-height:1.45;
+}
+.guided-scope-preview strong{color:#79dcff;}
+.school-guided-notice{
+  background:rgba(117,91,255,.07);
+  border:1px solid rgba(117,91,255,.15);
+}
+.school-guided-notice strong{color:#b6a3ff;}
+.ai-difficulty-row{margin-top:13px;}
+.ai-difficulty-row select{min-height:50px;}
+html[data-theme="light"] .guided-ai-panel{
+  background:linear-gradient(145deg,rgba(220,234,248,.86),rgba(207,226,245,.88));
+  border-color:rgba(44,82,128,.15);
+}
+html[data-theme="light"] .guided-scope-details{
+  background:rgba(232,241,250,.64);
+  border-color:rgba(44,82,128,.13);
+}
+html[data-theme="light"] .guided-scope-details summary{color:#405d79;}
+html[data-theme="light"] .guided-scope-preview{
+  color:#45637e;
+  background:rgba(29,132,190,.06);
+  border-color:rgba(29,132,190,.15);
+}
+html[data-theme="light"] .guided-scope-preview strong{color:#006fae;}
+html[data-theme="light"] .school-guided-notice{
+  background:rgba(105,82,196,.07)!important;
+  border-color:rgba(92,70,178,.16)!important;
+  color:#445f7b!important;
+}
+html[data-theme="light"] .school-guided-notice strong{color:#5e46b4!important;}
+@media(max-width:1150px){
+  .ai-source-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+}
+@media(max-width:760px){
+  .ai-source-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .guided-ai-grid,.guided-other-grid,.guided-scope-grid{grid-template-columns:1fr;}
+  .guided-scope-focus{grid-column:auto;}
+}
+@media(max-width:480px){
+  .ai-source-tabs{grid-template-columns:1fr!important;}
+}
+
 </style>
 </head>
 <body>
@@ -4257,7 +4346,7 @@ html[data-theme="light"] .qz-account-stage .qz-account-card p{
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.14.3";
+  const APP_VERSION = "3.15.0";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -6037,35 +6126,51 @@ authPromise.then(() => {
       // QZMAX 3.8 Verified AI + Document Quiz Engine
       '<div class="card host-studio-only verified-ai-card" id="host-ai-generator-card" style="margin-bottom:16px;">'+
         '<div class="verified-ai-head">'+
-          '<div><div class="eyebrow">QZMAX MULTI-AI</div><h3>How do you want to create?</h3><p>Generate with QZMAX\'s free multi-provider AI router, use your own document, or create manually.</p></div>'+
+          '<div><div class="eyebrow">QZMAX MULTI-AI</div><h3>How do you want to create?</h3><p>Use a guided topic, school practice, your own document or source link — or create manually.</p></div>'+
           '<span class="verified-engine-badge">BETA</span>'+
         '</div>'+
         '<div class="ai-source-tabs" role="tablist" aria-label="Quiz creation source">'+
-          '<button type="button" class="ai-source-tab active" id="ai-source-trusted">✦ AI Knowledge + Search</button>'+
+          '<button type="button" class="ai-source-tab active" id="ai-source-trusted">✦ Guided AI + Search</button>'+
+          '<button type="button" class="ai-source-tab" id="ai-source-school">🎓 School / Education</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-document">▣ My Document</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-link">↗ Source Link</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-manual">✎ Manual</button>'+
         '</div>'+
 
         '<div id="ai-source-panel-trusted" class="ai-source-panel">'+
-          '<div class="ai-source-notice trusted ai-first-notice"><strong>Blind fact check • Two-source evidence</strong><span>QZMAX searches the topic to draft questions, then performs a fresh search for every individual question. A blind verifier must solve it independently and cite two different websites before it can enter the queue.</span></div>'+
-          '<div style="display:flex; justify-content:space-between; align-items:center; margin:13px 0 8px;">'+
-            '<div class="eyebrow" id="ai-mode-title">Custom Topic</div>'+
-            '<button id="ai-mode-toggle" type="button" class="ai-text-link">Switch to School Exam Mode</button>'+
-          '</div>'+
-          '<div id="ai-mode-custom">'+
-            '<div class="qform-row"><label>Topic / instructions</label><input type="text" id="ai-topic" class="ai-prompt" placeholder="e.g. Ancient Egypt, Australian geography, the Solar System"></div>'+
-          '</div>'+
-          '<div id="ai-mode-school" style="display:none;">'+
-            '<div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">'+
-              '<div class="qform-row" style="flex:1; min-width:130px;"><label>Grade / Year</label><select id="ai-grade">'+
-                '<option value="Year 5">Year 5</option><option value="Year 6">Year 6</option><option value="Year 7">Year 7</option><option value="Year 8">Year 8</option><option value="Year 9">Year 9</option><option value="Year 10">Year 10</option><option value="Year 11">Year 11</option><option value="Year 12">Year 12</option>'+
-              '</select></div>'+
-              '<div class="qform-row" style="flex:1.5; min-width:160px;"><label>Subject</label><select id="ai-subject">'+
-                '<option value="Mathematics">Mathematics</option><option value="English">English</option><option value="Science / Biology">Science / Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option><option value="History">History</option><option value="Geography">Geography</option><option value="Economics">Economics</option><option value="Computer Science">Computer Science</option>'+
-              '</select></div>'+
-              '<div class="qform-row" style="flex:1; min-width:120px;"><label>Difficulty</label><select id="ai-diff"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard / Exam Style</option></select></div>'+
+          '<div class="ai-source-notice trusted ai-first-notice"><strong>Guided scope • Blind fact check • Two-source evidence</strong><span>Your selections become one scope contract used by generation, search and the blind verifier. Every accepted fact still requires evidence from two independent websites.</span></div>'+
+          '<div class="guided-ai-panel">'+
+            '<div class="eyebrow guided-ai-kicker">GUIDED AI GENERATOR</div>'+
+            '<div class="guided-ai-grid">'+
+              '<div class="qform-row"><label>Category</label><select id="ai-guided-category"></select></div>'+
+              '<div class="qform-row"><label>Topic</label><select id="ai-guided-topic"></select></div>'+
             '</div>'+
+            '<div class="guided-other-grid">'+
+              '<div class="qform-row" id="ai-guided-category-other-wrap" style="display:none;"><label>Enter category</label><input type="text" id="ai-guided-category-other" placeholder="e.g. Aviation, Medicine, Architecture"></div>'+
+              '<div class="qform-row" id="ai-guided-topic-other-wrap" style="display:none;"><label>Enter topic</label><input type="text" id="ai-guided-topic-other" placeholder="Enter the exact topic you want"></div>'+
+            '</div>'+
+            '<details class="guided-scope-details" id="ai-guided-scope-details">'+
+              '<summary>Refine scope (optional)</summary>'+
+              '<div class="guided-scope-grid">'+
+                '<div class="qform-row"><label>Country / Region</label><input type="text" id="ai-guided-region" placeholder="e.g. Australia, Egypt, Worldwide"></div>'+
+                '<div class="qform-row"><label>Time period</label><input type="text" id="ai-guided-time" placeholder="e.g. 2000–present, Ancient era, 20th century"></div>'+
+                '<div class="qform-row guided-scope-focus"><label>Specific focus / instructions</label><input type="text" id="ai-guided-focus" placeholder="e.g. Focus on major events and people; avoid politics"></div>'+
+              '</div>'+
+            '</details>'+
+            '<div class="guided-scope-preview" id="ai-guided-preview"></div>'+
+          '</div>'+
+        '</div>'+
+
+        '<div id="ai-source-panel-school" class="ai-source-panel" style="display:none;">'+
+          '<div class="ai-source-notice school-guided-notice"><strong>Structured school generation</strong><span>Choose the year and subject. Difficulty, language and format are shared below. QZMAX keeps the questions at the selected year level.</span></div>'+
+          '<div class="eyebrow" style="margin:13px 0 8px;">SCHOOL EXAM PRACTICE</div>'+
+          '<div class="guided-ai-grid school-guided-grid">'+
+            '<div class="qform-row"><label>Grade / Year</label><select id="ai-grade">'+
+              '<option value="Year 5">Year 5</option><option value="Year 6">Year 6</option><option value="Year 7">Year 7</option><option value="Year 8">Year 8</option><option value="Year 9">Year 9</option><option value="Year 10">Year 10</option><option value="Year 11">Year 11</option><option value="Year 12">Year 12</option>'+
+            '</select></div>'+
+            '<div class="qform-row"><label>Subject</label><select id="ai-subject">'+
+              '<option value="Mathematics">Mathematics</option><option value="English">English</option><option value="Science / Biology">Science / Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option><option value="History">History</option><option value="Geography">Geography</option><option value="Economics">Economics</option><option value="Computer Science">Computer Science</option>'+
+            '</select></div>'+
           '</div>'+
         '</div>'+
 
@@ -6109,6 +6214,7 @@ authPromise.then(() => {
         '</div>'+
 
         '<div id="ai-generation-controls">'+
+          '<div class="qform-row ai-difficulty-row"><label>Difficulty</label><select id="ai-difficulty"><option value="Easy">Easy</option><option value="Medium" selected>Medium</option><option value="Hard">Hard / Challenging</option></select><div class="qtype-hint" id="ai-difficulty-hint">Medium balances direct knowledge with one- or two-step reasoning.</div></div>'+
           '<div class="qform-row ai-language-row"><label>Question language</label><select id="ai-language"><option value="English" selected>English</option><option value="Arabic">العربية — Arabic</option><option value="Egyptian Simple Arabic">العربية المصرية البسيطة — Egyptian Simple Arabic</option></select><div class="qtype-hint">Questions, answer choices and explanations will be generated in the selected language or dialect.</div></div>'+
           '<div class="ai-format-row">'+
             '<div class="qform-row ai-format-type"><label>Question format</label><select id="ai-question-type"><option value="multiple_choice">Multiple Choice</option><option value="true_false">True / False</option><option value="multiple_correct">Select Multiple</option><option value="mixed">Mixed</option></select></div>'+
@@ -6122,7 +6228,7 @@ authPromise.then(() => {
           '<div class="ai-progress-shell" id="ai-progress-shell" style="display:none;"><div class="ai-progress-bar"><span id="ai-progress-fill"></span></div><div class="ai-progress-label" id="ai-progress-label">Preparing…</div></div>'+
           '<div class="err-msg" id="ai-msg"></div>'+
           '<div class="verification-legend"><span><b class="verify-dot source"></b> 2-Source Checked</span><span><b class="verify-dot link"></b> Link Grounded</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
-          '<div class="accuracy-note" id="ai-accuracy-note"><strong>Accuracy safeguard:</strong> Custom Topic questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.</div>'+
+          '<div class="accuracy-note" id="ai-accuracy-note"><strong>Accuracy safeguard:</strong> Guided AI questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.</div>'+
         '</div>'+
       '</div>'+
 
@@ -6330,15 +6436,16 @@ authPromise.then(() => {
       setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
     };
 
-    // QZMAX 3.8 — source-grounded AI + document generation
+    // QZMAX 3.15 — guided AI + school + source-grounded generation
     let isSchoolMode = false;
     let aiSourceMode = 'trusted';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
     let aiLinkState = { url:'', title:'', domain:'', text:'', chars:0, words:0, truncated:false, extractDepth:'basic' };
 
     function setAISourceMode(mode){
-      aiSourceMode = ['trusted','document','link','manual'].includes(mode) ? mode : 'trusted';
-      ['trusted','document','link','manual'].forEach(m=>{
+      aiSourceMode = ['trusted','school','document','link','manual'].includes(mode) ? mode : 'trusted';
+      isSchoolMode = aiSourceMode === 'school';
+      ['trusted','school','document','link','manual'].forEach(m=>{
         const tab = $('ai-source-'+m);
         const panel = $('ai-source-panel-'+m);
         if(tab) tab.classList.toggle('active', m===aiSourceMode);
@@ -6348,6 +6455,7 @@ authPromise.then(() => {
       if(controls) controls.style.display = aiSourceMode==='manual' ? 'none' : '';
       if($('ai-msg')) $('ai-msg').textContent = '';
       updateAIGenerateButton();
+      updateAIDifficultyHint();
     }
 
     function updateAIGenerateButton(){
@@ -6355,8 +6463,8 @@ authPromise.then(() => {
       if(!btn) return;
       if(aiSourceMode==='document') btn.textContent = 'Generate from Document';
       else if(aiSourceMode==='link') btn.textContent = 'Generate from Source Link';
-      else if(isSchoolMode) btn.textContent = 'Generate Year-Level Exam Questions';
-      else btn.textContent = 'Generate with Free Multi-AI';
+      else if(aiSourceMode==='school') btn.textContent = 'Generate Year-Level Exam Questions';
+      else btn.textContent = 'Generate Guided Questions';
 
       const note = $('ai-accuracy-note');
       if(note){
@@ -6364,15 +6472,16 @@ authPromise.then(() => {
           note.innerHTML = '<strong>Document grounding:</strong> QZMAX generates from the uploaded document only. The document itself is treated as the host-selected source of truth.';
         }else if(aiSourceMode==='link'){
           note.innerHTML = '<strong>Source Link grounding:</strong> Every accepted question must include supporting evidence found in the extracted page content. QZMAX does not independently certify the factual accuracy of the page itself.';
-        }else if(isSchoolMode){
+        }else if(aiSourceMode==='school'){
           note.innerHTML = '<strong>Curriculum-guided review:</strong> QZMAX follows the selected year, subject and difficulty guidance. Host review remains important because this mode is not an official curriculum certification.';
         }else{
-          note.innerHTML = '<strong>Accuracy safeguard:</strong> Custom Topic questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.';
+          note.innerHTML = '<strong>Guided AI accuracy safeguard:</strong> Category, topic and optional scope are carried into generation, web search and blind verification. Every accepted factual answer must still be independently supported by two different source domains.';
         }
       }
     }
 
     $('ai-source-trusted').onclick = ()=>setAISourceMode('trusted');
+    $('ai-source-school').onclick = ()=>setAISourceMode('school');
     $('ai-source-document').onclick = ()=>setAISourceMode('document');
     $('ai-source-link').onclick = ()=>setAISourceMode('link');
     $('ai-source-manual').onclick = ()=>setAISourceMode('manual');
@@ -6382,16 +6491,192 @@ authPromise.then(() => {
       const q = $('qf-text'); if(q) setTimeout(()=>q.focus(),250);
     };
 
-    $('ai-mode-toggle').onclick = () => {
-      isSchoolMode = !isSchoolMode;
-      $('ai-mode-custom').style.display = isSchoolMode ? 'none' : 'block';
-      $('ai-mode-school').style.display = isSchoolMode ? 'block' : 'none';
-      $('ai-mode-title').textContent = isSchoolMode ? 'School Exam Practice' : 'Custom Topic';
-      $('ai-mode-toggle').textContent = isSchoolMode ? 'Switch to Custom Topic' : 'Switch to School Exam Mode';
-      $('ai-msg').textContent = '';
-      updateAIGenerateButton();
-      updateAIQuestionTypeUI();
+
+    const GUIDED_AI_TOPICS = {
+      'General Knowledge':[
+        'Mixed General Knowledge','Australia','World','Science & Nature','Entertainment',
+        'Sports','History & Geography','People & Places','Other'
+      ],
+      'History':[
+        'Australian History','Australian Indigenous History','Ancient Egypt','Ancient Greece',
+        'Ancient Rome','World War I','World War II','Modern World History','Other'
+      ],
+      'Geography':[
+        'Australia','World Geography','Countries & Capitals','Landforms & Landscapes',
+        'Oceans & Rivers','Flags & Nations','Human Geography','Other'
+      ],
+      'Science & Nature':[
+        'General Science','Biology','Physics','Chemistry','Astronomy','Earth & Space',
+        'Human Body','Ecology & Environment','Animals & Plants','Other'
+      ],
+      'Mathematics':[
+        'Arithmetic','Fractions & Decimals','Percentages','Algebra','Geometry',
+        'Measurement','Statistics & Probability','Logic & Problem Solving','Other'
+      ],
+      'Technology':[
+        'Computers & Internet','AI & Robotics','Inventions','Space Technology',
+        'Cybersecurity','Programming','Consumer Technology','Other'
+      ],
+      'Film & Television':[
+        'Australian Film & TV','Egyptian Cinema','Egyptian Television','Hollywood',
+        'International Cinema','Animation','Actors & Directors','Awards & Classics','Other'
+      ],
+      'Music':[
+        'Australian Music','Egyptian Music','International Pop','Rock','Classical',
+        'Albums & Artists','Music History','Other'
+      ],
+      'Sports':[
+        'Australian Sports','Football / Soccer','Rugby','Cricket','Tennis',
+        'Basketball','Olympics','Motorsport','Other'
+      ],
+      'Arts & Literature':[
+        'Australian Literature','World Literature','Authors & Books','Visual Arts',
+        'Theatre','Poetry','Mythology','Other'
+      ],
+      'Culture & Society':[
+        'Australian Culture','Egyptian Culture','World Cultures','Food & Traditions',
+        'Festivals & Traditions','Languages','Social Customs','Other'
+      ],
+      'Business & Economics':[
+        'Australian Economy','Personal Finance','Business Basics','Markets & Trade',
+        'Brands & Companies','Entrepreneurship','Other'
+      ],
+      'Civics & Government':[
+        'Australian Civics','Australian Government','World Governments','Democracy & Elections',
+        'Law & Citizenship','International Organisations','Other'
+      ],
+      'Current Affairs':[
+        'Australia','World','Science & Technology','Business & Economy',
+        'Sports','Entertainment','Other'
+      ],
+      'Other':['Other']
     };
+
+    const GUIDED_AI_CATEGORIES = Object.keys(GUIDED_AI_TOPICS);
+
+    function populateGuidedCategories(){
+      const sel=$('ai-guided-category');
+      if(!sel) return;
+      sel.innerHTML=GUIDED_AI_CATEGORIES.map(v=>'<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>').join('');
+      sel.value='General Knowledge';
+      populateGuidedTopics();
+    }
+
+    function populateGuidedTopics(){
+      const category=$('ai-guided-category')?.value || 'General Knowledge';
+      const topics=GUIDED_AI_TOPICS[category] || ['Other'];
+      const sel=$('ai-guided-topic');
+      if(sel){
+        const previous=sel.value;
+        sel.innerHTML=topics.map(v=>'<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>').join('');
+        sel.value=topics.includes(previous)?previous:topics[0];
+      }
+      updateGuidedOtherFields();
+      updateGuidedScopePreview();
+    }
+
+    function updateGuidedOtherFields(){
+      const category=$('ai-guided-category')?.value || '';
+      const topic=$('ai-guided-topic')?.value || '';
+      const catWrap=$('ai-guided-category-other-wrap');
+      const topicWrap=$('ai-guided-topic-other-wrap');
+      if(catWrap) catWrap.style.display=category==='Other'?'':'none';
+      if(topicWrap) topicWrap.style.display=topic==='Other'?'':'none';
+    }
+
+    function guidedScopeFromUI(){
+      const selectedCategory=$('ai-guided-category')?.value || '';
+      const selectedTopic=$('ai-guided-topic')?.value || '';
+      const customCategory=$('ai-guided-category-other')?.value.trim() || '';
+      const customTopic=$('ai-guided-topic-other')?.value.trim() || '';
+
+      const category=selectedCategory==='Other' ? customCategory : selectedCategory;
+      const topic=selectedTopic==='Other' ? customTopic : selectedTopic;
+
+      return {
+        mode:'guided_ai',
+        category:String(category||'').trim(),
+        topic:String(topic||'').trim(),
+        region:String($('ai-guided-region')?.value||'').trim(),
+        timePeriod:String($('ai-guided-time')?.value||'').trim(),
+        focus:String($('ai-guided-focus')?.value||'').trim(),
+        difficulty:String($('ai-difficulty')?.value||'Medium').trim()
+      };
+    }
+
+    function guidedScopeLabel(scope){
+      const parts=[
+        scope.category,
+        scope.topic,
+        scope.region ? 'Region: '+scope.region : '',
+        scope.timePeriod ? 'Period: '+scope.timePeriod : '',
+        scope.focus ? 'Focus: '+scope.focus : '',
+        scope.difficulty ? 'Difficulty: '+scope.difficulty : ''
+      ].filter(Boolean);
+      return parts.join(' · ');
+    }
+
+    function updateGuidedScopePreview(){
+      const el=$('ai-guided-preview');
+      if(!el) return;
+      const s=guidedScopeFromUI();
+      const category=s.category || 'Choose a category';
+      const topic=s.topic || 'Choose or enter a topic';
+      el.innerHTML='<strong>Scope:</strong> '+escapeHtml(
+        [category,topic,s.region,s.timePeriod,s.focus].filter(Boolean).join(' · ')
+      );
+    }
+
+    function buildGuidedAITopic(scope){
+      const title = scope.category==='General Knowledge'
+        ? 'General Knowledge — '+scope.topic
+        : scope.topic+' — '+scope.category;
+
+      return [
+        title,
+        scope.region ? 'Region: '+scope.region : '',
+        scope.timePeriod ? 'Time period: '+scope.timePeriod : '',
+        scope.focus ? 'Specific focus: '+scope.focus : ''
+      ].filter(Boolean).join(' | ');
+    }
+
+    function updateAIDifficultyHint(){
+      const hint=$('ai-difficulty-hint');
+      if(!hint) return;
+      const diff=$('ai-difficulty')?.value || 'Medium';
+      if(aiSourceMode==='school'){
+        hint.textContent = diff==='Easy'
+          ? 'Straightforward year-level knowledge and one-step application.'
+          : diff==='Hard'
+          ? 'Exam-style multi-step reasoning without exceeding the selected year level.'
+          : 'Balanced year-level knowledge and one- or two-step reasoning.';
+      }else if(aiSourceMode==='document' || aiSourceMode==='link'){
+        hint.textContent = diff==='Easy'
+          ? 'Direct recall and straightforward understanding from the selected source.'
+          : diff==='Hard'
+          ? 'Deeper reasoning and relationships, but only where the selected source supports them.'
+          : 'A balanced mix of direct knowledge and source-supported reasoning.';
+      }else{
+        hint.textContent = diff==='Easy'
+          ? 'Straightforward, widely established facts with clear answers.'
+          : diff==='Hard'
+          ? 'More challenging relationships and reasoning while keeping answers unambiguous.'
+          : 'Medium balances direct knowledge with one- or two-step reasoning.';
+      }
+      updateGuidedScopePreview();
+    }
+
+    populateGuidedCategories();
+    $('ai-guided-category').onchange=populateGuidedTopics;
+    $('ai-guided-topic').onchange=()=>{updateGuidedOtherFields();updateGuidedScopePreview();};
+    [
+      'ai-guided-category-other','ai-guided-topic-other','ai-guided-region',
+      'ai-guided-time','ai-guided-focus'
+    ].forEach(id=>{
+      const el=$(id);
+      if(el) el.addEventListener('input',updateGuidedScopePreview);
+    });
+    $('ai-difficulty').onchange=updateAIDifficultyHint;
 
     function updateAIQuestionTypeUI(){
       const type = $('ai-question-type').value || 'multiple_choice';
@@ -6593,6 +6878,8 @@ authPromise.then(() => {
       let sourceType = aiSourceMode;
       let sourceName = '';
       let sourceUrls = [];
+      let structuredScope = {};
+      const selectedDifficulty = $('ai-difficulty') ? $('ai-difficulty').value : 'Medium';
 
       if(aiSourceMode==='document'){
         if(!aiDocumentState.text){
@@ -6604,6 +6891,11 @@ authPromise.then(() => {
         topic = focus || ('Create a quiz from '+aiDocumentState.name);
         sourceText = aiDocumentState.text;
         sourceName = aiDocumentState.name;
+        structuredScope = {
+          mode:'document',
+          topic:focus || aiDocumentState.name,
+          difficulty:selectedDifficulty
+        };
       }else if(aiSourceMode==='link'){
         if(!aiLinkState.text){
           $('ai-msg').style.color='var(--wrong)';
@@ -6616,22 +6908,38 @@ authPromise.then(() => {
         sourceName = aiLinkState.title || aiLinkState.domain || 'Source link';
         sourceUrls = [aiLinkState.url];
         sourceType = 'link';
+        structuredScope = {
+          mode:'link',
+          topic:focus || aiLinkState.title || aiLinkState.domain || 'Source link',
+          difficulty:selectedDifficulty
+        };
+      }else if(aiSourceMode==='school'){
+        const grade = $('ai-grade').value;
+        const subject = $('ai-subject').value;
+        topic = buildSchoolExamTopic(grade, subject, selectedDifficulty);
+        sourceType = 'school';
+        sourceName = `${grade} ${subject} — curriculum-guided review`;
+        structuredScope = {
+          mode:'school',
+          year:grade,
+          subject,
+          difficulty:selectedDifficulty
+        };
       }else{
-        if(isSchoolMode){
-          const grade = $('ai-grade').value;
-          const subject = $('ai-subject').value;
-          const diff = $('ai-diff').value;
-          topic = buildSchoolExamTopic(grade, subject, diff);
-          sourceType = 'school';
-          sourceName = `${grade} ${subject} — curriculum-guided review`;
-        }else{
-          topic = $('ai-topic').value.trim();
-          if(!topic){
-            $('ai-msg').style.color='var(--wrong)';
-            $('ai-msg').textContent = 'Describe a topic for the questions.';
-            return;
-          }
+        structuredScope = guidedScopeFromUI();
+        if(!structuredScope.category){
+          $('ai-msg').style.color='var(--wrong)';
+          $('ai-msg').textContent = 'Choose a category or enter your custom category.';
+          return;
         }
+        if(!structuredScope.topic){
+          $('ai-msg').style.color='var(--wrong)';
+          $('ai-msg').textContent = 'Choose a topic or enter your custom topic.';
+          return;
+        }
+        topic = buildGuidedAITopic(structuredScope);
+        sourceType = 'ai';
+        sourceName = 'QZMAX Guided AI + Search';
       }
 
       const generationId = newGenerationId();
@@ -6665,15 +6973,13 @@ authPromise.then(() => {
       msg.style.color = 'var(--muted)';
 
       try{
-        if(aiSourceMode==='trusted' && !isSchoolMode){
-          // QZMAX 3.12 — Custom Topic is AI-first.
-          // Search-capable providers do their own grounding when selected.
+        if(aiSourceMode==='trusted'){
           sourceText = '';
           sourceUrls = [];
           sourceType = 'ai';
-          sourceName = 'QZMAX Free Multi-AI Router';
-          setAIProgress(8, 'Routing your exact topic through search-capable and free AI providers…');
-        }else if(isSchoolMode){
+          sourceName = 'QZMAX Guided AI + Search';
+          setAIProgress(8, 'Locking the guided scope into search and blind verification…');
+        }else if(aiSourceMode==='school'){
           sourceText = '';
           sourceUrls = [];
           sourceType = 'school';
@@ -6699,6 +7005,8 @@ authPromise.then(() => {
           questionLanguage,
           timePerQuestion,
           pointsPerQuestion,
+          difficulty:selectedDifficulty,
+          structuredScope,
           generationId,
           existingQuestions:S.questionsDraft,
           onProgress:(done,total,label)=>{
@@ -7074,6 +7382,23 @@ authPromise.then(() => {
     return ['True','False'];
   }
 
+
+  function aiDifficultyInstruction(difficulty='Medium',sourceType='ai'){
+    if(difficulty==='Easy'){
+      return sourceType==='document' || sourceType==='link'
+        ? 'DIFFICULTY REQUIREMENT: EASY. Prefer direct recall, recognition and straightforward understanding explicitly supported by the selected source.'
+        : 'DIFFICULTY REQUIREMENT: EASY. Prefer straightforward, widely established facts and simple one-step reasoning with clear answers.';
+    }
+    if(difficulty==='Hard'){
+      return sourceType==='document' || sourceType==='link'
+        ? 'DIFFICULTY REQUIREMENT: HARD / CHALLENGING. Use deeper relationships, comparison, cause/effect or multi-step reasoning only where the selected source explicitly supports the answer. Do not introduce outside facts.'
+        : 'DIFFICULTY REQUIREMENT: HARD / CHALLENGING. Prefer less obvious but well-established facts, relationships and multi-step reasoning. Answers must remain unambiguous and verifiable.';
+    }
+    return sourceType==='document' || sourceType==='link'
+      ? 'DIFFICULTY REQUIREMENT: MEDIUM. Use a balanced mix of direct source knowledge and one- or two-step reasoning supported by the selected source.'
+      : 'DIFFICULTY REQUIREMENT: MEDIUM. Use a balanced mix of established knowledge and one- or two-step reasoning.';
+  }
+
   function aiFormatInstruction(questionType, optsPerQ, questionLanguage='English'){
     if(questionType==='true_false'){
       const labels = aiTrueFalseLabels(questionLanguage);
@@ -7136,16 +7461,29 @@ authPromise.then(() => {
     return 'Medium';
   }
 
-  function buildGenerationScope(topic,count,attempt=0){
+  function buildGenerationScope(topic,count,attempt=0,structuredScope={}){
+    const structuredParts = [
+      structuredScope.category ? 'Category: '+structuredScope.category : '',
+      structuredScope.topic ? 'Topic: '+structuredScope.topic : '',
+      structuredScope.region ? 'Country / Region: '+structuredScope.region : '',
+      structuredScope.timePeriod ? 'Time period: '+structuredScope.timePeriod : '',
+      structuredScope.focus ? 'Specific focus: '+structuredScope.focus : '',
+      structuredScope.year ? 'Year level: '+structuredScope.year : '',
+      structuredScope.subject ? 'Subject: '+structuredScope.subject : '',
+      structuredScope.difficulty ? 'Difficulty: '+structuredScope.difficulty : ''
+    ].filter(Boolean);
+
     if(!isGeneralKnowledgeTopic(topic)){
       return {
         generalKnowledge:false,
         coverageCategories:[],
         instruction:[
           'HOST SCOPE CONTRACT: '+String(topic||'').trim(),
+          structuredParts.length ? 'STRUCTURED HOST SCOPE: '+structuredParts.join(' | ') : '',
           'Generate only questions that directly belong to this host-requested scope.',
-          'Do not import themes, entities, examples, or subject matter from any previous quiz generation.'
-        ].join(' ')
+          'Treat every populated structured field as a required scope constraint, not a suggestion.',
+          'Do not import themes, entities, examples, places, eras, or subject matter from any previous quiz generation.'
+        ].filter(Boolean).join(' ')
       };
     }
 
@@ -7161,7 +7499,12 @@ authPromise.then(() => {
       instruction:[
         'GENERAL KNOWLEDGE COVERAGE CONTRACT.',
         'Difficulty: '+difficulty+'.',
-        'Use a broad worldwide mix rather than concentrating on one country, celebrity, film, music scene, franchise, era, or industry.',
+        structuredParts.length ? 'STRUCTURED HOST SCOPE: '+structuredParts.join(' | ') : '',
+        structuredScope.region
+          ? 'Keep every question within the requested country / region: '+structuredScope.region+'.'
+          : 'Use a broad worldwide mix rather than concentrating on one country, celebrity, film, music scene, franchise, era, or industry.',
+        structuredScope.timePeriod ? 'Keep every question within this time period: '+structuredScope.timePeriod+'.' : '',
+        structuredScope.focus ? 'Apply this specific focus: '+structuredScope.focus+'.' : '',
         'For this batch use these categories: '+selected.join(' | ')+'.',
         'Include a JSON field named category on every question, using exactly one of those category labels.',
         'Use every listed category once before repeating any category.',
@@ -7633,7 +7976,11 @@ authPromise.then(() => {
     const formatInstruction = aiFormatInstruction(requestedType, optsPerQ, questionLanguage);
     const existing = Array.isArray(context.existingQuestions) ? context.existingQuestions : [];
     const generationAttempt = Math.max(0,Number(context.generationAttempt)||0);
-    const generationScope = buildGenerationScope(topic,count,generationAttempt);
+    const structuredScope = context.structuredScope && typeof context.structuredScope==='object'
+      ? context.structuredScope
+      : {};
+    const difficulty = context.difficulty || structuredScope.difficulty || 'Medium';
+    const generationScope = buildGenerationScope(topic,count,generationAttempt,structuredScope);
     const avoidFactKeys = sameTopicFactKeys(existing,topic);
     const sourceExcerpt = context.sourceExcerpt || '';
     const languageInstruction = questionLanguage === 'Egyptian Simple Arabic'
@@ -7724,6 +8071,7 @@ authPromise.then(() => {
     const enhancedTopic = [
       'CURRENT HOST TOPIC / INSTRUCTIONS: '+topic,
       generationScope.instruction,
+      aiDifficultyInstruction(difficulty,context.sourceType||'ai'),
       languageInstruction,
       formatInstruction,
       sourceRule,
@@ -7754,7 +8102,10 @@ authPromise.then(() => {
           preferSearch:context.sourceType==='ai',
           questionLanguage,
           generationId:context.generationId||'',
+          generationAttempt,
           scopeInstruction:generationScope.instruction,
+          structuredScope,
+          difficulty,
           generalKnowledge:generationScope.generalKnowledge,
           coverageCategories:generationScope.coverageCategories,
           avoidFactKeys
@@ -7768,8 +8119,19 @@ authPromise.then(() => {
     const routedModel = res.headers.get('X-QZMAX-AI-Model') || '';
     const routedVerification = res.headers.get('X-QZMAX-AI-Verification') || '';
     let items;
-    try{ items = await res.json(); }catch(e){ throw new Error('Could not read the AI server response.'); }
-    if(!res.ok) throw new Error(items.error || 'Server error generating questions.');
+    let responseText = '';
+    try{
+      responseText = await res.text();
+      items = responseText ? JSON.parse(responseText) : null;
+    }catch(e){
+      const gatewayLike = [502,503,504].includes(res.status) ||
+        /timeout|timed out|gateway|function invocation|internal server/i.test(responseText);
+      if(gatewayLike){
+        throw new Error('QZMAX verification request timed out before the server could return a complete result. QZMAX will retry in a smaller verified pass.');
+      }
+      throw new Error('The QZMAX AI server returned an unreadable response. Please try again.');
+    }
+    if(!res.ok) throw new Error((items && items.error) || 'Server error generating questions.');
     if(!Array.isArray(items) || !items.length) throw new Error('No usable questions returned.');
 
     const questions = [];
@@ -7825,7 +8187,8 @@ authPromise.then(() => {
 
   async function generateVerifiedQuestionBatches({
     topic,requestedCount,optsPerQ,questionType,sourceText,sourceType,sourceName,sourceUrls,
-    questionLanguage='English',timePerQuestion=DEFAULT_QUESTION_TIME,pointsPerQuestion=DEFAULT_QUESTION_POINTS,generationId='',existingQuestions,onProgress
+    questionLanguage='English',timePerQuestion=DEFAULT_QUESTION_TIME,pointsPerQuestion=DEFAULT_QUESTION_POINTS,
+    difficulty='Medium',structuredScope={},generationId='',existingQuestions,onProgress
   }){
     const target = Math.max(1,Math.min(100,requestedCount||10));
 
@@ -7856,6 +8219,8 @@ authPromise.then(() => {
           questionLanguage,
           timePerQuestion,
           pointsPerQuestion,
+          difficulty,
+          structuredScope,
           generationId,
           existingQuestions:(Array.isArray(existingQuestions)?existingQuestions:[]).concat(mixed),
           onProgress:(subDone,subTarget)=>{
@@ -7880,10 +8245,18 @@ authPromise.then(() => {
     }
     const accepted = [];
     const known = Array.isArray(existingQuestions) ? existingQuestions.slice() : [];
-    const internalBatchSize = sourceType==='link' ? 5 : 10;
-    const maxAttempts = sourceType==='link'
-      ? Math.ceil(target/internalBatchSize) + 10
-      : Math.ceil(target/10) + 8;
+    // Preserve the host's requested total, but split expensive web-verified
+    // work into small serverless passes so one invocation cannot become overloaded.
+    const internalBatchSize =
+      sourceType==='link' ? 5 :
+      sourceType==='ai' ? 2 :
+      10;
+    const maxAttempts =
+      sourceType==='link'
+        ? Math.ceil(target/internalBatchSize) + 10
+        : sourceType==='ai'
+        ? Math.ceil(target/internalBatchSize) + 8
+        : Math.ceil(target/10) + 8;
     let attempts = 0;
 
     while(accepted.length < target && attempts < maxAttempts){
@@ -7897,6 +8270,8 @@ authPromise.then(() => {
         target,
         sourceType==='link'
           ? 'Reading another relevant section of the source — building '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
+          : sourceType==='ai'
+          ? 'Generating and independently verifying '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
           : 'Generating '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
       );
 
@@ -7910,6 +8285,8 @@ authPromise.then(() => {
           questionLanguage,
           timePerQuestion,
           pointsPerQuestion,
+          difficulty,
+          structuredScope,
           generationId,
           generationAttempt:attempts,
           existingQuestions:known.concat(accepted)
