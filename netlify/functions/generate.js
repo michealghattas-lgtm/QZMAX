@@ -1,6 +1,6 @@
 'use strict';
 
-// QZMAX 3.15.0 — Guided AI Generator
+// QZMAX 3.17.0 — Unified Content Engine
 //
 // No paid OpenAI, Claude or xAI API is used.
 // The router keeps the requested batch size and switches providers on rate limit.
@@ -15,7 +15,7 @@
 const MAX_BATCH = 10;
 const MAX_OPTIONS = 8;
 const MAX_PROMPT_CHARS = 60000;
-const GLOBAL_BUDGET_MS = 23000;
+const GLOBAL_BUDGET_MS = 20000;
 
 const MODELS = {
   geminiSearch: process.env.GEMINI_SEARCH_MODEL || 'gemini-2.5-flash',
@@ -1317,10 +1317,14 @@ async function verifyCandidatesWithIndependentModel(candidates, broadEvidence, r
   ].filter(Boolean).join('\n\n');
 
   const user = verifierEvidenceText(targetedRecords);
+  let verifierRoutesTried = 0;
 
   for (const route of verificationRoutes) {
     if (Date.now() >= deadline - 1800) break;
     if (routeOnCooldown(route)) continue;
+    if (verifierRoutesTried >= 2) break;
+
+    verifierRoutesTried++;
 
     try {
       const rawAudits = await runProvider(
@@ -1589,11 +1593,12 @@ exports.handler = async function handler(event) {
   // Lightweight status endpoint — does not spend AI quota.
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      version:'3.15.0',
+      version:'3.17.0',
       freeOnly:true,
       factualRetrieval:'Tavily search + Tavily Extract for host-selected Source Links',
       sourceLinkExtraction:'Tavily Extract · exact selected page only',
       factualVerification:'Topic-scope audit + question-specific Tavily + blind two-source answer audit + canonical factKey',
+      verifiedPassArchitecture:'Up to 5 Guided AI questions per pass · max 2 generator routes + max 2 blind-verifier routes per invocation',
       configured:configuredRoutes(),
       customTopicOrder:CUSTOM_DEFAULT_ORDER,
       strictOrder:STRICT_DEFAULT_ORDER,
@@ -1697,6 +1702,7 @@ exports.handler = async function handler(event) {
   const order = parseProviderOrder(request);
   const errors = [];
   let bestLinkPartial = null;
+  let customGeneratorRoutesTried = 0;
 
   for (const route of order) {
     if (route !== 'local' && routeOnCooldown(route)) {
@@ -1707,6 +1713,14 @@ exports.handler = async function handler(event) {
     if (Date.now() >= deadline && route !== 'local') {
       errors.push(`${route}: skipped because the Netlify function time budget was exhausted`);
       continue;
+    }
+
+    if (customWebVerified && route !== 'local') {
+      if (customGeneratorRoutesTried >= 2) {
+        errors.push(`${route}: deferred to a later verified pass`);
+        continue;
+      }
+      customGeneratorRoutesTried++;
     }
 
     try {
