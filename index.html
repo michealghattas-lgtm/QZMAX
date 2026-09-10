@@ -4450,6 +4450,22 @@ html[data-theme="light"] .q-verify-badge.studybible{
   border-color:rgba(36,102,171,.19)!important;
 }
 
+
+/* =========================================================
+   QZMAX 3.18.0 — Separate AI Generator + QZMAX Library
+   ========================================================= */
+.ai-source-tabs{grid-template-columns:repeat(7,minmax(0,1fr))!important;}
+.ai-engine-route-note{margin-top:9px;padding:9px 11px;border-radius:11px;border:1px solid rgba(95,190,255,.13);background:rgba(52,139,210,.055);display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;font-size:9.5px;color:#9cb2ca;}
+.ai-engine-route-note span{font-size:8px;font-weight:900;letter-spacing:.12em;color:#63d4ff;}.ai-engine-route-note strong{font-size:10px;color:#c8d9ec;}.ai-engine-route-note small{grid-column:1/-1;color:#788da7;font-size:9px;line-height:1.4;}
+.qz-library-notice{background:rgba(229,166,66,.07);border:1px solid rgba(229,166,66,.16);}.qz-library-notice strong{color:#f0c779;}
+.qz-library-panel{margin-top:12px;padding:14px;border-radius:16px;border:1px solid rgba(229,166,66,.14);background:linear-gradient(145deg,rgba(40,29,13,.34),rgba(12,19,38,.52));}
+.qz-library-primary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}.qz-library-filter-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px;}.qz-library-add-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px;}
+.qz-library-coverage{margin-top:11px;min-height:40px;display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:12px;border:1px solid rgba(229,166,66,.16);background:rgba(229,166,66,.055);color:#c7b28b;font-size:10px;line-height:1.45;}.qz-library-coverage.ready{color:#e9ca8d;}.qz-library-coverage.empty{color:#c5a5a5;}.qz-library-coverage strong{color:inherit;}
+.qz-library-trust{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;color:#8b99ad;font-size:9px;}.qz-library-trust span{display:flex;align-items:center;gap:5px;}
+html[data-theme="light"] .ai-engine-route-note{background:rgba(34,137,195,.055);border-color:rgba(34,137,195,.16);color:#49677e;}html[data-theme="light"] .ai-engine-route-note strong{color:#234f6c;}html[data-theme="light"] .ai-engine-route-note small{color:#5d7487;}
+html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!important;border-color:rgba(173,116,24,.17)!important;}html[data-theme="light"] .qz-library-notice strong{color:#81570c!important;}html[data-theme="light"] .qz-library-panel{background:linear-gradient(145deg,rgba(248,239,219,.78),rgba(222,234,247,.86));border-color:rgba(157,108,24,.16);}html[data-theme="light"] .qz-library-coverage{color:#6f5729;background:rgba(204,142,39,.065);border-color:rgba(161,108,21,.17);}html[data-theme="light"] .qz-library-coverage.ready{color:#6a4a0b;}html[data-theme="light"] .qz-library-coverage.empty{color:#835252;}
+@media(max-width:1350px){.ai-source-tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important;}}@media(max-width:1000px){.qz-library-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}@media(max-width:760px){.ai-source-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.qz-library-primary-grid,.qz-library-filter-grid,.qz-library-add-grid{grid-template-columns:1fr;}}@media(max-width:480px){.ai-source-tabs{grid-template-columns:1fr!important;}}
+
 </style>
 </head>
 <body>
@@ -4474,7 +4490,7 @@ html[data-theme="light"] .q-verify-badge.studybible{
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.17.0";
+  const APP_VERSION = "3.18.0";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -6254,11 +6270,12 @@ authPromise.then(() => {
       // QZMAX 3.8 Verified AI + Document Quiz Engine
       '<div class="card host-studio-only verified-ai-card" id="host-ai-generator-card" style="margin-bottom:16px;">'+
         '<div class="verified-ai-head">'+
-          '<div><div class="eyebrow">QZMAX CREATE</div><h3>How do you want to create?</h3><p>Use verified knowledge, instant puzzles, school practice, your own source — or create manually.</p></div>'+
+          '<div><div class="eyebrow">QZMAX CREATE</div><h3>How do you want to create?</h3><p>Create with AI, choose from the QZMAX Library, use instant puzzles, school practice, your own source — or create manually.</p></div>'+
           '<span class="verified-engine-badge">BETA</span>'+
         '</div>'+
         '<div class="ai-source-tabs" role="tablist" aria-label="Quiz creation source">'+
-          '<button type="button" class="ai-source-tab active" id="ai-source-trusted">✦ Guided AI + Search</button>'+
+          '<button type="button" class="ai-source-tab active" id="ai-source-ai">✦ AI Generator</button>'+
+          '<button type="button" class="ai-source-tab" id="ai-source-library">📚 QZMAX Library</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-puzzle">🧩 Puzzle Mode</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-school">🎓 School / Education</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-document">▣ My Document</button>'+
@@ -6266,10 +6283,10 @@ authPromise.then(() => {
           '<button type="button" class="ai-source-tab" id="ai-source-manual">✎ Manual</button>'+
         '</div>'+
 
-        '<div id="ai-source-panel-trusted" class="ai-source-panel">'+
-          '<div class="ai-source-notice trusted ai-first-notice"><strong>Verified first • Knowledge Bank next • AI only for gaps</strong><span>QZMAX checks reviewed Verified records first, then matching Knowledge/Study Bible packs. Only uncovered questions go through fresh search and blind two-source verification.</span></div>'+
+        '<div id="ai-source-panel-ai" class="ai-source-panel">'+
+          '<div class="ai-source-notice trusted ai-first-notice"><strong>Research first • One generator • Independent QA</strong><span>AI Generator is completely separate from the QZMAX Library. For factual topics QZMAX gathers fresh evidence, uses one free AI model to draft the batch, then a different free model reviews it. Providers are fallbacks, not extra generation stages.</span></div>'+
           '<div class="guided-ai-panel">'+
-            '<div class="eyebrow guided-ai-kicker">GUIDED AI GENERATOR</div>'+
+            '<div class="eyebrow guided-ai-kicker">AI GENERATOR</div>'+
             '<div class="guided-ai-grid">'+
               '<div class="qform-row"><label>Category</label><select id="ai-guided-category"></select></div>'+
               '<div class="qform-row"><label>Topic</label><select id="ai-guided-topic"></select></div>'+
@@ -6287,10 +6304,36 @@ authPromise.then(() => {
               '</div>'+
             '</details>'+
             '<div class="guided-scope-preview" id="ai-guided-preview"></div>'+
-            '<div class="verified-kb-coverage" id="qz-verified-kb-coverage"><span class="verified-kb-icon">✓</span><span>Checking QZMAX Verified Knowledge…</span></div>'+
+            '<div class="ai-engine-route-note"><span>FREE-AI ROUTE</span><strong>Gemini → Groq → Cloudflare → Mistral → reserve providers</strong><small>Only failures move to the next provider. QZMAX Library content is never mixed into an AI request.</small></div>'+
           '</div>'+
         '</div>'+
 
+        '<div id="ai-source-panel-library" class="ai-source-panel" style="display:none;">'+
+          '<div class="ai-source-notice qz-library-notice"><strong>Stored questions only • No AI • No web search</strong><span>Every dropdown is built from questions that actually exist in QZMAX Verified, QZMAX Knowledge and Study Bible content. Selecting a field automatically removes combinations that have no stored questions.</span></div>'+
+          '<div class="qz-library-panel">'+
+            '<div class="eyebrow guided-ai-kicker">QZMAX LIBRARY</div>'+
+            '<div class="qz-library-primary-grid">'+
+              '<div class="qform-row"><label>Category</label><select id="qz-library-category" disabled><option>Loading…</option></select></div>'+
+              '<div class="qform-row"><label>Topic</label><select id="qz-library-topic" disabled><option>Loading…</option></select></div>'+
+            '</div>'+
+            '<div class="qz-library-filter-grid">'+
+              '<div class="qform-row"><label>Language</label><select id="qz-library-language" disabled></select></div>'+
+              '<div class="qform-row"><label>Difficulty</label><select id="qz-library-difficulty" disabled></select></div>'+
+              '<div class="qform-row"><label>Country / Region</label><select id="qz-library-region" disabled></select></div>'+
+              '<div class="qform-row"><label>Time period</label><select id="qz-library-period" disabled></select></div>'+
+              '<div class="qform-row"><label>Question format</label><select id="qz-library-format" disabled></select></div>'+
+            '</div>'+
+            '<div class="qz-library-coverage" id="qz-library-coverage"><span class="verified-kb-icon">📚</span><span>Loading QZMAX Library…</span></div>'+
+            '<div class="qz-library-add-grid">'+
+              '<div class="qform-row"><label>Questions to add</label><input type="number" id="qz-library-count" value="10" min="1" max="10" inputmode="numeric"></div>'+
+              '<div class="qform-row"><label>Time each</label><input type="number" id="qz-library-time" value="20" min="3" max="600" step="1" inputmode="numeric"></div>'+
+              '<div class="qform-row"><label>Points each</label><input type="number" id="qz-library-points" value="100" min="0" max="100000" step="10" inputmode="numeric"></div>'+
+            '</div>'+
+            '<button class="btn btn-primary btn-block ai-generate-hero" id="qz-library-add" disabled>Add from QZMAX Library</button>'+
+            '<div class="err-msg" id="qz-library-msg"></div>'+
+            '<div class="qz-library-trust"><span><b class="verify-dot qzmax"></b> QZMAX Verified</span><span><b class="verify-dot knowledge"></b> QZMAX Knowledge</span><span><b class="verify-dot studybible"></b> Study Bible Grounded</span></div>'+
+          '</div>'+
+        '</div>'+
 
         '<div id="ai-source-panel-puzzle" class="ai-source-panel" style="display:none;">'+
           '<div class="ai-source-notice puzzle-mode-notice"><strong>Instant curated puzzles • No AI wait</strong><span>Choose a puzzle family and QZMAX pulls unused Ready puzzles directly from the Puzzle Bank. No AI provider or web search is called.</span></div>'+
@@ -6368,11 +6411,11 @@ authPromise.then(() => {
             '<div class="qform-row ai-metric-card ai-metric-points"><label>Points each</label><input type="number" id="ai-points-per-q" value="100" min="0" max="100000" step="10" inputmode="numeric"><div class="qtype-hint">Applied to every generated question.</div></div>'+
           '</div>'+
           '<div class="ai-format-note" id="ai-format-note"><strong>Multiple Choice:</strong> one correct answer per question.</div>'+
-          '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate with Free Multi-AI</button>'+
+          '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate with AI</button>'+
           '<div class="ai-progress-shell" id="ai-progress-shell" style="display:none;"><div class="ai-progress-bar"><span id="ai-progress-fill"></span></div><div class="ai-progress-label" id="ai-progress-label">Preparing…</div></div>'+
           '<div class="err-msg" id="ai-msg"></div>'+
-          '<div class="verification-legend"><span><b class="verify-dot qzmax"></b> QZMAX Verified</span><span><b class="verify-dot knowledge"></b> QZMAX Knowledge</span><span><b class="verify-dot studybible"></b> Study Bible Grounded</span><span><b class="verify-dot puzzle"></b> QZMAX Puzzle</span><span><b class="verify-dot source"></b> 2-Source Checked</span><span><b class="verify-dot link"></b> Link Grounded</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
-          '<div class="accuracy-note" id="ai-accuracy-note"><strong>Accuracy safeguard:</strong> Guided AI questions are checked with a fresh question-specific web search. The verifier is not shown QZMAX\'s proposed answer and must independently reach the same answer using exact evidence from at least two different source domains.</div>'+
+          '<div class="verification-legend"><span><b class="verify-dot qzmax"></b> QZMAX Verified</span><span><b class="verify-dot knowledge"></b> QZMAX Knowledge</span><span><b class="verify-dot studybible"></b> Study Bible Grounded</span><span><b class="verify-dot puzzle"></b> QZMAX Puzzle</span><span><b class="verify-dot source"></b> AI Grounded + Reviewed</span><span><b class="verify-dot link"></b> Link Grounded</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
+          '<div class="accuracy-note" id="ai-accuracy-note"><strong>AI accuracy safeguard:</strong> For factual AI topics, QZMAX gathers fresh web evidence, drafts with one free AI provider, then sends the batch and evidence to a different free AI provider for independent QA. Unsupported or ambiguous questions are excluded rather than filled from the QZMAX Library.</div>'+
         '</div>'+
       '</div>'+
 
@@ -6580,23 +6623,23 @@ authPromise.then(() => {
       setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
     };
 
-    // QZMAX 3.15 — guided AI + school + source-grounded generation
+    // QZMAX 3.18 — separate AI Generator and QZMAX Library
     let isSchoolMode = false;
-    let aiSourceMode = 'trusted';
+    let aiSourceMode = 'ai';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
     let aiLinkState = { url:'', title:'', domain:'', text:'', chars:0, words:0, truncated:false, extractDepth:'basic' };
 
     function setAISourceMode(mode){
-      aiSourceMode = ['trusted','puzzle','school','document','link','manual'].includes(mode) ? mode : 'trusted';
+      aiSourceMode = ['ai','library','puzzle','school','document','link','manual'].includes(mode) ? mode : 'ai';
       isSchoolMode = aiSourceMode === 'school';
-      ['trusted','puzzle','school','document','link','manual'].forEach(m=>{
+      ['ai','library','puzzle','school','document','link','manual'].forEach(m=>{
         const tab = $('ai-source-'+m);
         const panel = $('ai-source-panel-'+m);
         if(tab) tab.classList.toggle('active', m===aiSourceMode);
         if(panel) panel.style.display = m===aiSourceMode ? '' : 'none';
       });
       const controls = $('ai-generation-controls');
-      if(controls) controls.style.display = aiSourceMode==='manual' ? 'none' : '';
+      if(controls) controls.style.display = (aiSourceMode==='manual' || aiSourceMode==='library') ? 'none' : '';
       if($('ai-msg')) $('ai-msg').textContent = '';
 
       const puzzleMode = aiSourceMode==='puzzle';
@@ -6619,6 +6662,7 @@ authPromise.then(() => {
         updateAIQuestionTypeUI();
         schedulePuzzleCoverage();
       }
+      if(aiSourceMode==='library') ensureQZMAXLibraryReady();
 
       updateAIGenerateButton();
       updateAIDifficultyHint();
@@ -6631,7 +6675,7 @@ authPromise.then(() => {
       else if(aiSourceMode==='link') btn.textContent = 'Generate from Source Link';
       else if(aiSourceMode==='puzzle') btn.textContent = 'Add Puzzles Instantly';
       else if(aiSourceMode==='school') btn.textContent = 'Generate Year-Level Exam Questions';
-      else btn.textContent = 'Generate Guided Questions';
+      else btn.textContent = 'Generate with AI';
 
       const note = $('ai-accuracy-note');
       if(note){
@@ -6644,12 +6688,13 @@ authPromise.then(() => {
         }else if(aiSourceMode==='school'){
           note.innerHTML = '<strong>Curriculum-guided review:</strong> QZMAX follows the selected year, subject and difficulty guidance. Host review remains important because this mode is not an official curriculum certification.';
         }else{
-          note.innerHTML = '<strong>Unified content trust:</strong> QZMAX Verified records are reviewed; QZMAX Knowledge records retain their imported review status; Study Bible Grounded records retain source-grounded review status. Only AI-generated gap-fill questions require the fresh blind two-source check.';
+          note.innerHTML = '<strong>AI Generator:</strong> QZMAX Library records are not consulted here. Factual AI requests use fresh search evidence, one generator model and an independent free-model QA pass; unsupported questions are excluded.';
         }
       }
     }
 
-    $('ai-source-trusted').onclick = ()=>setAISourceMode('trusted');
+    $('ai-source-ai').onclick = ()=>setAISourceMode('ai');
+    $('ai-source-library').onclick = ()=>setAISourceMode('library');
     $('ai-source-puzzle').onclick = ()=>setAISourceMode('puzzle');
     $('ai-source-school').onclick = ()=>setAISourceMode('school');
     $('ai-source-document').onclick = ()=>setAISourceMode('document');
@@ -7578,6 +7623,267 @@ authPromise.then(() => {
       return out;
     }
 
+
+    // =========================================================
+    // QZMAX 3.18 — QZMAX Library: database-driven cascading UI
+    // =========================================================
+    let qzLibraryEntries=null;
+    let qzLibraryPromise=null;
+    let qzLibraryMatches=[];
+
+    function qzLibraryFormatFromVerified(question){
+      if(question.type==='True / False') return 'True / False';
+      if(question.type==='Select Multiple') return 'Select Multiple';
+      if(question.type==='Typed') return 'Typed Answer';
+      return 'Multiple Choice';
+    }
+
+    function qzLibraryDifficulty(record){
+      return record && record.difficultyUnrated===true
+        ? 'Unrated'
+        : String(record?.difficulty||'Unrated').trim() || 'Unrated';
+    }
+
+    async function loadQZMAXLibraryEntries(){
+      if(qzLibraryEntries) return qzLibraryEntries;
+      if(qzLibraryPromise) return qzLibraryPromise;
+
+      qzLibraryPromise=(async()=>{
+        const entries=[];
+        const [verified,manifest]=await Promise.all([
+          loadQZMAXVerifiedKB().catch(()=>null),
+          loadQZMAXKnowledgeManifest().catch(()=>null)
+        ]);
+
+        if(verified && Array.isArray(verified.questions)){
+          for(const question of verified.questions){
+            if(!question || question.status!=='Ready') continue;
+            const fact=verified._factById?.get(question.factId);
+            if(!fact || !verifiedRecordIsFresh(fact)) continue;
+            entries.push({
+              origin:'verified',
+              id:question.id||fact.id,
+              category:String(question.category||fact.category||'Uncategorised'),
+              topic:String(question.topic||fact.topic||'General'),
+              language:String(question.language||'English'),
+              difficulty:String(question.difficulty||fact.difficulty||'Unrated'),
+              region:String(fact.region||'Unspecified'),
+              period:String(fact.timePeriod||'Unspecified'),
+              format:qzLibraryFormatFromVerified(question),
+              trustKind:'qzmax',
+              trustLabel:'QZMAX Verified',
+              question,fact,
+              source:verified._sourceById?.get(fact.sourceId)||null
+            });
+          }
+        }
+
+        if(manifest && Array.isArray(manifest.packs)){
+          const loaded=await Promise.all(manifest.packs.map(async pack=>({
+            pack,
+            data:await loadQZMAXKnowledgePack(pack).catch(()=>null)
+          })));
+          for(const item of loaded){
+            if(!item.data || !Array.isArray(item.data.records)) continue;
+            for(const record of item.data.records){
+              if(!record || record.runtimeEligible!==true) continue;
+              entries.push({
+                origin:'knowledge',
+                id:record.id||record.duplicateKey,
+                category:String(record.category||'Uncategorised'),
+                topic:String(record.topic||'General'),
+                language:String(record.language||item.pack.language||'Unspecified'),
+                difficulty:qzLibraryDifficulty(record),
+                region:String(record.region||record.market||'Unspecified'),
+                period:String(record.yearPeriod||'Unspecified'),
+                format:'Multiple Choice',
+                trustKind:record.trustKind==='studybible'?'studybible':'knowledge',
+                trustLabel:record.trustLabel||item.pack.trustLabel||'QZMAX Knowledge',
+                record
+              });
+            }
+          }
+        }
+
+        qzLibraryEntries=entries;
+        return entries;
+      })().catch(err=>{
+        qzLibraryPromise=null;
+        throw err;
+      });
+      return qzLibraryPromise;
+    }
+
+    function qzLibrarySortedUnique(entries,field){
+      const values=[...new Set((entries||[]).map(x=>String(x?.[field]||'').trim()).filter(Boolean))];
+      return values.sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
+    }
+
+    function qzLibrarySetSelect(id,values,{anyLabel='',preserve=true}={}){
+      const el=$(id);
+      if(!el) return '';
+      const previous=preserve?el.value:'';
+      const options=[];
+      if(anyLabel) options.push({value:'',label:anyLabel});
+      values.forEach(v=>options.push({value:v,label:v}));
+      el.innerHTML=options.map(o=>'<option value="'+escapeHtml(o.value)+'">'+escapeHtml(o.label)+'</option>').join('');
+      const valid=options.some(o=>o.value===previous);
+      el.value=valid?previous:(options[0]?.value||'');
+      el.disabled=options.length<=1 && !values.length;
+      return el.value;
+    }
+
+    function qzLibraryFilter(entries,field,value){
+      if(!value) return entries;
+      return entries.filter(x=>String(x?.[field]||'')===String(value));
+    }
+
+    function refreshQZMAXLibraryFilters(){
+      const entries=Array.isArray(qzLibraryEntries)?qzLibraryEntries:[];
+      if(!entries.length) return;
+
+      let pool=entries;
+      const category=qzLibrarySetSelect('qz-library-category',qzLibrarySortedUnique(pool,'category'));
+      pool=qzLibraryFilter(pool,'category',category);
+
+      const topic=qzLibrarySetSelect('qz-library-topic',qzLibrarySortedUnique(pool,'topic'));
+      pool=qzLibraryFilter(pool,'topic',topic);
+
+      const language=qzLibrarySetSelect('qz-library-language',qzLibrarySortedUnique(pool,'language'),{anyLabel:'Any available language'});
+      pool=qzLibraryFilter(pool,'language',language);
+
+      const difficulty=qzLibrarySetSelect('qz-library-difficulty',qzLibrarySortedUnique(pool,'difficulty'),{anyLabel:'Any available difficulty'});
+      pool=qzLibraryFilter(pool,'difficulty',difficulty);
+
+      const region=qzLibrarySetSelect('qz-library-region',qzLibrarySortedUnique(pool,'region'),{anyLabel:'Any available region'});
+      pool=qzLibraryFilter(pool,'region',region);
+
+      const period=qzLibrarySetSelect('qz-library-period',qzLibrarySortedUnique(pool,'period'),{anyLabel:'Any available period'});
+      pool=qzLibraryFilter(pool,'period',period);
+
+      const format=qzLibrarySetSelect('qz-library-format',qzLibrarySortedUnique(pool,'format'),{anyLabel:'Any available format'});
+      pool=qzLibraryFilter(pool,'format',format);
+
+      qzLibraryMatches=pool;
+      updateQZMAXLibraryCoverage();
+    }
+
+    function updateQZMAXLibraryCoverage(){
+      const el=$('qz-library-coverage');
+      const btn=$('qz-library-add');
+      const countInput=$('qz-library-count');
+      if(!el || !btn || !countInput) return;
+
+      const total=qzLibraryMatches.length;
+      const verified=qzLibraryMatches.filter(x=>x.trustKind==='qzmax').length;
+      const knowledge=qzLibraryMatches.filter(x=>x.trustKind==='knowledge').length;
+      const studyBible=qzLibraryMatches.filter(x=>x.trustKind==='studybible').length;
+      countInput.max=String(Math.max(1,total));
+      const current=Math.max(1,parseInt(countInput.value,10)||10);
+      countInput.value=String(total?Math.min(current,total):1);
+      countInput.disabled=!total;
+      btn.disabled=!total;
+
+      el.className='qz-library-coverage '+(total?'ready':'empty');
+      el.innerHTML='<span class="verified-kb-icon">📚</span><span>'+
+        (total
+          ? '<strong>'+total.toLocaleString()+'</strong> matching stored question'+(total===1?'':'s')+' · '+
+            verified+' Verified · '+knowledge+' Knowledge · '+studyBible+' Study Bible. No AI or search will be called.'
+          : 'No stored questions match this exact combination. Change one of the earlier filters.')+
+        '</span>';
+    }
+
+    async function ensureQZMAXLibraryReady(){
+      const coverage=$('qz-library-coverage');
+      const btn=$('qz-library-add');
+      if(qzLibraryEntries){
+        refreshQZMAXLibraryFilters();
+        return;
+      }
+      if(coverage){
+        coverage.className='qz-library-coverage';
+        coverage.innerHTML='<span class="verified-kb-icon">📚</span><span>Loading QZMAX Verified, Knowledge and Study Bible records…</span>';
+      }
+      if(btn) btn.disabled=true;
+      try{
+        const entries=await loadQZMAXLibraryEntries();
+        if(!entries.length) throw new Error('No runtime-eligible QZMAX Library records were found.');
+        ['qz-library-category','qz-library-topic','qz-library-language','qz-library-difficulty','qz-library-region','qz-library-period','qz-library-format'].forEach(id=>{
+          const el=$(id); if(el) el.disabled=false;
+        });
+        refreshQZMAXLibraryFilters();
+      }catch(err){
+        if(coverage){
+          coverage.className='qz-library-coverage empty';
+          coverage.innerHTML='<span class="verified-kb-icon">!</span><span>'+escapeHtml(err.message||'QZMAX Library could not be loaded.')+'</span>';
+        }
+      }
+    }
+
+    function qzLibraryEntryToQuestion(entry,context){
+      if(entry.origin==='verified'){
+        return verifiedQuestionToQZMAX(entry.question,entry.fact,entry.source,context);
+      }
+      return knowledgeRecordToQZMAX(entry.record,{...context,questionLanguage:entry.language});
+    }
+
+    ['qz-library-category','qz-library-topic','qz-library-language','qz-library-difficulty','qz-library-region','qz-library-period','qz-library-format'].forEach(id=>{
+      const el=$(id);
+      if(el) el.addEventListener('change',refreshQZMAXLibraryFilters);
+    });
+
+    $('qz-library-add').onclick=async()=>{
+      const msg=$('qz-library-msg');
+      const btn=$('qz-library-add');
+      if(!qzLibraryMatches.length){
+        msg.style.color='var(--wrong)';
+        msg.textContent='No stored questions match the selected Library filters.';
+        return;
+      }
+
+      const requested=Math.max(1,Math.min(qzLibraryMatches.length,parseInt($('qz-library-count').value,10)||10));
+      const timePerQuestion=Math.max(3,Math.min(600,parseInt($('qz-library-time').value,10)||DEFAULT_QUESTION_TIME));
+      const pointsPerQuestion=Math.max(0,Math.min(100000,parseInt($('qz-library-points').value,10)||DEFAULT_QUESTION_POINTS));
+      $('qz-library-count').value=String(requested);
+      $('qz-library-time').value=String(timePerQuestion);
+      $('qz-library-points').value=String(pointsPerQuestion);
+      const generationId=newGenerationId();
+      const topic='QZMAX Library — '+($('qz-library-category').value||'')+' — '+($('qz-library-topic').value||'');
+
+      btn.disabled=true;
+      msg.style.color='var(--muted)';
+      msg.textContent='Selecting unused stored questions…';
+      try{
+        const pool=shuffleVerifiedCopy(qzLibraryMatches);
+        const added=[];
+        for(const entry of pool){
+          if(added.length>=requested) break;
+          const q=qzLibraryEntryToQuestion(entry,{timePerQuestion,pointsPerQuestion,generationId,topic});
+          if(!aiQuestionStructuralCheck(q)) continue;
+          if(isDuplicateGeneratedQuestion(q,S.questionsDraft) || isDuplicateGeneratedQuestion(q,added)) continue;
+          added.push(q);
+        }
+        if(!added.length) throw new Error('All matching Library questions are already in the current queue or failed structural checks.');
+        randomizeGeneratedAnswerPositions(added);
+        S.questionsDraft=S.questionsDraft.concat(added);
+        renderHostQList();
+        await pushQuestionsToState();
+
+        const verified=added.filter(q=>q.aiMeta?.label==='QZMAX Verified').length;
+        const studyBible=added.filter(q=>q.aiMeta?.kind==='studybible').length;
+        const knowledge=added.length-verified-studyBible;
+        msg.style.color=added.length===requested?'var(--correct)':'var(--wrong)';
+        msg.textContent='Added '+added.length+' stored question'+(added.length===1?'':'s')+': '+verified+' Verified · '+knowledge+' Knowledge · '+studyBible+' Study Bible.'+
+          (added.length<requested?' '+(requested-added.length)+' matching question(s) were skipped because they were already in the queue or duplicated another selected question.':'')+
+          ' No AI or web search was used.';
+      }catch(err){
+        msg.style.color='var(--wrong)';
+        msg.textContent=err.message||'Could not add questions from QZMAX Library.';
+      }finally{
+        btn.disabled=!qzLibraryMatches.length;
+      }
+    };
+
     const GUIDED_AI_TOPICS = {
       'General Knowledge':[
         'Mixed General Knowledge','Australia','Egypt','Middle East','World','Science & Nature',
@@ -7687,7 +7993,7 @@ authPromise.then(() => {
       const topic=selectedTopic==='Other' ? customTopic : selectedTopic;
 
       return {
-        mode:'guided_ai',
+        mode:'ai_generator',
         category:String(category||'').trim(),
         topic:String(topic||'').trim(),
         region:String($('ai-guided-region')?.value||'').trim(),
@@ -7718,7 +8024,6 @@ authPromise.then(() => {
       el.innerHTML='<strong>Scope:</strong> '+escapeHtml(
         [category,topic,s.region,s.timePeriod,s.focus].filter(Boolean).join(' · ')
       );
-      scheduleVerifiedCoveragePreview();
     }
 
     function buildGuidedAITopic(scope){
@@ -7779,7 +8084,6 @@ authPromise.then(() => {
     });
     $('ai-difficulty').onchange=()=>{
       updateAIDifficultyHint();
-      scheduleVerifiedCoveragePreview();
     };
 
     function updateAIQuestionTypeUI(){
@@ -7808,19 +8112,16 @@ authPromise.then(() => {
 
     $('ai-question-type').onchange = ()=>{
       updateAIQuestionTypeUI();
-      scheduleVerifiedCoveragePreview();
     };
     ['ai-count','ai-opts-per-q','ai-language'].forEach(id=>{
       const el=$(id);
       if(el){
-        el.addEventListener('input',()=>{scheduleVerifiedCoveragePreview();schedulePuzzleCoverage();});
-        el.addEventListener('change',()=>{scheduleVerifiedCoveragePreview();schedulePuzzleCoverage();});
+        el.addEventListener('input',()=>schedulePuzzleCoverage());
+        el.addEventListener('change',()=>schedulePuzzleCoverage());
       }
     });
     updateAIQuestionTypeUI();
-    setAISourceMode('trusted');
-    loadQZMAXVerifiedKB().then(()=>scheduleVerifiedCoveragePreview());
-    loadQZMAXKnowledgeManifest().then(()=>scheduleVerifiedCoveragePreview());
+    setAISourceMode('ai');
     loadQZMAXPuzzleBank().then(()=>schedulePuzzleCoverage());
 
     $('ai-document-file').onchange = async ()=>{
@@ -8072,7 +8373,7 @@ authPromise.then(() => {
         }
         topic = buildGuidedAITopic(structuredScope);
         sourceType = 'ai';
-        sourceName = 'QZMAX Guided AI + Search';
+        sourceName = 'QZMAX AI Generator';
       }
 
       const generationId = newGenerationId();
@@ -8108,10 +8409,7 @@ authPromise.then(() => {
       msg.style.color = 'var(--muted)';
 
       try{
-        let verifiedQuestions = [];
-        let knowledgeQuestions = [];
         let generatedAI = [];
-        let aiShortfallError = null;
 
         if(aiSourceMode==='puzzle'){
           setAIProgress(35,'Selecting matching puzzles from QZMAX Puzzle Bank…');
@@ -8123,110 +8421,18 @@ authPromise.then(() => {
             existingQuestions:S.questionsDraft
           });
           setAIProgress(92,'Puzzle selection complete — checking duplicates and answer positions…');
-        }else if(aiSourceMode==='trusted'){
-          sourceText = '';
-          sourceUrls = [];
-          sourceType = 'ai';
-          sourceName = 'QZMAX Guided AI + Search';
-
-          setAIProgress(5, 'Checking QZMAX Verified Knowledge first…');
-
-          verifiedQuestions = await selectQZMAXVerifiedQuestions({
-            scope:structuredScope,
-            requestedType:aiQuestionType,
-            optsPerQ,
-            questionLanguage,
-            target:count,
-            timePerQuestion,
-            pointsPerQuestion,
-            generationId,
-            topic,
-            existingQuestions:S.questionsDraft
-          });
-
-          if(verifiedQuestions.length){
-            setAIProgress(
-              Math.min(52,10+Math.round((verifiedQuestions.length/count)*40)),
-              verifiedQuestions.length+' of '+count+' found in QZMAX Verified Knowledge…'
-            );
-          }
-
-          const afterVerified=Math.max(0,count-verifiedQuestions.length);
-          if(afterVerified>0){
-            setAIProgress(
-              Math.max(14,Math.min(58,10+Math.round((verifiedQuestions.length/count)*40))),
-              'Checking matching QZMAX Knowledge and Study Bible packs…'
-            );
-
-            knowledgeQuestions=await selectQZMAXKnowledgeQuestions({
-              scope:structuredScope,
-              requestedType:aiQuestionType,
-              optsPerQ,
-              questionLanguage,
-              target:afterVerified,
-              timePerQuestion,
-              pointsPerQuestion,
-              generationId,
-              topic,
-              existingQuestions:S.questionsDraft.concat(verifiedQuestions)
-            });
-
-            if(knowledgeQuestions.length){
-              setAIProgress(
-                Math.min(72,24+Math.round(((verifiedQuestions.length+knowledgeQuestions.length)/count)*48)),
-                (verifiedQuestions.length+knowledgeQuestions.length)+' of '+count+
-                ' supplied instantly from QZMAX content banks…'
-              );
-            }
-          }
-
-          const remaining=Math.max(0,count-verifiedQuestions.length-knowledgeQuestions.length);
-          if(remaining>0){
-            const localCount=verifiedQuestions.length+knowledgeQuestions.length;
-            setAIProgress(
-              Math.max(28,Math.min(76,24+Math.round((localCount/count)*48))),
-              'Local content supplied '+localCount+
-              '. Freshly generating and verifying only the remaining '+remaining+'…'
-            );
-
-            try{
-              generatedAI = await generateVerifiedQuestionBatches({
-                topic,
-                requestedCount:remaining,
-                optsPerQ,
-                questionType:aiQuestionType,
-                sourceText:'',
-                sourceType:'ai',
-                sourceName:'QZMAX Guided AI + Search',
-                sourceUrls:[],
-                questionLanguage,
-                timePerQuestion,
-                pointsPerQuestion,
-                difficulty:selectedDifficulty,
-                structuredScope,
-                generationId,
-                existingQuestions:S.questionsDraft.concat(verifiedQuestions,knowledgeQuestions),
-                onProgress:(done,total,label)=>{
-                  const localCount=verifiedQuestions.length+knowledgeQuestions.length;
-                  const basePct=localCount/count;
-                  const aiPct=(done/Math.max(1,total))*(1-basePct);
-                  setAIProgress(
-                    Math.min(96,18+Math.round((basePct+aiPct)*78)),
-                    label||('Verified '+done+' of '+total+' shortfall questions…')
-                  );
-                }
-              });
-            }catch(shortfallErr){
-              if(!(verifiedQuestions.length+knowledgeQuestions.length)) throw shortfallErr;
-              aiShortfallError=shortfallErr;
-            }
-          }
         }else{
-          if(aiSourceMode==='school'){
+          if(aiSourceMode==='ai'){
+            sourceText = '';
+            sourceUrls = [];
+            sourceType = 'ai';
+            sourceName = 'QZMAX AI Generator';
+            setAIProgress(8,'Researching the selected topic and preparing the AI batch…');
+          }else if(aiSourceMode==='school'){
             sourceText = '';
             sourceUrls = [];
             sourceType = 'school';
-            setAIProgress(8, 'Year-level subject guidance ready — starting generation…');
+            setAIProgress(8,'Year-level subject guidance ready — starting generation…');
           }else{
             setAIProgress(
               8,
@@ -8259,7 +8465,7 @@ authPromise.then(() => {
           });
         }
 
-        const generated=verifiedQuestions.concat(knowledgeQuestions,generatedAI).slice(0,count);
+        const generated=generatedAI.slice(0,count);
         if(!generated.length){
           throw aiShortfallError || new Error('No usable questions could be produced.');
         }
@@ -8276,45 +8482,23 @@ authPromise.then(() => {
         setAIProgress(100, 'Complete');
 
         const puzzleCount=generated.filter(q=>q&&q.aiMeta&&q.aiMeta.label==='QZMAX Puzzle').length;
-        const qzmaxCount=generated.filter(q=>q&&q.aiMeta&&q.aiMeta.label==='QZMAX Verified').length;
-        const knowledgeCount=generated.filter(q=>q&&q.aiMeta&&q.aiMeta.kind==='knowledge').length;
-        const studyBibleCount=generated.filter(q=>q&&q.aiMeta&&q.aiMeta.kind==='studybible').length;
-        const webCount=generated.filter(q=>q&&q.aiMeta&&q.aiMeta.label==='2-Source Checked').length;
-        const localKnowledgeCount=qzmaxCount+knowledgeCount+studyBibleCount;
 
         if(puzzleCount===generated.length){
           msg.style.color='var(--correct)';
           msg.textContent='Added '+generated.length+' QZMAX Puzzle'+(generated.length===1?'':'s')+
             ' instantly from the curated Puzzle Bank. No AI or web-search call was needed.';
           schedulePuzzleCoverage();
-        }else if(aiShortfallError){
-          msg.style.color='var(--wrong)';
-          msg.textContent='Added '+localKnowledgeCount+' local content question'+(localKnowledgeCount===1?'':'s')+
-            ' ('+qzmaxCount+' Verified · '+knowledgeCount+' Knowledge · '+studyBibleCount+' Study Bible). '+
-            'QZMAX could not complete the remaining '+Math.max(0,count-generated.length)+
-            ' through fresh AI verification: '+(aiShortfallError.message||'verification unavailable')+'.';
-        }else if(localKnowledgeCount===generated.length){
-          msg.style.color='var(--correct)';
-          msg.textContent='Added '+generated.length+' instantly from QZMAX content banks: '+
-            qzmaxCount+' Verified · '+knowledgeCount+' Knowledge · '+studyBibleCount+
-            ' Study Bible Grounded. No AI or web-search call was needed.';
-        }else if(localKnowledgeCount){
-          msg.style.color='var(--correct)';
-          msg.textContent='Added '+generated.length+' questions: '+qzmaxCount+' Verified · '+
-            knowledgeCount+' Knowledge · '+studyBibleCount+' Study Bible Grounded · '+
-            webCount+' freshly 2-Source Checked. AI/search was used only for the shortfall.';
         }else{
           msg.style.color = 'var(--correct)';
-          const allWebVerified = generated.length>0 &&
-            generated.every(q=>q&&q.aiMeta&&q.aiMeta.label==='2-Source Checked');
-          const groundedLabel = allWebVerified
-            ? 'web-verified'
-            : aiSourceMode==='document'
+          const aiReviewed = generated.filter(q=>q&&q.aiMeta&&q.aiMeta.label==='AI Grounded + Reviewed').length;
+          const groundedLabel = aiSourceMode==='document'
             ? 'document-grounded'
             : aiSourceMode==='link'
             ? 'link-grounded'
             : sourceType==='school'
             ? 'year-level curriculum-guided'
+            : aiReviewed
+            ? 'AI grounded + independently reviewed'
             : 'AI-review';
           const usedRoutes=[...new Set(generated.map(q=>{
             const p=q&&q.aiMeta&&q.aiMeta.provider;
@@ -8323,11 +8507,9 @@ authPromise.then(() => {
           }).filter(Boolean))];
           msg.textContent='Added '+generated.length+' '+groundedLabel+' question'+
             (generated.length===1?'':'s')+'. Duplicate and structural checks passed.'+
-            (usedRoutes.length?' Route'+(usedRoutes.length>1?'s':'')+': '+usedRoutes.join(' → ')+'.':'')+
+            (usedRoutes.length?' Generator: '+usedRoutes.join(' → ')+'.':'')+
             ' Review before saving.';
         }
-
-        scheduleVerifiedCoveragePreview();
       }catch(err){
         msg.style.color = 'var(--wrong)';
         msg.textContent = err.message || 'Something went wrong generating questions.';
@@ -9122,10 +9304,10 @@ authPromise.then(() => {
     if(item && item.webVerified){
       return {
         kind:'source',
-        label:'2-Source Checked',
+        label:'AI Grounded + Reviewed',
         sourceName:Array.isArray(item.sourceTitles) && item.sourceTitles.length
           ? item.sourceTitles.slice(0,2).join(' • ')
-          : (item.sourceTitle||'Two independent web sources'),
+          : (item.sourceTitle||'Fresh web evidence'),
         sourceUrls:Array.isArray(item.sourceUrls) && item.sourceUrls.length
           ? item.sourceUrls.slice(0,2)
           : (item.sourceUrl ? [item.sourceUrl] : []),
@@ -9365,7 +9547,7 @@ authPromise.then(() => {
 
     let res;
     const aiController = new AbortController();
-    const aiRequestTimeoutMs = context.sourceType==='ai' ? 26000 : 32000;
+    const aiRequestTimeoutMs = context.sourceType==='ai' ? 30000 : 32000;
     const aiRequestTimer = setTimeout(()=>aiController.abort(),aiRequestTimeoutMs);
     try{
       res = await fetch('/.netlify/functions/generate',{
@@ -9538,7 +9720,6 @@ authPromise.then(() => {
     // work into small serverless passes so one invocation cannot become overloaded.
     const internalBatchSize =
       sourceType==='link' ? 5 :
-      sourceType==='ai' ? 5 :
       10;
 
     // Guided AI already performs expensive web search + blind verification.
@@ -9564,7 +9745,7 @@ authPromise.then(() => {
         sourceType==='link'
           ? 'Reading another relevant section of the source — building '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
           : sourceType==='ai'
-          ? 'Verified pass '+(attempts+1)+' — generating and checking '+batchCount+' question'+(batchCount===1?'':'s')+'…'
+          ? 'AI batch '+(attempts+1)+' — research, generation and independent QA for '+batchCount+' question'+(batchCount===1?'':'s')+'…'
           : 'Generating '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
       );
 
@@ -9606,7 +9787,7 @@ authPromise.then(() => {
               sourceType==='link'
                 ? 'Checked source evidence and duplicates — '+accepted.length+' of '+target+' Link Grounded questions ready…'
                 : sourceType==='ai'
-                ? 'Blind verification complete — '+accepted.length+' of '+target+' verified questions ready…'
+                ? 'Independent QA complete — '+accepted.length+' of '+target+' grounded questions ready…'
                 : 'Checked topic scope, facts and duplicates — '+accepted.length+' of '+target+' unique questions ready…'
             )
           : 'All '+target+' questions ready.'
@@ -9641,7 +9822,7 @@ authPromise.then(() => {
       : (sourceCount ? sourceCount+' independent source'+(sourceCount===1?'':'s') : '');
     const verifyTitle = [
       meta.sourceName||meta.label||'',
-      meta.verificationProvider ? 'Blind verifier: '+meta.verificationProvider : '',
+      meta.verificationProvider ? 'Independent QA: '+meta.verificationProvider : '',
       sourceCountLabel
     ].filter(Boolean).join(' · ');
     return '<span class="q-verify-badge '+kind+'" title="'+escapeHtml(verifyTitle)+'">'+

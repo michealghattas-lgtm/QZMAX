@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "0.4",
+  "generatedAt": "2026-09-10",
+  "engineName": "QZMAX Content Architecture",
+  "layers": [
+    {
+      "priority": 1,
+      "kind": "verified",
+      "label": "QZMAX Verified",
+      "file": "qzmax_verified_kb_seed_v0_2.json",
+      "trust": "Reviewed verified records",
+      "libraryGroup": "QZMAX Library"
+    },
+    {
+      "priority": 1,
+      "kind": "knowledge",
+      "label": "QZMAX Knowledge / Study Bible Grounded",
+      "manifest": "knowledge_manifest_v0_4.json",
+      "editorialCandidateCount": 11350,
+      "runtimeEligibleCount": 11160,
+      "libraryGroup": "QZMAX Library"
+    },
+    {
+      "priority": 2,
+      "kind": "puzzle",
+      "label": "QZMAX Puzzle",
+      "file": "qzmax_puzzle_bank_v0_1.json",
+      "trust": "Curated puzzle quality gate"
+    },
+    {
+      "priority": 3,
+      "kind": "ai",
+      "label": "AI Grounded + Reviewed",
+      "trust": "Tavily evidence grounding + independent batch AI QA",
+      "architecture": "Separate AI Generator; does not use QZMAX Library records"
+    }
+  ]
+}
