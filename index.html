@@ -4452,7 +4452,7 @@ html[data-theme="light"] .q-verify-badge.studybible{
 
 
 /* =========================================================
-   QZMAX 3.18.1 — Library language + Puzzle duplicate fixes
+   QZMAX 3.18.2 — Live answer + AI reliability fixes
    ========================================================= */
 .ai-source-tabs{grid-template-columns:repeat(7,minmax(0,1fr))!important;}
 .ai-engine-route-note{margin-top:9px;padding:9px 11px;border-radius:11px;border:1px solid rgba(95,190,255,.13);background:rgba(52,139,210,.055);display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;font-size:9.5px;color:#9cb2ca;}
@@ -4490,7 +4490,7 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.18.1";
+  const APP_VERSION = "3.18.2";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4578,6 +4578,42 @@ authPromise.then(() => {
       return true;
     }catch(e){ console.error('firebase set failed', path, e); return false; }
   }
+
+  function waitMs(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
+
+  async function withTimeout(promise, timeoutMs, label){
+    let timer;
+    try{
+      return await Promise.race([
+        promise,
+        new Promise((_,reject)=>{
+          timer=setTimeout(()=>reject(new Error(label || 'Operation timed out.')),timeoutMs);
+        })
+      ]);
+    }finally{ clearTimeout(timer); }
+  }
+
+  async function fbSetConfirmed(path, value, attempts=3){
+    let lastError=null;
+    for(let attempt=0;attempt<attempts;attempt++){
+      try{
+        await withTimeout(set(ref(db,path),value),4200,'Answer save timed out.');
+        return true;
+      }catch(error){
+        lastError=error;
+        // A timed-out write may still have reached Firebase. Verify by the
+        // submission id before retrying the exact same idempotent payload.
+        try{
+          const snapshot=await withTimeout(get(ref(db,path)),1400,'Answer verification timed out.');
+          const saved=snapshot.exists()?snapshot.val():null;
+          if(saved && value && saved.submissionId && saved.submissionId===value.submissionId) return true;
+        }catch(_){ }
+        if(attempt<attempts-1) await waitMs(350 + attempt*450);
+      }
+    }
+    console.error('firebase confirmed set failed',path,lastError);
+    return false;
+  }
   async function fbDelete(path){
     try{
       await remove(ref(db, path));
@@ -4656,6 +4692,7 @@ authPromise.then(() => {
     hostRevealing:false,
     hostTimerHandle:null, hostPollHandle:null,
     hostRecoveryHandle:null, hostRecoveryInProgress:false,
+    hostRevealReason:'', lateReconcileHandle:null,
     hostControlWatchUnsub:null, hostControlLost:false,
     playerTimerHandle:null, playerPollHandle:null,
     lastPhaseKey:null, questionsDraft:[],
@@ -4710,6 +4747,17 @@ authPromise.then(() => {
     if(Array.isArray(a.answerIndexes)) return true;
     if(typeof a.answerText === 'string') return true;
     return false;
+  }
+
+  function answerEligibleForScoring(q,a){
+    if(!answerSubmitted(a)) return false;
+    const t=Number(a.timeMs);
+    if(!Number.isFinite(t)) return true; // Backward compatibility for older sessions.
+    const limitMs=Math.max(1,Number(q&&q.timeLimit)||DEFAULT_QUESTION_TIME)*1000;
+    // timeMs is captured when the player taps/selects, before any Firebase retry.
+    // A small allowance covers the 150ms UI timer interval and clock-offset jitter,
+    // not additional answering time.
+    return t>=0 && t<=limitMs+500;
   }
 
   function answerIsCorrect(q, a){
@@ -6623,7 +6671,7 @@ authPromise.then(() => {
       setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
     };
 
-    // QZMAX 3.18.1 — separate AI Generator and QZMAX Library
+    // QZMAX 3.18.2 — separate AI Generator and QZMAX Library
     let isSchoolMode = false;
     let aiSourceMode = 'ai';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
@@ -7640,7 +7688,7 @@ authPromise.then(() => {
 
 
     // =========================================================
-    // QZMAX 3.18.1 — QZMAX Library: database-driven cascading UI
+    // QZMAX 3.18.2 — QZMAX Library: database-driven cascading UI
     // =========================================================
     let qzLibraryEntries=null;
     let qzLibraryPromise=null;
@@ -9580,7 +9628,7 @@ authPromise.then(() => {
 
     let res;
     const aiController = new AbortController();
-    const aiRequestTimeoutMs = context.sourceType==='ai' ? 30000 : 32000;
+    const aiRequestTimeoutMs = context.sourceType==='ai' ? 56000 : 42000;
     const aiRequestTimer = setTimeout(()=>aiController.abort(),aiRequestTimeoutMs);
     try{
       res = await fetch('/.netlify/functions/generate',{
@@ -9612,7 +9660,7 @@ authPromise.then(() => {
       });
     }catch(e){
       if(e && e.name==='AbortError'){
-        throw new Error('This verified pass exceeded the QZMAX time limit and was stopped. QZMAX will try the next pass.');
+        throw new Error('This verified pass exceeded the QZMAX time limit and was stopped. QZMAX will retry with the remaining questions.');
       }
       throw new Error('Could not reach the AI server — check your connection.');
     }finally{
@@ -9755,7 +9803,7 @@ authPromise.then(() => {
       sourceType==='link' ? 5 :
       10;
 
-    // Guided AI already performs expensive web search + blind verification.
+    // AI Generator performs one evidence search + compact independent QA.
     // Keep retries tightly bounded. A request for 5 questions normally uses
     // one verified pass, with at most two recovery passes.
     const maxAttempts =
@@ -10341,7 +10389,7 @@ authPromise.then(() => {
         fbGet(answersPath(S.code, st.currentIndex)),
         fbGet(playersPath(S.code))
       ]);
-      const answeredCount = answersObj ? Object.values(answersObj).filter(answerSubmitted).length : 0;
+      const answeredCount = answersObj ? Object.values(answersObj).filter(a=>answerEligibleForScoring(q,a)).length : 0;
       const playerCount = playersObj ? Object.keys(playersObj).length : 0;
       const el = $('host-q-answered');
       if(el) el.textContent = answeredCount + ' of ' + playerCount + ' answered';
@@ -10352,12 +10400,15 @@ authPromise.then(() => {
   function scheduleReveal(st, message, delayMs){
     if(S.hostRevealing) return;
     S.hostRevealing = true;
+    S.hostRevealReason = String(message || '');
     clearInterval(S.hostTimerHandle);
     clearInterval(S.hostPollHandle);
+    const isTimeUp=/time/i.test(S.hostRevealReason);
+    const finalDelay=isTimeUp ? Math.max(2600,Number(delayMs)||0) : Math.max(500,Number(delayMs)||0);
     const el = $('host-q-answered');
-    if(el) el.textContent = message;
+    if(el) el.textContent = isTimeUp ? 'Finalising responses…' : message;
     clearTimeout(S.hostRecoveryHandle);
-    S.hostRecoveryHandle = setTimeout(()=>{ hostGoToReveal(st); }, delayMs);
+    S.hostRecoveryHandle = setTimeout(()=>{ hostGoToReveal(st); }, finalDelay);
   }
 
   async function hostGoToReveal(st){
@@ -10401,7 +10452,7 @@ authPromise.then(() => {
 
       for(const pid in answers){
         const a = answers[pid];
-        if(!answerSubmitted(a)) continue;
+        if(!answerEligibleForScoring(q,a)) continue;
         totalAnswered++;
         if(typeof a.answerIndex === 'number' && a.answerIndex>=0 && a.answerIndex<optionCounts.length){
           optionCounts[a.answerIndex]++;
@@ -10422,9 +10473,10 @@ authPromise.then(() => {
         const a = answers[pid];
         const oldPoints = (a && typeof a.pointsAwarded === 'number') ? a.pointsAwarded : 0;
         let points = 0;
-        const correct = answerIsCorrect(q,a);
+        const eligible = answerEligibleForScoring(q,a);
+        const correct = eligible && answerIsCorrect(q,a);
 
-        if(a && answerSubmitted(a)){
+        if(a && eligible){
           if(correct){
             correctCount++;
             const frac = Math.max(0, Math.min(1, 1 - ((a.timeMs||0)/1000)/q.timeLimit));
@@ -10433,6 +10485,11 @@ authPromise.then(() => {
           }
           a.pointsAwarded = points;
           a.wasCorrect = correct;
+          a.acceptedForScoring = true;
+        }else if(a && answerSubmitted(a)){
+          a.pointsAwarded = 0;
+          a.wasCorrect = false;
+          a.acceptedForScoring = false;
         }
 
         if(!q.excluded) player.score = Math.max(0, (player.score||0) - oldPoints + points);
@@ -10460,6 +10517,18 @@ authPromise.then(() => {
       firebaseConnected = true;
       showConnectionBanner('Live game synced.', true);
       buildHostReveal(nextState, optionCounts);
+
+      // One late-write reconciliation pass catches answers selected before the
+      // timer expired but confirmed by Firebase just after the reveal snapshot.
+      clearTimeout(S.lateReconcileHandle);
+      S.lateReconcileHandle=setTimeout(async()=>{
+        try{
+          const reconciled=await reconcileQuestionScores(qi);
+          if(reconciled && reconciled.status==='reveal' && reconciled.currentIndex===qi){
+            buildHostReveal(reconciled,reconciled.optionCounts||optionCounts);
+          }
+        }catch(err){ console.warn('late answer reconciliation failed',err); }
+      },1600);
     }catch(e){
       console.error('host reveal transition failed', e);
       firebaseConnected = false;
@@ -10467,6 +10536,80 @@ authPromise.then(() => {
       clearTimeout(S.hostRecoveryHandle);
       S.hostRecoveryHandle = setTimeout(()=>hostGoToReveal(st), 1800);
     }
+  }
+
+  async function reconcileQuestionScores(qi){
+    const latestState = await fbGetStrict(statePath(S.code));
+    if(!latestState || latestState.currentIndex!==qi) return latestState;
+    const q = latestState.questions && latestState.questions[qi];
+    if(!q) return latestState;
+
+    const [answersObj,playersObj] = await Promise.all([
+      fbGetStrict(answersPath(S.code,qi)),
+      fbGetStrict(playersPath(S.code))
+    ]);
+    const answers=answersObj||{};
+    const players=playersObj||{};
+    const options=q.options||[];
+    const optionCounts=new Array(options.length).fill(0);
+    const typedCounts=new Map();
+    let totalAnswered=0;
+    let correctCount=0;
+
+    for(const pid in answers){
+      const a=answers[pid];
+      if(!answerEligibleForScoring(q,a)) continue;
+      totalAnswered++;
+      if(typeof a.answerIndex==='number' && a.answerIndex>=0 && a.answerIndex<optionCounts.length) optionCounts[a.answerIndex]++;
+      if(Array.isArray(a.answerIndexes)){
+        [...new Set(a.answerIndexes.map(Number).filter(Number.isInteger))].forEach(i=>{
+          if(i>=0 && i<optionCounts.length) optionCounts[i]++;
+        });
+      }
+      if(typeof a.answerText==='string'){
+        const shown=a.answerText.trim().slice(0,80)||'(blank)';
+        typedCounts.set(shown,(typedCounts.get(shown)||0)+1);
+      }
+    }
+
+    for(const pid in players){
+      const player=players[pid];
+      const a=answers[pid];
+      const oldPoints=(a && typeof a.pointsAwarded==='number')?a.pointsAwarded:0;
+      const eligible=answerEligibleForScoring(q,a);
+      const correct=eligible && answerIsCorrect(q,a);
+      let points=0;
+      if(eligible && correct){
+        correctCount++;
+        const frac=Math.max(0,Math.min(1,1-((Number(a.timeMs)||0)/1000)/q.timeLimit));
+        const base=Number.isFinite(Number(q.points))?Number(q.points):DEFAULT_QUESTION_POINTS;
+        points=Math.round(base/2+(base/2)*frac);
+      }
+      if(a && answerSubmitted(a)){
+        a.pointsAwarded=points;
+        a.wasCorrect=correct;
+        a.acceptedForScoring=eligible;
+      }
+      if(!q.excluded) player.score=Math.max(0,(player.score||0)-oldPoints+points);
+      player.lastPoints=points;
+      player.lastCorrect=correct;
+    }
+
+    latestState.optionCounts=optionCounts;
+    latestState.totalAnswered=totalAnswered;
+    latestState.correctCount=correctCount;
+    latestState.responseSummary=Array.from(typedCounts.entries())
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,6)
+      .map(([text,count])=>({text,count}));
+    latestState.lastReconciledAt=getSyncedTime();
+
+    const updates={};
+    updates[playersPath(S.code)]=players;
+    updates[answersPath(S.code,qi)]=answers;
+    updates[statePath(S.code)]=latestState;
+    await fbAtomicUpdate(updates);
+    return latestState;
   }
 
   async function recalcQuestionScore(qi, newCorrectIndex){
@@ -10645,7 +10788,9 @@ authPromise.then(() => {
 
   async function hostGoToLeaderboard(st){
     try{
-      const st2 = await fbGetStrict(statePath(S.code));
+      clearTimeout(S.lateReconcileHandle);
+      let st2 = await reconcileQuestionScores(st.currentIndex);
+      if(!st2) st2 = await fbGetStrict(statePath(S.code));
       if(!st2) return;
       st2.status = 'leaderboard';
       await set(ref(db, statePath(S.code)), st2);
@@ -11269,7 +11414,7 @@ authPromise.then(() => {
     const teamKey = st.gameMode==='teams' ? ':'+JSON.stringify(st.teams||[]) : '';
     const currentQ = st.questions && st.currentIndex>=0 ? st.questions[st.currentIndex] : null;
     const mediaKey = currentQ ? ':'+(currentQ.imageUrl||'')+':'+normalizedQuestionType(currentQ) : '';
-    const phaseKey = st.status + ':' + st.currentIndex + ':' + (st.gameMode||'individual') + ':'+(st.sessionMode||'live') + ':'+(st.examEndsAt||'') + teamKey + mediaKey + ':'+(st.appVersion||'');
+    const phaseKey = st.status + ':' + st.currentIndex + ':' + (st.gameMode||'individual') + ':'+(st.sessionMode||'live') + ':'+(st.examEndsAt||'') + ':'+(st.lastReconciledAt||'') + teamKey + mediaKey + ':'+(st.appVersion||'');
     if(st.status==='setup'){
       if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; buildPlayerLobby(st); }
     } else if(st.status==='exam'){
@@ -11552,25 +11697,63 @@ authPromise.then(() => {
       '</div>';
     showScreen('screen-player-question');
 
+    let submitting=false;
     const lockStatus = ()=>{
-      $('pq-status').innerHTML = '<strong>Answer locked in!</strong> Your response has been recorded.';
+      $('pq-status').innerHTML = '<strong>✓ Answer locked in!</strong> Firebase confirmed your response.';
+    };
+    const savingStatus = ()=>{
+      $('pq-status').innerHTML = '<strong>Saving your answer…</strong> Keep this screen open for a moment.';
+    };
+    const canStillSubmit = ()=>{
+      const elapsed=getSyncedTime()-st.questionStartedAt;
+      return elapsed <= (Number(q.timeLimit)||DEFAULT_QUESTION_TIME)*1000 + 500;
+    };
+    const makeSubmission = fields=>{
+      const selectedAt=getSyncedTime();
+      return {
+        pid:S.pid,
+        ...fields,
+        timeMs:Math.max(0,selectedAt-st.questionStartedAt),
+        selectedAt,
+        submittedAt:selectedAt,
+        submissionId:S.pid+'-'+st.currentIndex+'-'+selectedAt+'-'+Math.random().toString(36).slice(2,7),
+        submissionVersion:2
+      };
+    };
+    const persistAnswer = async (payload,onFailure)=>{
+      submitting=true;
+      savingStatus();
+      const saved=await fbSetConfirmed(answerPath(S.code,st.currentIndex,S.pid),payload,3);
+      submitting=false;
+      if(saved){
+        answered=true;
+        lockStatus();
+        return true;
+      }
+      answered=false;
+      const stillOpen=canStillSubmit();
+      $('pq-status').innerHTML = stillOpen
+        ? '<strong>Could not confirm the save.</strong> Please tap your answer again.'
+        : '<strong>We could not confirm this answer before the question closed.</strong>';
+      if(typeof onFailure==='function') onFailure(stillOpen);
+      return false;
     };
 
     if(type==='typed'){
       const submitTyped = async ()=>{
-        if(answered) return;
+        if(answered || submitting) return;
         const inp = $('pq-typed-input');
         const answerText = inp.value.trim();
         if(!answerText){
           $('pq-status').textContent = 'Type an answer before locking it in.';
           return;
         }
-        answered = true;
         inp.disabled = true;
         $('pq-typed-submit').disabled = true;
-        const timeMs = getSyncedTime()-st.questionStartedAt;
-        lockStatus();
-        await fbSet(answerPath(S.code, st.currentIndex, S.pid), { pid:S.pid, answerText, timeMs, submittedAt:getSyncedTime() });
+        const payload=makeSubmission({answerText});
+        await persistAnswer(payload,stillOpen=>{
+          if(stillOpen){ inp.disabled=false; $('pq-typed-submit').disabled=false; inp.focus(); }
+        });
       };
       if($('pq-typed-submit')) $('pq-typed-submit').onclick = submitTyped;
       if($('pq-typed-input')) $('pq-typed-input').addEventListener('keydown',e=>{ if(e.key==='Enter') submitTyped(); });
@@ -11578,7 +11761,7 @@ authPromise.then(() => {
       const selected = new Set(selectedExisting);
       document.querySelectorAll('#screen-player-question .opt-card').forEach(card=>{
         card.onclick = ()=>{
-          if(answered) return;
+          if(answered || submitting) return;
           const i = parseInt(card.dataset.i,10);
           if(selected.has(i)){ selected.delete(i); card.classList.remove('selected'); }
           else { selected.add(i); card.classList.add('selected'); }
@@ -11586,29 +11769,34 @@ authPromise.then(() => {
         };
       });
       if($('pq-multi-submit')) $('pq-multi-submit').onclick = async ()=>{
-        if(answered) return;
+        if(answered || submitting) return;
         if(!selected.size){
           $('pq-status').textContent = 'Select at least one answer first.';
           return;
         }
-        answered = true;
         document.querySelectorAll('#screen-player-question .opt-card').forEach(c=>c.classList.add('disabled'));
         $('pq-multi-submit').disabled = true;
-        const timeMs = getSyncedTime()-st.questionStartedAt;
-        lockStatus();
-        await fbSet(answerPath(S.code, st.currentIndex, S.pid), { pid:S.pid, answerIndexes:[...selected].sort((a,b)=>a-b), timeMs, submittedAt:getSyncedTime() });
+        const payload=makeSubmission({answerIndexes:[...selected].sort((a,b)=>a-b)});
+        await persistAnswer(payload,stillOpen=>{
+          if(stillOpen){
+            document.querySelectorAll('#screen-player-question .opt-card').forEach(c=>c.classList.remove('disabled'));
+            $('pq-multi-submit').disabled=false;
+          }
+        });
       };
     }else{
       document.querySelectorAll('#screen-player-question .opt-card').forEach(card=>{
         card.onclick = async ()=>{
-          if(answered) return;
-          answered = true;
+          if(answered || submitting) return;
           const i = parseInt(card.dataset.i,10);
-          const timeMs = getSyncedTime()-st.questionStartedAt;
           document.querySelectorAll('#screen-player-question .opt-card').forEach(c=>c.classList.add('disabled'));
           card.classList.add('selected');
-          lockStatus();
-          await fbSet(answerPath(S.code, st.currentIndex, S.pid), { pid:S.pid, answerIndex:i, timeMs, submittedAt:getSyncedTime() });
+          const payload=makeSubmission({answerIndex:i});
+          await persistAnswer(payload,stillOpen=>{
+            if(stillOpen){
+              document.querySelectorAll('#screen-player-question .opt-card').forEach(c=>c.classList.remove('disabled','selected'));
+            }
+          });
         };
       });
     }
@@ -11620,7 +11808,9 @@ authPromise.then(() => {
       if(remaining<=0){
         clearInterval(S.playerTimerHandle);
         if(!answered){
-          $('pq-status').innerHTML = '<strong>Time’s up.</strong> Waiting for the reveal…';
+          $('pq-status').innerHTML = submitting
+            ? '<strong>Finalising your answer…</strong> Your original selection time is preserved.'
+            : '<strong>Time’s up.</strong> Waiting for the reveal…';
           document.querySelectorAll('#screen-player-question .opt-card').forEach(c=>c.classList.add('disabled'));
           if($('pq-multi-submit')) $('pq-multi-submit').disabled = true;
           if($('pq-typed-input')) $('pq-typed-input').disabled = true;

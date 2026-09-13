@@ -1,6 +1,6 @@
 'use strict';
 
-// QZMAX 3.18.1 — AI Generator + QZMAX Library maintenance release
+// QZMAX 3.18.2 — Live Answer Reliability + AI Generator Reliability
 //
 // The QZMAX Library is stored content and never enters this function.
 // AI Generator uses a simple free-only pipeline:
@@ -11,7 +11,7 @@
 const MAX_BATCH = 10;
 const MAX_OPTIONS = 8;
 const MAX_PROMPT_CHARS = 60000;
-const GLOBAL_BUDGET_MS = 24000;
+const GLOBAL_BUDGET_MS = 50000;
 
 const MODELS = {
   geminiSearch: process.env.GEMINI_SEARCH_MODEL || 'gemini-2.5-flash',
@@ -490,7 +490,7 @@ async function callOpenAICompatible({
   if (!key) throw Object.assign(new Error(`${providerName} key is not configured.`), { skip:true });
   const remaining = deadline - Date.now();
   if (remaining < 1800) throw Object.assign(new Error('Request time budget exhausted.'), { timeout:true });
-  const timeout = Math.max(1600, Math.min(9500, remaining - 300));
+  const timeout = Math.max(1600, Math.min(12000, remaining - 500));
 
   const doCall = async () => {
     const body = {
@@ -612,7 +612,7 @@ async function callCloudflare(messages, deadline) {
 
   const remaining = deadline - Date.now();
   if (remaining < 1800) throw Object.assign(new Error('Request time budget exhausted.'), { timeout:true });
-  const timeout = Math.max(1600, Math.min(9500, remaining - 300));
+  const timeout = Math.max(1600, Math.min(12000, remaining - 500));
   const modelPath = MODELS.cloudflare
     .split('/')
     .map(encodeURIComponent)
@@ -662,7 +662,7 @@ async function callGemini(messages, deadline, search=false) {
   const model = search ? MODELS.geminiSearch : MODELS.gemini;
   const remaining = deadline - Date.now();
   if (remaining < 1800) throw Object.assign(new Error('Request time budget exhausted.'), { timeout:true });
-  const timeout = Math.max(1600, Math.min(9500, remaining - 300));
+  const timeout = Math.max(1600, Math.min(12000, remaining - 500));
   const prompt = messages.map(m => `${m.role.toUpperCase()}:\n${m.content}`).join('\n\n');
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
@@ -1009,7 +1009,7 @@ async function fetchTavilyEvidence(request, deadline) {
       auto_parameters:false,
       safe_search:true
     }),
-  }, Math.max(1800, Math.min(7000, remaining - 500)));
+  }, Math.max(1800, Math.min(8000, remaining - 700)));
 
   if (!res.ok) throw await readErrorResponse(res);
   const data = await res.json();
@@ -1042,7 +1042,7 @@ function buildWebEvidenceMessages(baseMessages, request, evidence) {
     'Every question must satisfy every populated structured scope field and be directly supported by one evidence source.',
     'For EACH question return sourceId, sourceUrl, sourceTitle and sourceEvidence.',
     'sourceId/sourceUrl/sourceTitle must exactly match one source below.',
-    'sourceEvidence must be an EXACT copied phrase of roughly 8–45 words from that source CONTENT which directly supports the correct answer.',
+    'sourceEvidence should be a short copied supporting phrase from that source CONTENT. Exact copying is preferred; QZMAX will anchor it back to the selected source before QA.',
     'The evidence must establish the named entity and relationship asked by the question — not merely mention the same people, work, year or topic.',
     'If the evidence does not support a safe question, do not invent one.',
     'Do not infer a cast member, release year, singer, album, director, character, award, quotation or relationship unless the evidence explicitly establishes it.',
@@ -1052,6 +1052,40 @@ function buildWebEvidenceMessages(baseMessages, request, evidence) {
   ].filter(Boolean).join('\n');
 
   return [...baseMessages, {role:'user', content:webRule}];
+}
+
+function evidenceWords(value) {
+  return normalizeEvidenceText(value)
+    .split(' ')
+    .filter(word => word.length >= 3 && !LINK_EVIDENCE_STOPWORDS.has(word));
+}
+
+function recoverWebEvidenceSnippet(item, source) {
+  const units = splitLinkEvidenceUnits(`${source.title}. ${source.content}`);
+  if (!units.length) return String(source.content || '').slice(0,600);
+
+  const requested = evidenceWords(item.sourceEvidence || '');
+  const questionWords = evidenceWords(item.question || '');
+  const options = Array.isArray(item.options) ? item.options : [];
+  const idx = Number.parseInt(item.correctIndex,10);
+  const answerWords = Number.isInteger(idx) && idx >= 0 && idx < options.length
+    ? evidenceWords(options[idx])
+    : [];
+
+  let best = null;
+  for (const unit of units) {
+    const norm = normalizeEvidenceText(unit);
+    const words = new Set(norm.split(' '));
+    const quoteOverlap = requested.filter(w => words.has(w)).length;
+    const qOverlap = questionWords.filter(w => words.has(w)).length;
+    const aOverlap = answerWords.filter(w => words.has(w)).length;
+    const score = quoteOverlap * 6 + qOverlap * 2 + aOverlap * 4;
+    if (!best || score > best.score) best = {unit, score};
+  }
+
+  // Always return text copied from the selected source. The independent QA
+  // reviewer is responsible for deciding whether it actually proves the item.
+  return (best && best.unit ? best.unit : String(source.content || '')).slice(0,600);
 }
 
 function attachAndValidateEvidence(items, evidence) {
@@ -1067,22 +1101,25 @@ function attachAndValidateEvidence(items, evidence) {
     const quote = String(item.sourceEvidence || '').trim();
     const quoteNorm = normalizeEvidenceText(quote);
     const sourceNorm = normalizeEvidenceText(`${source.title} ${source.content}`);
+    const anchoredEvidence = quoteNorm.length >= 18 && sourceNorm.includes(quoteNorm)
+      ? quote
+      : recoverWebEvidenceSnippet(item, source);
 
-    if (quoteNorm.length < 18 || !sourceNorm.includes(quoteNorm)) continue;
+    if (normalizeEvidenceText(anchoredEvidence).length < 18) continue;
 
     accepted.push({
       ...item,
       sourceId:source.id,
       sourceUrl:source.url,
       sourceTitle:source.title,
-      sourceEvidence:quote
+      sourceEvidence:anchoredEvidence
     });
   }
   return accepted;
 }
 
 async function reviewAIBatch(candidates, evidence, request, deadline, generatorRoute) {
-  if (!Array.isArray(candidates) || !candidates.length) return {verified:[], reviewerRoute:''};
+  if (!Array.isArray(candidates) || !candidates.length) return {verified:[], reviewerRoute:'', rejected:[]};
 
   const generatorProvider = routeProvider(generatorRoute);
   const pack = evidencePackText(evidence);
@@ -1092,10 +1129,7 @@ async function reviewAIBatch(candidates, evidence, request, deadline, generatorR
     options:q.options,
     correctIndex:q.correctIndex,
     correctIndexes:q.correctIndexes,
-    explanation:q.explanation,
     sourceId:q.sourceId,
-    sourceUrl:q.sourceUrl,
-    sourceTitle:q.sourceTitle,
     sourceEvidence:q.sourceEvidence,
     category:q.category,
     factKey:q.factKey
@@ -1106,17 +1140,15 @@ async function reviewAIBatch(candidates, evidence, request, deadline, generatorR
     {
       role:'system',
       content:[
-        'You are the independent QZMAX batch QA reviewer.',
+        'You are the independent QZMAX factual QA reviewer.',
         'A different AI provider drafted the candidates below.',
         'Use ONLY the supplied WEB EVIDENCE PACK. Do not use memory or outside knowledge.',
-        'Return ONLY candidates that are factually supported, in scope, unambiguous, and have no distractor that is also correct.',
-        'Do NOT create new questions and do NOT rewrite candidate wording/options.',
-        'For accepted candidates, copy the candidate object exactly into a top-level JSON array named questions.',
-        'Reject a candidate by omitting it.',
-        'The correctIndex/correctIndexes must be supported by the cited evidence.',
-        'The cited sourceEvidence must be an exact phrase present in the cited evidence source.',
-        'Return ONLY one valid JSON object with a top-level array named questions. The array may be smaller than the candidate list or empty if nothing is safe.',
-        'Each returned object must preserve: question, options, correctIndex/correctIndexes, explanation, sourceId, sourceUrl, sourceTitle, sourceEvidence, category and factKey exactly from the candidate.'
+        'For every candidate decide whether the configured correct answer is directly supported, in scope, unambiguous, and whether no distractor is also correct.',
+        'Do NOT rewrite or reproduce the full candidate.',
+        'Return ONLY one valid JSON object with a top-level array named questions.',
+        'Return exactly one compact decision object per candidate using: {"candidateIndex":0,"approved":true,"reason":""}.',
+        'Use approved:false with a short reason when the evidence does not safely support the candidate.',
+        'candidateIndex must exactly match the supplied candidateIndex. Do not invent indexes.'
       ].join('\n')
     },
     {
@@ -1131,14 +1163,6 @@ async function reviewAIBatch(candidates, evidence, request, deadline, generatorR
     }
   ];
 
-  const candidateByFact = new Map();
-  const candidateByQuestion = new Map();
-  for (const q of candidates) {
-    const fk = normalizeEvidenceText(q.factKey || '');
-    if (fk) candidateByFact.set(fk, q);
-    candidateByQuestion.set(normalizeEvidenceText(q.question || ''), q);
-  }
-
   const errors=[];
   for (const route of AI_REVIEW_ORDER) {
     if (routeProvider(route) === generatorProvider) continue;
@@ -1147,36 +1171,41 @@ async function reviewAIBatch(candidates, evidence, request, deadline, generatorR
 
     try {
       const raw = await runProvider(route, messages, reviewRequest, deadline);
-      const reviewed = attachAndValidateEvidence(validateQuestions(raw, reviewRequest), evidence);
-      const verified=[];
-      const seen=new Set();
-      for (const item of reviewed) {
-        const fk=normalizeEvidenceText(item.factKey || '');
-        const qk=normalizeEvidenceText(item.question || '');
-        const original=(fk && candidateByFact.get(fk)) || candidateByQuestion.get(qk);
-        if (!original) continue;
-        const key=normalizeEvidenceText(original.factKey || original.question || '');
-        if (seen.has(key)) continue;
-        seen.add(key);
-        verified.push({
-          ...original,
+      const approvedIndexes = new Set();
+      const rejected=[];
+
+      for (const decision of Array.isArray(raw) ? raw : []) {
+        const idx = Number.parseInt(decision?.candidateIndex,10);
+        if (!Number.isInteger(idx) || idx < 0 || idx >= candidates.length) continue;
+        const approvalText=String(decision.approved ?? decision.status ?? '').trim().toLowerCase();
+        const approved = decision.approved === true || ['true','yes','approved','pass','passed'].includes(approvalText);
+        if (approved) approvedIndexes.add(idx);
+        else rejected.push({index:idx, reason:String(decision?.reason || 'Rejected by independent QA').slice(0,180)});
+      }
+
+      const verified = [...approvedIndexes]
+        .sort((a,b)=>a-b)
+        .map(idx => ({
+          ...candidates[idx],
           webVerified:true,
-          sourceUrls:original.sourceUrl ? [original.sourceUrl] : [],
-          sourceTitles:original.sourceTitle ? [original.sourceTitle] : [],
+          sourceUrls:candidates[idx].sourceUrl ? [candidates[idx].sourceUrl] : [],
+          sourceTitles:candidates[idx].sourceTitle ? [candidates[idx].sourceTitle] : [],
           verificationProvider:routeProvider(route),
           verificationRoute:route
-        });
+        }));
+
+      if (verified.length || rejected.length) {
+        return {verified, reviewerRoute:route, rejected};
       }
-      if (verified.length) return {verified, reviewerRoute:route};
-      errors.push(`${route}: reviewer accepted no candidates`);
+      errors.push(`${route}: reviewer returned no usable candidate decisions`);
     } catch (err) {
       if (!err?.skip) markRouteCooldown(route, err);
       errors.push(`${route}: ${String(err?.message || err).slice(0,180)}`);
     }
   }
 
-  console.warn('[QZMAX AI QA] no reviewer accepted candidates', errors.join(' | ').slice(0,1000));
-  return {verified:[], reviewerRoute:''};
+  console.warn('[QZMAX AI QA] no reviewer returned usable decisions', errors.join(' | ').slice(0,1000));
+  return {verified:[], reviewerRoute:'', rejected:[]};
 }
 
 // QZMAX 3.18 removed the legacy per-question Tavily search + blind two-source
@@ -1377,12 +1406,12 @@ exports.handler = async function handler(event) {
   // Lightweight status endpoint — does not spend AI quota.
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      version:'3.18.1',
+      version:'3.18.2',
       freeOnly:true,
       factualRetrieval:'Tavily search for AI Generator + Tavily Extract for host-selected Source Links',
       sourceLinkExtraction:'Tavily Extract · exact selected page only',
-      factualVerification:'Tavily evidence grounding + independent batch QA provider + structural/duplicate validation',
-      verifiedPassArchitecture:'Up to 10 AI questions per pass · one generator provider · one independent QA provider · fallback only on failure',
+      factualVerification:'Tavily evidence grounding + compact independent batch QA + structural/duplicate validation',
+      verifiedPassArchitecture:'Up to 10 AI questions per pass · one generator · compact independent QA · one targeted repair for rejected/missing items',
       configured:configuredRoutes(),
       aiGeneratorOrder:CUSTOM_DEFAULT_ORDER,
       aiReviewerOrder:AI_REVIEW_ORDER,
@@ -1506,19 +1535,65 @@ exports.handler = async function handler(event) {
             deadline,
             route
           );
-          const verified = audit.verified || [];
+          let verified = audit.verified || [];
+          let reviewerRoute = audit.reviewerRoute || '';
+          let repairedCount = 0;
+
+          // One tightly bounded repair pass: preserve every approved question and
+          // ask the SAME generator only for the missing/rejected count. The
+          // frontend can aggregate a useful partial if the repair cannot finish.
+          const missing = Math.max(0, request.count - verified.length);
+          if (missing > 0 && Date.now() + 9000 < deadline) {
+            try {
+              const acceptedKeys = verified
+                .map(q => String(q.factKey || q.question || '').trim())
+                .filter(Boolean)
+                .slice(0,40);
+              const repairRequest = {
+                ...request,
+                count:missing,
+                generationAttempt:(Number(request.generationAttempt) || 0) + 1,
+                topic:[
+                  String(request.topic || ''),
+                  'QZMAX REPAIR PASS: Generate only '+missing+' replacement question'+(missing===1?'':'s')+' for candidates that failed independent QA.',
+                  acceptedKeys.length ? 'Do not repeat these already-approved facts/questions: '+acceptedKeys.join(' | ') : ''
+                ].filter(Boolean).join('\n\n')
+              };
+              const repairMessages = buildWebEvidenceMessages(buildMessages(repairRequest), repairRequest, webEvidence);
+              const repairRaw = await runProvider(route, repairMessages, repairRequest, deadline);
+              const repairValid = applyCoverageGuard(validateQuestions(repairRaw, repairRequest), repairRequest);
+              const repairGrounded = attachAndValidateEvidence(repairValid, webEvidence);
+              if (repairGrounded.length) {
+                const repairAudit = await reviewAIBatch(repairGrounded, webEvidence, repairRequest, deadline, route);
+                if (repairAudit.reviewerRoute) reviewerRoute = repairAudit.reviewerRoute;
+                const seen = new Set(verified.map(q => normalizeEvidenceText(q.factKey || q.question || '')));
+                for (const q of repairAudit.verified || []) {
+                  const key = normalizeEvidenceText(q.factKey || q.question || '');
+                  if (!key || seen.has(key)) continue;
+                  seen.add(key);
+                  verified.push(q);
+                  repairedCount++;
+                  if (verified.length >= request.count) break;
+                }
+              }
+            } catch (repairErr) {
+              errors.push(`${route}: repair ${String(repairErr?.message || repairErr).slice(0,180)}`);
+            }
+          }
 
           if (verified.length) {
-            console.log(`[QZMAX AI] generator=${route} provider=${provider} model=${model} qa=${audit.reviewerRoute} accepted=${verified.length}/${request.count}`);
+            console.log(`[QZMAX AI] generator=${route} provider=${provider} model=${model} qa=${reviewerRoute} accepted=${verified.length}/${request.count} repaired=${repairedCount}`);
             return jsonResponse(200, verified.slice(0, request.count), {
               'X-QZMAX-AI-Provider':provider,
               'X-QZMAX-AI-Model':model,
               'X-QZMAX-AI-Route':route,
-              'X-QZMAX-AI-Verification':`Tavily grounded + independent ${routeProvider(audit.reviewerRoute)} batch QA`
+              'X-QZMAX-AI-Verification':`Tavily grounded + independent ${routeProvider(reviewerRoute)} compact QA`,
+              'X-QZMAX-AI-Accepted':`${Math.min(verified.length,request.count)}/${request.count}`,
+              'X-QZMAX-AI-Repair':String(repairedCount)
             });
           }
 
-          errors.push(`${route}: independent batch QA rejected all grounded candidates`);
+          errors.push(`${route}: independent compact QA approved no grounded candidates`);
           continue;
         }
 
@@ -1583,7 +1658,7 @@ exports.handler = async function handler(event) {
 
   return jsonResponse(503, {
     error:aiGeneratorMode
-      ? 'QZMAX could not complete a grounded batch that passed independent AI QA. No unchecked questions were added. Try a more specific topic or request fewer questions.'
+      ? 'QZMAX could not complete a grounded batch with the available free AI providers. No unchecked questions were added. Try again, use a more specific topic, or request fewer questions.'
       : 'All configured free AI routes are currently unavailable or rate-limited. QZMAX kept the requested batch size unchanged. Configure additional free providers or try again shortly.',
     details:process.env.QZMAX_AI_DEBUG === '1' ? errors : undefined,
   });
