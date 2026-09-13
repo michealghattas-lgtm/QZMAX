@@ -1,0 +1,28 @@
+QZMAX 3.18.3 TEST REPORT
+Date: 2026-09-14
+
+STATIC CHECKS
+PASS - netlify/functions/generate.js parses with node --check
+PASS - main inline module script from index.html parses with node --check
+PASS - all 9 JSON data/manifest files parse successfully
+PASS - index.html reports APP_VERSION 3.18.3
+PASS - generate status endpoint reports version 3.18.3
+
+MOCKED BACKEND INTEGRATION CHECKS
+PASS - Stable 20-question General Knowledge request:
+       Gemini called once; Tavily not called; 20/20 returned; mode=standard.
+PASS - Current Affairs request:
+       Tavily called once, then Gemini once; no independent reviewer call;
+       returned questions marked webVerified; mode=web-grounded.
+PASS - Simulated Gemini HTTP 500:
+       QZMAX moved to Groq GPT-OSS 120B and returned a valid batch.
+
+REGRESSION NOTE
+The 3.18.2 live answer/Firebase reliability code was retained. 3.18.3 changes are
+restricted to AI Generator orchestration/UI copy/version metadata plus documentation.
+The 3.18.1 Library bilingual topic and Puzzle Mode puzzleKey fixes remain present.
+
+LIMITATION
+These checks use mocked provider responses because the Netlify environment secrets are
+not available inside this build environment. A real deployed test with the configured
+Gemini/Groq/Tavily keys is still required after deployment.

@@ -4452,7 +4452,7 @@ html[data-theme="light"] .q-verify-badge.studybible{
 
 
 /* =========================================================
-   QZMAX 3.18.2 — Live answer + AI reliability fixes
+   QZMAX 3.18.3 — Fast AI Generator + conditional web grounding
    ========================================================= */
 .ai-source-tabs{grid-template-columns:repeat(7,minmax(0,1fr))!important;}
 .ai-engine-route-note{margin-top:9px;padding:9px 11px;border-radius:11px;border:1px solid rgba(95,190,255,.13);background:rgba(52,139,210,.055);display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;font-size:9.5px;color:#9cb2ca;}
@@ -4490,7 +4490,7 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.18.2";
+  const APP_VERSION = "3.18.3";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -6332,7 +6332,7 @@ authPromise.then(() => {
         '</div>'+
 
         '<div id="ai-source-panel-ai" class="ai-source-panel">'+
-          '<div class="ai-source-notice trusted ai-first-notice"><strong>Research first • One generator • Independent QA</strong><span>AI Generator is completely separate from the QZMAX Library. For factual topics QZMAX gathers fresh evidence, uses one free AI model to draft the batch, then a different free model reviews it. Providers are fallbacks, not extra generation stages.</span></div>'+
+          '<div class="ai-source-notice trusted ai-first-notice"><strong>Fast AI generation • Web grounding only when needed</strong><span>QZMAX generates ordinary quiz topics with one free AI model, then runs fast structural checks locally. Current and recent topics are automatically grounded with fresh web evidence. A second AI provider is used only if the first provider fails.</span></div>'+
           '<div class="guided-ai-panel">'+
             '<div class="eyebrow guided-ai-kicker">AI GENERATOR</div>'+
             '<div class="guided-ai-grid">'+
@@ -6352,7 +6352,7 @@ authPromise.then(() => {
               '</div>'+
             '</details>'+
             '<div class="guided-scope-preview" id="ai-guided-preview"></div>'+
-            '<div class="ai-engine-route-note"><span>FREE-AI ROUTE</span><strong>Gemini → Groq → Cloudflare → Mistral → reserve providers</strong><small>Only failures move to the next provider. QZMAX Library content is never mixed into an AI request.</small></div>'+
+            '<div class="ai-engine-route-note"><span>QZMAX AI</span><strong>Fast generation • automatic fallback</strong><small>Current/recent topics are web-grounded automatically. QZMAX Library content is never mixed into an AI request.</small></div>'+
           '</div>'+
         '</div>'+
 
@@ -6453,7 +6453,7 @@ authPromise.then(() => {
           '<div class="qform-row ai-language-row"><label>Question language</label><select id="ai-language"><option value="English" selected>English</option><option value="Arabic">العربية — Arabic</option><option value="Egyptian Simple Arabic">العربية المصرية البسيطة — Egyptian Simple Arabic</option></select><div class="qtype-hint">Questions, answer choices and explanations will be generated in the selected language or dialect.</div></div>'+
           '<div class="ai-format-row">'+
             '<div class="qform-row ai-format-type"><label>Question format</label><select id="ai-question-type"><option value="multiple_choice">Multiple Choice</option><option value="true_false">True / False</option><option value="multiple_correct">Select Multiple</option><option value="mixed">Mixed</option></select></div>'+
-            '<div class="qform-row ai-metric-card ai-metric-questions"><label>Questions</label><input type="number" id="ai-count" value="10" min="1" max="100" inputmode="numeric"><div class="qtype-hint">Up to 100 — generated in batches.</div></div>'+
+            '<div class="qform-row ai-metric-card ai-metric-questions"><label>Questions</label><input type="number" id="ai-count" value="10" min="1" max="100" inputmode="numeric"><div class="qtype-hint">Up to 100 — AI uses batches of up to 20.</div></div>'+
             '<div class="qform-row ai-metric-card ai-metric-options"><label>Options each</label><input type="number" id="ai-opts-per-q" value="4" min="2" max="8" inputmode="numeric"><div class="qtype-hint">Usually 2–8 choices.</div></div>'+
             '<div class="qform-row ai-metric-card ai-metric-time"><label>Time each</label><input type="number" id="ai-time-per-q" value="20" min="3" max="600" step="1" inputmode="numeric"><div class="qtype-hint">Seconds allowed per question.</div></div>'+
             '<div class="qform-row ai-metric-card ai-metric-points"><label>Points each</label><input type="number" id="ai-points-per-q" value="100" min="0" max="100000" step="10" inputmode="numeric"><div class="qtype-hint">Applied to every generated question.</div></div>'+
@@ -6462,8 +6462,8 @@ authPromise.then(() => {
           '<button class="btn btn-primary btn-block ai-generate-hero" id="ai-generate">Generate with AI</button>'+
           '<div class="ai-progress-shell" id="ai-progress-shell" style="display:none;"><div class="ai-progress-bar"><span id="ai-progress-fill"></span></div><div class="ai-progress-label" id="ai-progress-label">Preparing…</div></div>'+
           '<div class="err-msg" id="ai-msg"></div>'+
-          '<div class="verification-legend"><span><b class="verify-dot qzmax"></b> QZMAX Verified</span><span><b class="verify-dot knowledge"></b> QZMAX Knowledge</span><span><b class="verify-dot studybible"></b> Study Bible Grounded</span><span><b class="verify-dot puzzle"></b> QZMAX Puzzle</span><span><b class="verify-dot source"></b> AI Grounded + Reviewed</span><span><b class="verify-dot link"></b> Link Grounded</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> AI • Review</span></div>'+
-          '<div class="accuracy-note" id="ai-accuracy-note"><strong>AI accuracy safeguard:</strong> For factual AI topics, QZMAX gathers fresh web evidence, drafts with one free AI provider, then sends the batch and evidence to a different free AI provider for independent QA. Unsupported or ambiguous questions are excluded rather than filled from the QZMAX Library.</div>'+
+          '<div class="verification-legend"><span><b class="verify-dot qzmax"></b> QZMAX Verified</span><span><b class="verify-dot knowledge"></b> QZMAX Knowledge</span><span><b class="verify-dot studybible"></b> Study Bible Grounded</span><span><b class="verify-dot puzzle"></b> QZMAX Puzzle</span><span><b class="verify-dot source"></b> Web Grounded</span><span><b class="verify-dot link"></b> Link Grounded</span><span><b class="verify-dot document"></b> Document Grounded</span><span><b class="verify-dot review"></b> QZMAX AI</span></div>'+
+          '<div class="accuracy-note" id="ai-accuracy-note"><strong>QZMAX AI:</strong> Ordinary quiz topics use one fast AI generation call plus local structure and duplicate checks. Current/recent topics automatically switch to fresh web grounding. If the primary free AI provider fails, QZMAX falls back to another provider.</div>'+
         '</div>'+
       '</div>'+
 
@@ -6671,7 +6671,7 @@ authPromise.then(() => {
       setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
     };
 
-    // QZMAX 3.18.2 — separate AI Generator and QZMAX Library
+    // QZMAX 3.18.3 — separate AI Generator and QZMAX Library
     let isSchoolMode = false;
     let aiSourceMode = 'ai';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
@@ -6736,7 +6736,7 @@ authPromise.then(() => {
         }else if(aiSourceMode==='school'){
           note.innerHTML = '<strong>Curriculum-guided review:</strong> QZMAX follows the selected year, subject and difficulty guidance. Host review remains important because this mode is not an official curriculum certification.';
         }else{
-          note.innerHTML = '<strong>AI Generator:</strong> QZMAX Library records are not consulted here. Factual AI requests use fresh search evidence, one generator model and an independent free-model QA pass; unsupported questions are excluded.';
+          note.innerHTML = '<strong>QZMAX AI:</strong> QZMAX Library records are not consulted here. Ordinary topics use one fast AI call plus local validation; current/recent topics automatically use fresh web evidence. Another free AI provider is used only if the first route fails.';
         }
       }
     }
@@ -8508,7 +8508,9 @@ authPromise.then(() => {
             sourceUrls = [];
             sourceType = 'ai';
             sourceName = 'QZMAX AI Generator';
-            setAIProgress(8,'Researching the selected topic and preparing the AI batch…');
+            setAIProgress(8, aiNeedsWebGrounding(topic,structuredScope)
+              ? 'Checking fresh web information for this current/recent topic…'
+              : 'Creating the quiz with QZMAX AI…');
           }else if(aiSourceMode==='school'){
             sourceText = '';
             sourceUrls = [];
@@ -8571,25 +8573,18 @@ authPromise.then(() => {
           schedulePuzzleCoverage();
         }else{
           msg.style.color = 'var(--correct)';
-          const aiReviewed = generated.filter(q=>q&&q.aiMeta&&q.aiMeta.label==='AI Grounded + Reviewed').length;
+          const webGroundedCount = generated.filter(q=>q&&q.aiMeta&&q.aiMeta.label==='Web Grounded').length;
           const groundedLabel = aiSourceMode==='document'
             ? 'document-grounded'
             : aiSourceMode==='link'
             ? 'link-grounded'
             : sourceType==='school'
             ? 'year-level curriculum-guided'
-            : aiReviewed
-            ? 'AI grounded + independently reviewed'
-            : 'AI-review';
-          const usedRoutes=[...new Set(generated.map(q=>{
-            const p=q&&q.aiMeta&&q.aiMeta.provider;
-            const m=q&&q.aiMeta&&q.aiMeta.model;
-            return p ? (m ? p+' · '+m : p) : '';
-          }).filter(Boolean))];
+            : webGroundedCount===generated.length
+            ? 'web-grounded AI'
+            : 'QZMAX AI';
           msg.textContent='Added '+generated.length+' '+groundedLabel+' question'+
-            (generated.length===1?'':'s')+'. Duplicate and structural checks passed.'+
-            (usedRoutes.length?' Generator: '+usedRoutes.join(' → ')+'.':'')+
-            ' Review before saving.';
+            (generated.length===1?'':'s')+'. Duplicate and structural checks passed. Review before saving.';
         }
       }catch(err){
         msg.style.color = 'var(--wrong)';
@@ -8991,6 +8986,37 @@ authPromise.then(() => {
       .trim();
   }
 
+  function aiNeedsWebGrounding(topic,structuredScope={}){
+    const category = normalizedTopicKey(structuredScope.category||'');
+    if(category==='current affairs') return true;
+
+    const year=String(new Date().getFullYear());
+    const text=normalizedTopicKey([
+      topic,
+      structuredScope.category,
+      structuredScope.topic,
+      structuredScope.region,
+      structuredScope.timePeriod,
+      structuredScope.focus
+    ].filter(Boolean).join(' '));
+    if(!text) return false;
+
+    const freshTerms=[
+      'current affairs','latest','today','tonight','this week','this month','this year',
+      'recent','recently','news','breaking','live score','latest score','results today',
+      'current president','current prime minister','current government','current ranking',
+      'current standings','current price','market price','stock price','exchange rate',
+      'box office','ongoing','present day',
+      'أخبار','اخبار','أحدث','احدث','حاليا','النهاردة','النهارده','اليوم','دلوقتي',
+      'هذا الأسبوع','هذا الاسبوع','الشهر الحالي','السنة الحالية','السنه الحاليه',
+      'نتيجة اليوم','نتيجه اليوم','الترتيب الحالي','السعر الحالي','الرئيس الحالي','رئيس الوزراء الحالي'
+    ].map(normalizedTopicKey);
+    if(freshTerms.some(term=>term && text.includes(term))) return true;
+    if(new RegExp('(?:^|\\s)'+year+'(?:\\s|$)').test(text)) return true;
+    if(/\b(?:present|ongoing)\b/.test(text)) return true;
+    return false;
+  }
+
   function isGeneralKnowledgeTopic(topic){
     const t = normalizedTopicKey(topic);
     return /\bgeneral knowledge\b/.test(t) ||
@@ -9385,7 +9411,7 @@ authPromise.then(() => {
     if(item && item.webVerified){
       return {
         kind:'source',
-        label:'AI Grounded + Reviewed',
+        label:'Web Grounded',
         sourceName:Array.isArray(item.sourceTitles) && item.sourceTitles.length
           ? item.sourceTitles.slice(0,2).join(' • ')
           : (item.sourceTitle||'Fresh web evidence'),
@@ -9440,8 +9466,8 @@ authPromise.then(() => {
     if(sourceType==='ai'){
       return {
         kind:'review',
-        label:'AI • Review',
-        sourceName:sourceName||'QZMAX Free Multi-AI Router'
+        label:'QZMAX AI',
+        sourceName:sourceName||'QZMAX Free AI Generator'
       };
     }
     return {kind:'review',label:'AI • Review',sourceName:''};
@@ -9524,6 +9550,7 @@ authPromise.then(() => {
       : {};
     const difficulty = context.difficulty || structuredScope.difficulty || 'Medium';
     const generationScope = buildGenerationScope(topic,count,generationAttempt,structuredScope);
+    const webGrounding = context.sourceType==='ai' && aiNeedsWebGrounding(topic,structuredScope);
     const avoidFactKeys = sameTopicFactKeys(existing,topic);
     const sourceExcerpt = context.sourceExcerpt || '';
     const languageInstruction = questionLanguage === 'Egyptian Simple Arabic'
@@ -9597,7 +9624,8 @@ authPromise.then(() => {
           'CRITICAL TOPIC-FIDELITY RULE: The current host Topic / Instructions field is the only subject scope for this generation.',
           'Do not carry over any subject, person, place, work, example, theme, or category from earlier generations.',
           'Every question must directly satisfy the current scope contract.',
-          'Use widely established facts. Current Topic questions will be independently web checked after generation.',
+          'Use established facts. Before returning the JSON, silently verify that each configured correct answer is highly confident, unambiguous, and the only defensible answer among the options. If uncertain, replace the question with a safer fact.',
+          'Do not create trick questions merely to increase difficulty.',
           'For copyrighted lyrics, dialogue and other protected text, use only very short excerpts or ask about identification, attribution or context.'
         ].join(' ')
       : 'Accuracy requirement: use established facts, avoid disputed/time-sensitive claims, and make exactly one defensible answer unless Select Multiple is requested.';
@@ -9623,12 +9651,17 @@ authPromise.then(() => {
       requestedType==='multiple_choice'
         ? 'Vary the position of the correct answer across the returned questions. Do not make the first option correct every time.'
         : '',
+      context.sourceType==='ai'
+        ? (webGrounding
+            ? 'FRESHNESS MODE: This request is current/recent. QZMAX will supply web evidence on the server; use only that evidence for time-sensitive factual claims.'
+            : 'FAST STANDARD AI MODE: No web research is required for this request. Prefer well-established, high-confidence facts and replace anything uncertain before returning the JSON.')
+        : '',
       'Return clean JSON only in the schema expected by the quiz application.'
     ].filter(Boolean).join('\n\n');
 
     let res;
     const aiController = new AbortController();
-    const aiRequestTimeoutMs = context.sourceType==='ai' ? 56000 : 42000;
+    const aiRequestTimeoutMs = context.sourceType==='ai' ? (webGrounding ? 47000 : 37000) : 42000;
     const aiRequestTimer = setTimeout(()=>aiController.abort(),aiRequestTimeoutMs);
     try{
       res = await fetch('/.netlify/functions/generate',{
@@ -9646,7 +9679,8 @@ authPromise.then(() => {
           sourceName:context.sourceName||'',
           sourceUrls:Array.isArray(context.sourceUrls)?context.sourceUrls.slice(0,2):[],
           sourceEvidenceText:context.sourceType==='link' ? sourceExcerpt : '',
-          preferSearch:context.sourceType==='ai',
+          preferSearch:webGrounding,
+          webGrounding,
           questionLanguage,
           generationId:context.generationId||'',
           generationAttempt,
@@ -9660,7 +9694,7 @@ authPromise.then(() => {
       });
     }catch(e){
       if(e && e.name==='AbortError'){
-        throw new Error('This verified pass exceeded the QZMAX time limit and was stopped. QZMAX will retry with the remaining questions.');
+        throw new Error('This AI request took too long and was stopped. QZMAX will retry the remaining questions using the free fallback routes.');
       }
       throw new Error('Could not reach the AI server — check your connection.');
     }finally{
@@ -9679,7 +9713,7 @@ authPromise.then(() => {
       const gatewayLike = [502,503,504].includes(res.status) ||
         /timeout|timed out|gateway|function invocation|internal server/i.test(responseText);
       if(gatewayLike){
-        throw new Error('QZMAX verification request timed out before the server could return a complete result. QZMAX will retry in a smaller verified pass.');
+        throw new Error('The AI request timed out before the server returned a complete result. QZMAX will retry the remaining questions using the free fallback routes.');
       }
       throw new Error('The QZMAX AI server returned an unreadable response. Please try again.');
     }
@@ -9797,20 +9831,21 @@ authPromise.then(() => {
     }
     const accepted = [];
     const known = Array.isArray(existingQuestions) ? existingQuestions.slice() : [];
-    // Preserve the host's requested total, but split expensive web-verified
-    // work into small serverless passes so one invocation cannot become overloaded.
+    // Normal AI generation uses one server call for up to 20 questions. Larger
+    // host requests are split only because the public UI supports totals up to 100.
+    // Source Link remains smaller because it cycles through extracted source windows.
     const internalBatchSize =
       sourceType==='link' ? 5 :
+      sourceType==='ai' ? (aiNeedsWebGrounding(topic,structuredScope) ? 10 : 20) :
       10;
 
-    // AI Generator performs one evidence search + compact independent QA.
-    // Keep retries tightly bounded. A request for 5 questions normally uses
-    // one verified pass, with at most two recovery passes.
+    // Providers are fallbacks, not sequential reviewers. If a provider returns a
+    // useful partial batch, keep it and request only the missing questions next.
     const maxAttempts =
       sourceType==='link'
         ? Math.ceil(target/internalBatchSize) + 10
         : sourceType==='ai'
-        ? Math.ceil(target/internalBatchSize) + 2
+        ? Math.ceil(target/internalBatchSize) + 3
         : Math.ceil(target/10) + 8;
     let attempts = 0;
 
@@ -9826,7 +9861,9 @@ authPromise.then(() => {
         sourceType==='link'
           ? 'Reading another relevant section of the source — building '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
           : sourceType==='ai'
-          ? 'AI batch '+(attempts+1)+' — research, generation and independent QA for '+batchCount+' question'+(batchCount===1?'':'s')+'…'
+          ? (aiNeedsWebGrounding(topic,structuredScope)
+              ? 'Checking fresh web sources and creating '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
+              : 'Creating '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+' with QZMAX AI…')
           : 'Generating '+(accepted.length+1)+'–'+Math.min(target,accepted.length+batchCount)+' of '+target+'…'
       );
 
@@ -9849,6 +9886,15 @@ authPromise.then(() => {
       }catch(err){
         attempts++;
         if(attempts>=maxAttempts && !accepted.length) throw err;
+        if(sourceType==='ai' && onProgress){
+          onProgress(
+            accepted.length,
+            target,
+            accepted.length
+              ? accepted.length+' of '+target+' ready — trying another free AI route for the remaining '+(target-accepted.length)+'…'
+              : 'The first free AI route did not complete — trying another available route…'
+          );
+        }
         continue;
       }
 
@@ -9868,7 +9914,9 @@ authPromise.then(() => {
               sourceType==='link'
                 ? 'Checked source evidence and duplicates — '+accepted.length+' of '+target+' Link Grounded questions ready…'
                 : sourceType==='ai'
-                ? 'Independent QA complete — '+accepted.length+' of '+target+' grounded questions ready…'
+                ? (aiNeedsWebGrounding(topic,structuredScope)
+                    ? 'Web grounding complete — '+accepted.length+' of '+target+' questions ready…'
+                    : 'QZMAX AI checks complete — '+accepted.length+' of '+target+' questions ready…')
                 : 'Checked topic scope, facts and duplicates — '+accepted.length+' of '+target+' unique questions ready…'
             )
           : 'All '+target+' questions ready.'
@@ -9888,7 +9936,7 @@ authPromise.then(() => {
           ' unique Link Grounded questions after cycling through the relevant source sections. No unchecked questions were added. Try leaving Focus blank, broadening the focus, or request a smaller additional batch.'
         );
       }
-      throw new Error('Only '+accepted.length+' unique, in-scope questions could be produced after verification and duplicate checks. Try a broader document/topic or request fewer questions.');
+      throw new Error('Only '+accepted.length+' unique, valid questions could be produced after the available free AI attempts. Keep the completed questions and try generating the remaining amount again, or broaden the topic.');
     }
     return accepted.slice(0,target);
   }
@@ -9900,14 +9948,14 @@ authPromise.then(() => {
     const sourceCount = Array.isArray(meta.sourceUrls) ? meta.sourceUrls.length : 0;
     const sourceCountLabel = meta.kind==='link'
       ? (sourceCount ? sourceCount+' selected source link' : '')
-      : (sourceCount ? sourceCount+' independent source'+(sourceCount===1?'':'s') : '');
+      : (sourceCount ? sourceCount+' source'+(sourceCount===1?'':'s') : '');
     const verifyTitle = [
       meta.sourceName||meta.label||'',
-      meta.verificationProvider ? 'Independent QA: '+meta.verificationProvider : '',
+      meta.verificationProvider ? 'AI provider: '+meta.verificationProvider : '',
       sourceCountLabel
     ].filter(Boolean).join(' · ');
     return '<span class="q-verify-badge '+kind+'" title="'+escapeHtml(verifyTitle)+'">'+
-      (kind==='review'?'!':kind==='puzzle'?'🧩':kind==='knowledge'?'📚':kind==='studybible'?'📖':'✓')+' '+escapeHtml(meta.label||'AI • Review')+
+      (kind==='review'?'✦':kind==='puzzle'?'🧩':kind==='knowledge'?'📚':kind==='studybible'?'📖':'✓')+' '+escapeHtml(meta.label||'QZMAX AI')+
     '</span>';
   }
 
