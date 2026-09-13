@@ -4452,7 +4452,7 @@ html[data-theme="light"] .q-verify-badge.studybible{
 
 
 /* =========================================================
-   QZMAX 3.18.0 — Separate AI Generator + QZMAX Library
+   QZMAX 3.18.1 — Library language + Puzzle duplicate fixes
    ========================================================= */
 .ai-source-tabs{grid-template-columns:repeat(7,minmax(0,1fr))!important;}
 .ai-engine-route-note{margin-top:9px;padding:9px 11px;border-radius:11px;border:1px solid rgba(95,190,255,.13);background:rgba(52,139,210,.055);display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;font-size:9.5px;color:#9cb2ca;}
@@ -4490,7 +4490,7 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.18.0";
+  const APP_VERSION = "3.18.1";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -6623,7 +6623,7 @@ authPromise.then(() => {
       setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
     };
 
-    // QZMAX 3.18 — separate AI Generator and QZMAX Library
+    // QZMAX 3.18.1 — separate AI Generator and QZMAX Library
     let isSchoolMode = false;
     let aiSourceMode = 'ai';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
@@ -6771,11 +6771,18 @@ authPromise.then(() => {
       };
     }
 
+    function qzPuzzleKeyFromQuestion(q){
+      const direct=q?.aiMeta?.puzzleKey;
+      if(direct) return String(direct);
+      const factKey=String(q?.aiMeta?.factKey||'');
+      return factKey.startsWith('puzzle:') ? factKey.slice(7) : '';
+    }
+
     function puzzleCandidates(filters,existingQuestions=[]){
       if(!qzPuzzleBank) return [];
       const knownKeys=new Set(
         (existingQuestions||[])
-          .map(q=>q&&q.aiMeta&&q.aiMeta.puzzleKey)
+          .map(q=>qzPuzzleKeyFromQuestion(q))
           .filter(Boolean)
       );
       return qzPuzzleBank.puzzles.filter(p=>{
@@ -6783,7 +6790,8 @@ authPromise.then(() => {
         if(filters.topic && p.topic!==filters.topic) return false;
         if(filters.difficulty && p.difficulty!==filters.difficulty) return false;
         if(filters.language && p.language!==filters.language) return false;
-        if(knownKeys.has(p.puzzleKey)) return false;
+        const puzzleKey=String(p.puzzleKey||p.id||'');
+        if(!puzzleKey || knownKeys.has(puzzleKey)) return false;
         return true;
       });
     }
@@ -6849,16 +6857,23 @@ authPromise.then(() => {
         );
       }
 
-      const selected=shuffledPuzzlePool(candidates).slice(0,target);
+      // Puzzle Bank records are curated and carry a stable puzzleKey.  Do not run
+      // them through the generic AI semantic duplicate checker: emoji/symbol clues
+      // can normalize to the same text (for example many Emoji Rebus prompts become
+      // just "guess the phrase"), causing valid puzzles to be rejected incorrectly.
       const out=[];
-      for(const p of selected){
+      const usedKeys=new Set((existingQuestions||[]).map(q=>qzPuzzleKeyFromQuestion(q)).filter(Boolean));
+      for(const p of shuffledPuzzlePool(candidates)){
+        if(out.length>=target) break;
+        const puzzleKey=String(p.puzzleKey||p.id||'');
+        if(!puzzleKey || usedKeys.has(puzzleKey)) continue;
         const q=puzzleToQZMAX(p,{timePerQuestion,pointsPerQuestion,generationId});
         if(!aiQuestionStructuralCheck(q)) continue;
-        if(isDuplicateGeneratedQuestion(q,existingQuestions) || isDuplicateGeneratedQuestion(q,out)) continue;
+        usedKeys.add(puzzleKey);
         out.push(q);
       }
       if(out.length<target){
-        throw new Error('Puzzle duplicate checks left only '+out.length+' of '+target+' usable puzzles. Request fewer or choose another topic.');
+        throw new Error('Only '+out.length+' of '+target+' structurally valid unused puzzles could be selected. Request fewer or choose another topic.');
       }
       randomizeGeneratedAnswerPositions(out);
       return out;
@@ -7625,7 +7640,7 @@ authPromise.then(() => {
 
 
     // =========================================================
-    // QZMAX 3.18 — QZMAX Library: database-driven cascading UI
+    // QZMAX 3.18.1 — QZMAX Library: database-driven cascading UI
     // =========================================================
     let qzLibraryEntries=null;
     let qzLibraryPromise=null;
@@ -7642,6 +7657,22 @@ authPromise.then(() => {
       return record && record.difficultyUnrated===true
         ? 'Unrated'
         : String(record?.difficulty||'Unrated').trim() || 'Unrated';
+    }
+
+    // Canonical multilingual Library taxonomy.  Stored packs may keep localized
+    // topic labels, but equivalent topics must filter as one subject so Language
+    // can be selected afterwards without hiding translated records.
+    const QZ_LIBRARY_TOPIC_ALIASES = Object.freeze({
+      'شخصيات الكتاب المقدس':'Bible People',
+      'مقدمة الـOSB':'OSB Introduction',
+      'الكانون الأرثوذكسي':'Orthodox Canon',
+      'الكنيسة الأرثوذكسية':'Orthodox Church',
+      'قراءة الكتاب':'Reading the Bible'
+    });
+
+    function qzLibraryCanonicalTopic(value){
+      const topic=String(value||'General').trim() || 'General';
+      return QZ_LIBRARY_TOPIC_ALIASES[topic] || topic;
     }
 
     async function loadQZMAXLibraryEntries(){
@@ -7664,7 +7695,8 @@ authPromise.then(() => {
               origin:'verified',
               id:question.id||fact.id,
               category:String(question.category||fact.category||'Uncategorised'),
-              topic:String(question.topic||fact.topic||'General'),
+              topic:qzLibraryCanonicalTopic(question.topic||fact.topic||'General'),
+              topicOriginal:String(question.topic||fact.topic||'General'),
               language:String(question.language||'English'),
               difficulty:String(question.difficulty||fact.difficulty||'Unrated'),
               region:String(fact.region||'Unspecified'),
@@ -7691,7 +7723,8 @@ authPromise.then(() => {
                 origin:'knowledge',
                 id:record.id||record.duplicateKey,
                 category:String(record.category||'Uncategorised'),
-                topic:String(record.topic||'General'),
+                topic:qzLibraryCanonicalTopic(record.topic||'General'),
+                topicOriginal:String(record.topic||'General'),
                 language:String(record.language||item.pack.language||'Unspecified'),
                 difficulty:qzLibraryDifficulty(record),
                 region:String(record.region||record.market||'Unspecified'),

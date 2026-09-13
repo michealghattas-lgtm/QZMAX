@@ -1,25 +1,21 @@
 'use strict';
 
-// QZMAX 3.17.0 — Unified Content Engine
+// QZMAX 3.18.1 — AI Generator + QZMAX Library maintenance release
 //
-// No paid OpenAI, Claude or xAI API is used.
-// The router keeps the requested batch size and switches providers on rate limit.
-//
-// Search-first Custom Topic order:
-// Gemini + Google Search -> Groq Compound -> Groq Qwen -> Cerebras ->
-// Groq GPT-OSS 20B -> Mistral -> NVIDIA NIM -> SambaNova ->
-// Cloudflare -> OpenRouter Free -> Groq GPT-OSS 120B -> Gemini -> local.
-//
-// Strict Document / School generation does not use live-search routes.
+// The QZMAX Library is stored content and never enters this function.
+// AI Generator uses a simple free-only pipeline:
+//   Tavily evidence -> one generator provider -> one independent QA provider.
+// Providers are fallbacks, not sequential co-generators.
+// Document, Source Link and School modes keep the same free provider pool.
 
 const MAX_BATCH = 10;
 const MAX_OPTIONS = 8;
 const MAX_PROMPT_CHARS = 60000;
-const GLOBAL_BUDGET_MS = 20000;
+const GLOBAL_BUDGET_MS = 24000;
 
 const MODELS = {
   geminiSearch: process.env.GEMINI_SEARCH_MODEL || 'gemini-2.5-flash',
-  gemini: process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite',
+  gemini: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
   groqQwen: process.env.GROQ_MODEL || 'qwen/qwen3.8-27b',
   groqCompound: process.env.GROQ_COMPOUND_MODEL || 'groq/compound',
   groqOss20: process.env.GROQ_GPT_OSS_20B_MODEL || 'openai/gpt-oss-20b',
@@ -33,30 +29,37 @@ const MODELS = {
 };
 
 const CUSTOM_DEFAULT_ORDER = [
-  'groq_qwen',
-  'cerebras',
-  'groq_oss20',
+  'gemini',
+  'groq_oss120',
+  'cloudflare',
   'mistral',
+  'cerebras',
   'nvidia',
   'sambanova',
-  'cloudflare',
   'openrouter',
-  'groq_oss120',
-  'gemini',
 ];
 
 const STRICT_DEFAULT_ORDER = [
-  'groq_qwen',
-  'cerebras',
-  'groq_oss20',
+  'gemini',
+  'groq_oss120',
+  'cloudflare',
   'mistral',
+  'cerebras',
   'nvidia',
   'sambanova',
-  'cloudflare',
   'openrouter',
+  'local',
+];
+
+const AI_REVIEW_ORDER = [
   'groq_oss120',
   'gemini',
-  'local',
+  'cloudflare',
+  'mistral',
+  'cerebras',
+  'nvidia',
+  'sambanova',
+  'openrouter',
 ];
 
 const ROUTE_COOLDOWNS = new Map();
@@ -116,17 +119,19 @@ function parseProviderOrder(request) {
     order = order.filter(route => !['gemini_search','groq_compound'].includes(route));
   }
 
-  // Rotate the starting free provider between frontend passes.
-  const attempt = Math.max(0, Number(request?.generationAttempt) || 0);
   const nonLocal = order.filter(route => route !== 'local');
-  if (nonLocal.length && attempt) {
+  // AI Generator always starts from the preferred primary provider. The route
+  // moves only after a real failure/cooldown. Source-grounded retry passes may
+  // still rotate so a long document does not repeatedly hit one free quota.
+  const attempt = Math.max(0, Number(request?.generationAttempt) || 0);
+  if (!customAI && nonLocal.length && attempt) {
     const shift = attempt % nonLocal.length;
     order = nonLocal.slice(shift).concat(nonLocal.slice(0, shift));
   } else {
     order = nonLocal;
   }
 
-  order.push('local');
+  if (!customAI) order.push('local');
   return [...new Set(order)];
 }
 
@@ -954,15 +959,23 @@ async function fetchTavilyEvidence(request, deadline) {
   const key = process.env.TAVILY_API_KEY;
   if (!key) {
     throw Object.assign(
-      new Error('TAVILY_API_KEY is required for Web Verified Custom Topic generation.'),
+      new Error('TAVILY_API_KEY is required for factual AI grounding.'),
       { status:503 }
     );
   }
 
-  const query = [
-    structuredSearchScope(request),
-    String(request.originalTopic || request.topic || '')
-  ]
+  const queryParts = request.generalKnowledge && Array.isArray(request.coverageCategories) && request.coverageCategories.length
+    ? [
+        'reliable factual reference',
+        request.coverageCategories.join(' '),
+        request.structuredScope?.region || '',
+        request.structuredScope?.timePeriod || ''
+      ]
+    : [
+        structuredSearchScope(request),
+        String(request.originalTopic || request.topic || '')
+      ];
+  const query = queryParts
     .filter(Boolean)
     .join(' ')
     .replace(/\s+/g, ' ')
@@ -1068,335 +1081,106 @@ function attachAndValidateEvidence(items, evidence) {
   return accepted;
 }
 
-function answerSignature(item, type) {
-  if (type === 'multiple_correct') {
-    const arr = Array.isArray(item.correctIndexes)
-      ? item.correctIndexes.map(Number).sort((a,b)=>a-b)
-      : [];
-    return arr.join(',');
-  }
-  return String(Number.parseInt(item.correctIndex,10));
-}
+async function reviewAIBatch(candidates, evidence, request, deadline, generatorRoute) {
+  if (!Array.isArray(candidates) || !candidates.length) return {verified:[], reviewerRoute:''};
 
-function sameQuestionAndOptions(a, b) {
-  if (!a || !b) return false;
-  if (normalizeEvidenceText(a.question) !== normalizeEvidenceText(b.question)) return false;
+  const generatorProvider = routeProvider(generatorRoute);
+  const pack = evidencePackText(evidence);
+  const candidatePayload = candidates.map((q, i) => ({
+    candidateIndex:i,
+    question:q.question,
+    options:q.options,
+    correctIndex:q.correctIndex,
+    correctIndexes:q.correctIndexes,
+    explanation:q.explanation,
+    sourceId:q.sourceId,
+    sourceUrl:q.sourceUrl,
+    sourceTitle:q.sourceTitle,
+    sourceEvidence:q.sourceEvidence,
+    category:q.category,
+    factKey:q.factKey
+  }));
 
-  const ao = Array.isArray(a.options) ? a.options : [];
-  const bo = Array.isArray(b.options) ? b.options : [];
-  if (ao.length !== bo.length) return false;
-
-  return ao.every((opt, i) =>
-    normalizeEvidenceText(opt) === normalizeEvidenceText(bo[i])
-  );
-}
-
-
-const TARGETED_FACT_CACHE = new Map();
-const TARGETED_FACT_CACHE_TTL_MS = 30 * 60 * 1000;
-
-function sourceDomain(url) {
-  try {
-    return new URL(String(url || '')).hostname.toLowerCase().replace(/^www\./,'');
-  } catch (_) {
-    return '';
-  }
-}
-
-async function mapWithConcurrency(items, limit, worker) {
-  const out = new Array(items.length);
-  let next = 0;
-
-  async function run() {
-    while (true) {
-      const i = next++;
-      if (i >= items.length) return;
-      try {
-        out[i] = await worker(items[i], i);
-      } catch (err) {
-        out[i] = { error:err };
-      }
-    }
-  }
-
-  const workers = Array.from(
-    {length:Math.min(Math.max(1,limit),items.length)},
-    () => run()
-  );
-  await Promise.all(workers);
-  return out;
-}
-
-async function fetchTargetedQuestionEvidence(candidate, request, deadline, candidateIndex) {
-  const key = process.env.TAVILY_API_KEY;
-  if (!key) throw new Error('TAVILY_API_KEY is required for question-specific fact checking.');
-
-  const question = String(candidate?.question || '').replace(/\s+/g,' ').trim();
-  const topic = String(request.originalTopic || '').replace(/\s+/g,' ').trim();
-  const category = String(candidate?.category || '').replace(/\s+/g,' ').trim();
-  const query = [question,category,structuredSearchScope(request),topic]
-    .filter(Boolean).join(' ').replace(/\s+/g,' ').trim().slice(0, 900);
-
-  const cacheKey = normalizeEvidenceText(query);
-  const cached = TARGETED_FACT_CACHE.get(cacheKey);
-  if (cached && (Date.now() - cached.savedAt) < TARGETED_FACT_CACHE_TTL_MS) {
-    return cached.evidence;
-  }
-
-  const remaining = deadline - Date.now();
-  if (remaining < 2600) return [];
-
-  const res = await fetchWithTimeout('https://api.tavily.com/search', {
-    method:'POST',
-    headers:{
-      'Authorization':`Bearer ${key}`,
-      'Content-Type':'application/json'
+  const reviewRequest = {...request, count:candidates.length};
+  const messages = [
+    {
+      role:'system',
+      content:[
+        'You are the independent QZMAX batch QA reviewer.',
+        'A different AI provider drafted the candidates below.',
+        'Use ONLY the supplied WEB EVIDENCE PACK. Do not use memory or outside knowledge.',
+        'Return ONLY candidates that are factually supported, in scope, unambiguous, and have no distractor that is also correct.',
+        'Do NOT create new questions and do NOT rewrite candidate wording/options.',
+        'For accepted candidates, copy the candidate object exactly into a top-level JSON array named questions.',
+        'Reject a candidate by omitting it.',
+        'The correctIndex/correctIndexes must be supported by the cited evidence.',
+        'The cited sourceEvidence must be an exact phrase present in the cited evidence source.',
+        'Return ONLY one valid JSON object with a top-level array named questions. The array may be smaller than the candidate list or empty if nothing is safe.',
+        'Each returned object must preserve: question, options, correctIndex/correctIndexes, explanation, sourceId, sourceUrl, sourceTitle, sourceEvidence, category and factKey exactly from the candidate.'
+      ].join('\n')
     },
-    body:JSON.stringify({
-      query,
-      search_depth:'basic',
-      chunks_per_source:3,
-      max_results:5,
-      topic:'general',
-      include_answer:false,
-      include_raw_content:false,
-      include_images:false,
-      include_usage:true,
-      auto_parameters:false,
-      exact_match:false,
-      safe_search:true,
-      exclude_domains:[
-        'facebook.com','instagram.com','tiktok.com','x.com','twitter.com',
-        'pinterest.com','reddit.com'
-      ]
-    })
-  }, Math.max(1800, Math.min(6500, remaining - 500)));
-
-  if (!res.ok) throw await readErrorResponse(res);
-  const data = await res.json();
-
-  const byDomain = new Map();
-  for (const r of Array.isArray(data?.results) ? data.results : []) {
-    if (!r || !r.url || !r.content) continue;
-    const domain = sourceDomain(r.url);
-    if (!domain || byDomain.has(domain)) continue;
-
-    const content = String(r.content || '').replace(/\s+/g,' ').trim().slice(0,2600);
-    if (content.length < 50) continue;
-
-    byDomain.set(domain, {
-      id:`Q${candidateIndex+1}S${byDomain.size+1}`,
-      title:String(r.title || '').trim().slice(0,300),
-      url:String(r.url || '').trim().slice(0,1000),
-      domain,
-      content,
-      score:Number(r.score || 0)
-    });
-    if (byDomain.size >= 5) break;
-  }
-
-  const evidence = [...byDomain.values()];
-  TARGETED_FACT_CACHE.set(cacheKey,{savedAt:Date.now(),evidence});
-  return evidence;
-}
-
-async function fetchTargetedEvidenceForCandidates(candidates, request, deadline) {
-  const records = await mapWithConcurrency(
-    candidates,
-    4,
-    async (candidate, index) => {
-      const evidence = await fetchTargetedQuestionEvidence(candidate, request, deadline, index);
-      return { candidate, index, evidence };
+    {
+      role:'user',
+      content:[
+        structuredScopeText(request) ? 'REQUIRED SCOPE: '+structuredScopeText(request) : '',
+        'WEB EVIDENCE PACK:',
+        pack,
+        'CANDIDATES TO REVIEW:',
+        JSON.stringify(candidatePayload)
+      ].filter(Boolean).join('\n\n')
     }
-  );
+  ];
 
-  return records.filter(r =>
-    r && !r.error &&
-    Array.isArray(r.evidence) &&
-    new Set(r.evidence.map(s=>s.domain).filter(Boolean)).size >= 2
-  );
-}
-
-function verifierEvidenceText(records) {
-  return records.map(record => {
-    const evidence = record.evidence.map(src =>
-      `[${src.id}] ${src.title}\nURL: ${src.url}\nSOURCE TEXT: ${src.content}`
-    ).join('\n\n');
-
-    return [
-      `CANDIDATE ${record.index+1}`,
-      `QUESTION: ${record.candidate.question}`,
-      `OPTIONS: ${JSON.stringify(record.candidate.options)}`,
-      record.candidate.category ? `PROPOSED CATEGORY: ${record.candidate.category}` : '',
-      'QUESTION-SPECIFIC WEB RESULTS:',
-      evidence
-    ].join('\n');
-  }).join('\n\n====================\n\n');
-}
-
-function blindAuditSignature(audit, questionType, optionsLength) {
-  if (questionType === 'multiple_correct') {
-    const values = Array.isArray(audit?.correctIndexes)
-      ? [...new Set(audit.correctIndexes.map(Number).filter(i=>Number.isInteger(i)&&i>=0&&i<optionsLength))].sort((a,b)=>a-b)
-      : [];
-    return values.length >= 2 ? values.join(',') : '';
+  const candidateByFact = new Map();
+  const candidateByQuestion = new Map();
+  for (const q of candidates) {
+    const fk = normalizeEvidenceText(q.factKey || '');
+    if (fk) candidateByFact.set(fk, q);
+    candidateByQuestion.set(normalizeEvidenceText(q.question || ''), q);
   }
 
-  const idx = Number.parseInt(audit?.correctIndex,10);
-  return Number.isInteger(idx) && idx>=0 && idx<optionsLength ? String(idx) : '';
-}
-
-function validateBlindSupports(audit, evidence) {
-  const supports = Array.isArray(audit?.supports) ? audit.supports : [];
-  const byId = new Map(evidence.map(s=>[s.id,s]));
-  const valid = [];
-
-  for (const support of supports) {
-    const source = byId.get(String(support?.sourceId || '').trim());
-    if (!source) continue;
-
-    const quote = String(support?.evidence || '').trim();
-    const quoteNorm = normalizeEvidenceText(quote);
-    const sourceNorm = normalizeEvidenceText(source.content);
-
-    if (quoteNorm.length < 18 || !sourceNorm.includes(quoteNorm)) continue;
-
-    valid.push({source,quote});
-  }
-
-  const domains = new Set(valid.map(v=>v.source.domain).filter(Boolean));
-  if (domains.size < 2) return [];
-
-  // Keep at most one supporting citation per independent domain.
-  const kept = [];
-  const seenDomains = new Set();
-  for (const v of valid) {
-    if (seenDomains.has(v.source.domain)) continue;
-    seenDomains.add(v.source.domain);
-    kept.push(v);
-    if (kept.length >= 2) break;
-  }
-  return kept;
-}
-
-async function verifyCandidatesWithIndependentModel(candidates, broadEvidence, request, deadline, generatorRoute) {
-  if (!candidates.length) return {verified:[], verifierRoute:''};
-
-  // Fresh search for the exact fact asked by every candidate.
-  const targetedRecords = await fetchTargetedEvidenceForCandidates(candidates, request, deadline);
-  if (!targetedRecords.length) {
-    return {verified:[], verifierRoute:''};
-  }
-
-  const verificationRoutes = [
-    'gemini','cerebras','groq_oss120','mistral','nvidia',
-    'sambanova','cloudflare','openrouter','groq_oss20','groq_qwen'
-  ].filter(r => r !== generatorRoute);
-
-  const system = [
-    'You are the BLIND QZMAX factual verifier.',
-    'You are deliberately NOT being shown the answer selected by the question writer.',
-    'Solve every question independently from its QUESTION-SPECIFIC WEB RESULTS only.',
-    'Do not use memory, prior model knowledge, the broad topic evidence, or assumptions.',
-    'CURRENT HOST SCOPE: '+String(request.originalTopic || '').trim(),
-    structuredScopeText(request) ? 'STRUCTURED HOST SCOPE: '+structuredScopeText(request) : '',
-    request.scopeInstruction ? 'SCOPE/COVERAGE CONTRACT: '+request.scopeInstruction : '',
-    'First decide whether each candidate satisfies EVERY populated structured scope field and is directly in scope for the CURRENT HOST SCOPE. Ignore all prior topics because none are relevant to this audit.',
-    'For each accepted candidate output scopeVerdict:"in_scope". Omit anything off-topic, over-specialised relative to the requested general-knowledge coverage, or outside the named timeframe/category.',
-    'For each candidate, output it only when the web results establish exactly one defensible answer (or the exact complete set for Select Multiple).',
-    'For every accepted candidate include verdict:"supported", confidence:"high", scopeVerdict:"in_scope", question, options, category when supplied, and your independently chosen correctIndex/correctIndexes.',
-    'Also include factKey: a concise canonical fact identity in the form relationship|subject|answer. It must identify the underlying fact rather than copy the question wording.',
-    'Also include supports as an array of at least TWO objects from TWO DIFFERENT source IDs/domains. Each support object must contain sourceId and evidence.',
-    'The evidence value must be an EXACT copied phrase from that source text which materially supports your chosen answer.',
-    'Do not treat absence of a name in one snippet as proof that an option is false.',
-    'For True/False questions marked False, the cited evidence must explicitly establish a contradictory fact, not merely fail to mention the statement.',
-    'If two sources disagree, if the evidence is incomplete, or if you cannot prove the answer, OMIT the candidate.',
-    'Copy the question and options EXACTLY. Do not rewrite or reorder them.',
-    `Question type: ${request.questionType}.`,
-    'Return ONLY one valid JSON object: {"questions":[...]}'
-  ].filter(Boolean).join('\n\n');
-
-  const user = verifierEvidenceText(targetedRecords);
-  let verifierRoutesTried = 0;
-
-  for (const route of verificationRoutes) {
-    if (Date.now() >= deadline - 1800) break;
+  const errors=[];
+  for (const route of AI_REVIEW_ORDER) {
+    if (routeProvider(route) === generatorProvider) continue;
     if (routeOnCooldown(route)) continue;
-    if (verifierRoutesTried >= 2) break;
-
-    verifierRoutesTried++;
+    if (Date.now() >= deadline) break;
 
     try {
-      const rawAudits = await runProvider(
-        route,
-        [{role:'system',content:system},{role:'user',content:user}],
-        {...request, count:targetedRecords.length},
-        deadline
-      );
-
-      if (!Array.isArray(rawAudits) || !rawAudits.length) continue;
-
-      const verified = [];
-
-      for (const record of targetedRecords) {
-        const original = record.candidate;
-        const audit = rawAudits.find(v => sameQuestionAndOptions(original,v));
-        if (!audit) continue;
-
-        if (String(audit.verdict || '').toLowerCase() !== 'supported') continue;
-        if (String(audit.confidence || '').toLowerCase() !== 'high') continue;
-        if (String(audit.scopeVerdict || '').toLowerCase() !== 'in_scope') continue;
-
-        if (request.generalKnowledge && request.coverageCategories.length) {
-          const categoryKey = normalizeCategory(original.category);
-          const allowed = new Set(request.coverageCategories.map(normalizeCategory));
-          if (!categoryKey || !allowed.has(categoryKey)) continue;
-          if (audit.category && normalizeCategory(audit.category)!==categoryKey) continue;
-        }
-
-        const factKey = String(audit.factKey || '').replace(/\s+/g,' ').trim().slice(0,240);
-        if (factKey.length < 8) continue;
-
-        const blindSig = blindAuditSignature(
-          audit,
-          request.questionType,
-          Array.isArray(original.options) ? original.options.length : 0
-        );
-        const writerSig = answerSignature(original,request.questionType);
-        if (!blindSig || blindSig !== writerSig) continue;
-
-        const supports = validateBlindSupports(audit,record.evidence);
-        if (supports.length < 2) continue;
-
+      const raw = await runProvider(route, messages, reviewRequest, deadline);
+      const reviewed = attachAndValidateEvidence(validateQuestions(raw, reviewRequest), evidence);
+      const verified=[];
+      const seen=new Set();
+      for (const item of reviewed) {
+        const fk=normalizeEvidenceText(item.factKey || '');
+        const qk=normalizeEvidenceText(item.question || '');
+        const original=(fk && candidateByFact.get(fk)) || candidateByQuestion.get(qk);
+        if (!original) continue;
+        const key=normalizeEvidenceText(original.factKey || original.question || '');
+        if (seen.has(key)) continue;
+        seen.add(key);
         verified.push({
           ...original,
           webVerified:true,
+          sourceUrls:original.sourceUrl ? [original.sourceUrl] : [],
+          sourceTitles:original.sourceTitle ? [original.sourceTitle] : [],
           verificationProvider:routeProvider(route),
-          factKey,
-          category:original.category||audit.category||'',
-          sourceUrls:supports.map(s=>s.source.url),
-          sourceTitles:supports.map(s=>s.source.title),
-          sourceUrl:supports[0].source.url,
-          sourceTitle:supports[0].source.title,
-          sourceEvidence:supports
-            .map(s=>`${s.source.title}: ${s.quote}`)
-            .join(' | ')
-            .slice(0,1000)
+          verificationRoute:route
         });
       }
-
-      if (verified.length) return {verified,verifierRoute:route};
+      if (verified.length) return {verified, reviewerRoute:route};
+      errors.push(`${route}: reviewer accepted no candidates`);
     } catch (err) {
-      if (!err?.skip) {
-        markRouteCooldown(route,err);
-        console.warn(`[QZMAX BLIND VERIFY] ${route} failed`,String(err?.message||err).slice(0,400));
-      }
+      if (!err?.skip) markRouteCooldown(route, err);
+      errors.push(`${route}: ${String(err?.message || err).slice(0,180)}`);
     }
   }
 
-  return {verified:[],verifierRoute:''};
+  console.warn('[QZMAX AI QA] no reviewer accepted candidates', errors.join(' | ').slice(0,1000));
+  return {verified:[], reviewerRoute:''};
 }
 
+// QZMAX 3.18 removed the legacy per-question Tavily search + blind two-source
+// verifier. AI Generator now uses one shared evidence pack and one batch QA pass.
 
 function normalizeCategory(value) {
   return String(value || '').trim().toLocaleLowerCase();
@@ -1593,14 +1377,15 @@ exports.handler = async function handler(event) {
   // Lightweight status endpoint — does not spend AI quota.
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      version:'3.17.0',
+      version:'3.18.1',
       freeOnly:true,
-      factualRetrieval:'Tavily search + Tavily Extract for host-selected Source Links',
+      factualRetrieval:'Tavily search for AI Generator + Tavily Extract for host-selected Source Links',
       sourceLinkExtraction:'Tavily Extract · exact selected page only',
-      factualVerification:'Topic-scope audit + question-specific Tavily + blind two-source answer audit + canonical factKey',
-      verifiedPassArchitecture:'Up to 5 Guided AI questions per pass · max 2 generator routes + max 2 blind-verifier routes per invocation',
+      factualVerification:'Tavily evidence grounding + independent batch QA provider + structural/duplicate validation',
+      verifiedPassArchitecture:'Up to 10 AI questions per pass · one generator provider · one independent QA provider · fallback only on failure',
       configured:configuredRoutes(),
-      customTopicOrder:CUSTOM_DEFAULT_ORDER,
+      aiGeneratorOrder:CUSTOM_DEFAULT_ORDER,
+      aiReviewerOrder:AI_REVIEW_ORDER,
       strictOrder:STRICT_DEFAULT_ORDER,
     });
   }
@@ -1667,42 +1452,26 @@ exports.handler = async function handler(event) {
   }
 
   const deadline = Date.now() + GLOBAL_BUDGET_MS;
-  const customWebVerified = request.sourceType === 'ai' || request.preferSearch === true;
+  const aiGeneratorMode = request.sourceType === 'ai' || request.preferSearch === true;
   let webEvidence = [];
   let messages = buildMessages(request);
 
-  if (customWebVerified && !request.generalKnowledge) {
+  if (aiGeneratorMode) {
     try {
       webEvidence = await fetchTavilyEvidence(request, deadline);
       messages = buildWebEvidenceMessages(messages, request, webEvidence);
     } catch (err) {
-      console.warn('[QZMAX VERIFY] Tavily retrieval failed', String(err?.message || err).slice(0,500));
+      console.warn('[QZMAX AI] Tavily grounding failed', String(err?.message || err).slice(0,500));
       return jsonResponse(503, {
-        error:'QZMAX could not retrieve enough web evidence to safely draft this Custom Topic. No unchecked questions were generated. Please try a more specific topic or try again shortly.',
+        error:'QZMAX could not gather enough fresh evidence for this AI request, so no unchecked questions were generated. Try a more specific topic or try again shortly.',
         details:process.env.QZMAX_AI_DEBUG === '1' ? [String(err?.message || err)] : undefined
       });
     }
-  } else if (customWebVerified && request.generalKnowledge) {
-    messages = [
-      ...messages,
-      {
-        role:'user',
-        content:[
-          'GENERAL KNOWLEDGE DRAFTING MODE.',
-          request.scopeInstruction,
-          request.coverageCategories.length
-            ? 'Required category labels: '+request.coverageCategories.join(' | ')
-            : '',
-          'Draft broadly across the required categories. Every candidate will be independently searched and fact-checked before release.'
-        ].filter(Boolean).join('\n')
-      }
-    ];
   }
 
   const order = parseProviderOrder(request);
   const errors = [];
   let bestLinkPartial = null;
-  let customGeneratorRoutesTried = 0;
 
   for (const route of order) {
     if (route !== 'local' && routeOnCooldown(route)) {
@@ -1715,14 +1484,6 @@ exports.handler = async function handler(event) {
       continue;
     }
 
-    if (customWebVerified && route !== 'local') {
-      if (customGeneratorRoutesTried >= 2) {
-        errors.push(`${route}: deferred to a later verified pass`);
-        continue;
-      }
-      customGeneratorRoutesTried++;
-    }
-
     try {
       const raw = await runProvider(route, messages, request, deadline);
       const structurallyValid = applyCoverageGuard(validateQuestions(raw, request), request);
@@ -1731,9 +1492,15 @@ exports.handler = async function handler(event) {
         const provider = routeProvider(route);
         const model = routeModel(route);
 
-        if (customWebVerified) {
-          const audit = await verifyCandidatesWithIndependentModel(
-            structurallyValid,
+        if (aiGeneratorMode) {
+          const groundedDrafts = attachAndValidateEvidence(structurallyValid, webEvidence);
+          if (!groundedDrafts.length) {
+            errors.push(`${route}: generated candidates were not grounded in the supplied evidence pack`);
+            continue;
+          }
+
+          const audit = await reviewAIBatch(
+            groundedDrafts,
             webEvidence,
             request,
             deadline,
@@ -1742,16 +1509,16 @@ exports.handler = async function handler(event) {
           const verified = audit.verified || [];
 
           if (verified.length) {
-            console.log(`[QZMAX AI] route=${route} provider=${provider} model=${model} twoSourceChecked=${verified.length}/${request.count} blindVerifier=${audit.verifierRoute}`);
+            console.log(`[QZMAX AI] generator=${route} provider=${provider} model=${model} qa=${audit.reviewerRoute} accepted=${verified.length}/${request.count}`);
             return jsonResponse(200, verified.slice(0, request.count), {
               'X-QZMAX-AI-Provider':provider,
               'X-QZMAX-AI-Model':model,
               'X-QZMAX-AI-Route':route,
-              'X-QZMAX-AI-Verification':`Question-specific Tavily × 2 sources + blind ${routeProvider(audit.verifierRoute)}`
+              'X-QZMAX-AI-Verification':`Tavily grounded + independent ${routeProvider(audit.reviewerRoute)} batch QA`
             });
           }
 
-          errors.push(`${route}: blind two-source verifier rejected all candidate facts`);
+          errors.push(`${route}: independent batch QA rejected all grounded candidates`);
           continue;
         }
 
@@ -1815,8 +1582,8 @@ exports.handler = async function handler(event) {
   }
 
   return jsonResponse(503, {
-    error:customWebVerified
-      ? 'QZMAX could not establish the requested questions with two independent web sources and a blind answer check. No unchecked questions were added. Try a more specific topic or request fewer questions.'
+    error:aiGeneratorMode
+      ? 'QZMAX could not complete a grounded batch that passed independent AI QA. No unchecked questions were added. Try a more specific topic or request fewer questions.'
       : 'All configured free AI routes are currently unavailable or rate-limited. QZMAX kept the requested batch size unchanged. Configure additional free providers or try again shortly.',
     details:process.env.QZMAX_AI_DEBUG === '1' ? errors : undefined,
   });
