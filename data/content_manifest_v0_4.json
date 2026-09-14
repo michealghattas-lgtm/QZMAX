@@ -1,7 +1,7 @@
 {
   "schemaVersion": "0.4",
   "generatedAt": "2026-09-14",
-  "engineName": "QZMAX Content Architecture",
+  "engineName": "QZMAX Content Architecture 3.18.4",
   "layers": [
     {
       "priority": 1,
@@ -9,7 +9,9 @@
       "label": "QZMAX Verified",
       "file": "qzmax_verified_kb_seed_v0_2.json",
       "trust": "Reviewed verified records",
-      "libraryGroup": "QZMAX Library"
+      "libraryGroup": "QZMAX Library",
+      "activeInCreate": false,
+      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 3.18.4 Create UI."
     },
     {
       "priority": 1,
@@ -18,21 +20,26 @@
       "manifest": "knowledge_manifest_v0_4.json",
       "editorialCandidateCount": 11350,
       "runtimeEligibleCount": 11160,
-      "libraryGroup": "QZMAX Library"
+      "libraryGroup": "QZMAX Library",
+      "activeInCreate": false,
+      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 3.18.4 Create UI."
     },
     {
       "priority": 2,
       "kind": "puzzle",
       "label": "QZMAX Puzzle",
       "file": "qzmax_puzzle_bank_v0_1.json",
-      "trust": "Curated puzzle quality gate"
+      "trust": "Curated puzzle quality gate",
+      "activeInCreate": false,
+      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 3.18.4 Create UI."
     },
     {
       "priority": 3,
       "kind": "ai",
       "label": "QZMAX AI / Web Grounded",
       "trust": "Standard AI: one-provider generation + deterministic validation; current/recent requests: Tavily web grounding + deterministic validation",
-      "architecture": "Separate AI Generator; one provider per normal request; fallbacks only on provider failure; does not use QZMAX Library records"
+      "architecture": "Separate AI Generator; one provider per normal request; fallbacks only on provider failure; does not use QZMAX Library records",
+      "activeInCreate": true
     }
   ]
 }

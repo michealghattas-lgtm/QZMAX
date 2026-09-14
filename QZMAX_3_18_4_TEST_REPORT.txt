@@ -1,0 +1,45 @@
+QZMAX 3.18.4 TEST REPORT
+========================
+
+STATIC / SYNTAX
+PASS - index.html module JavaScript passes Node syntax validation after import stripping.
+PASS - netlify/functions/generate.js passes Node syntax validation.
+PASS - generate GET/status handler reports version 3.18.4.
+PASS - AI backend generation architecture is unchanged from the working 3.18.3 build.
+
+CREATOR
+PASS - QZMAX Library tab and panel are absent from the Create UI.
+PASS - Puzzle Mode tab and panel are absent from the Create UI.
+PASS - active creator mode list contains only AI, School, Document, Source Link and Manual.
+PASS - removed Library add listener is null-guarded so dormant legacy code cannot break startup.
+PASS - Puzzle Bank is no longer loaded automatically at creator startup.
+PASS - Bible topic list excludes Orthodox Study Bible — Mixed, Orthodox Canon and OSB Introduction.
+PASS - expanded quiz categories/topics are present.
+
+SESSION RESET
+PASS - one reset routine deletes the old room before creating a fresh session code.
+PASS - reset clears host timers/control watch/local session state and unsaved question queue.
+PASS - saved quizzes are outside the deleted room path and are not removed by reset.
+PASS - Reset controls are wired on Setup, Exam, Live Question, Reveal, Leaderboard and Final screens.
+PASS - Dashboard active session has Resume/Take over plus Reset controls.
+
+PLAYER ROSTER
+PASS - Setup contains a live joined-player roster container.
+PASS - setup polling writes current joined names to the roster.
+PASS - team roster labels are included where applicable.
+PASS - active Dashboard session displays joined names.
+
+PLAYER RANK
+PASS - fetchAllPlayers produces deterministic score/name ordering.
+PASS - question screen can show current standing after scoring has started.
+PASS - reveal contains current rank.
+PASS - leaderboard contains rank out of total and a personal row when outside visible Top 8.
+PASS - final screen contains Final rank #X of Y and a personal row when outside Top 5.
+PASS - team player screens expose team rank plus individual rank.
+
+MANUAL LIVE TESTS RECOMMENDED AFTER NETLIFY DEPLOY
+[ ] Start a fresh session; join 3 phones; verify all 3 names appear in Lobby roster.
+[ ] Press Reset session; confirm old players see session ended and host receives a new code with 0 players.
+[ ] Run 3+ questions; verify each player sees ranking on question/reveal/leaderboard/final screens.
+[ ] Verify a player ranked below Top 8 still sees their own rank on leaderboard.
+[ ] Generate 10–20 AI questions from an added category and confirm 3.18.3 fast AI behaviour remains intact.

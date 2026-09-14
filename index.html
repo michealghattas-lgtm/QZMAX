@@ -4454,7 +4454,7 @@ html[data-theme="light"] .q-verify-badge.studybible{
 /* =========================================================
    QZMAX 3.18.3 — Fast AI Generator + conditional web grounding
    ========================================================= */
-.ai-source-tabs{grid-template-columns:repeat(7,minmax(0,1fr))!important;}
+.ai-source-tabs{grid-template-columns:repeat(5,minmax(0,1fr))!important;}
 .ai-engine-route-note{margin-top:9px;padding:9px 11px;border-radius:11px;border:1px solid rgba(95,190,255,.13);background:rgba(52,139,210,.055);display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;align-items:center;font-size:9.5px;color:#9cb2ca;}
 .ai-engine-route-note span{font-size:8px;font-weight:900;letter-spacing:.12em;color:#63d4ff;}.ai-engine-route-note strong{font-size:10px;color:#c8d9ec;}.ai-engine-route-note small{grid-column:1/-1;color:#788da7;font-size:9px;line-height:1.4;}
 .qz-library-notice{background:rgba(229,166,66,.07);border:1px solid rgba(229,166,66,.16);}.qz-library-notice strong{color:#f0c779;}
@@ -4465,6 +4465,26 @@ html[data-theme="light"] .q-verify-badge.studybible{
 html[data-theme="light"] .ai-engine-route-note{background:rgba(34,137,195,.055);border-color:rgba(34,137,195,.16);color:#49677e;}html[data-theme="light"] .ai-engine-route-note strong{color:#234f6c;}html[data-theme="light"] .ai-engine-route-note small{color:#5d7487;}
 html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!important;border-color:rgba(173,116,24,.17)!important;}html[data-theme="light"] .qz-library-notice strong{color:#81570c!important;}html[data-theme="light"] .qz-library-panel{background:linear-gradient(145deg,rgba(248,239,219,.78),rgba(222,234,247,.86));border-color:rgba(157,108,24,.16);}html[data-theme="light"] .qz-library-coverage{color:#6f5729;background:rgba(204,142,39,.065);border-color:rgba(161,108,21,.17);}html[data-theme="light"] .qz-library-coverage.ready{color:#6a4a0b;}html[data-theme="light"] .qz-library-coverage.empty{color:#835252;}
 @media(max-width:1350px){.ai-source-tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important;}}@media(max-width:1000px){.qz-library-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}@media(max-width:760px){.ai-source-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.qz-library-primary-grid,.qz-library-filter-grid,.qz-library-add-grid{grid-template-columns:1fr;}}@media(max-width:480px){.ai-source-tabs{grid-template-columns:1fr!important;}}
+
+
+/* QZMAX 3.18.4 — session controls, lobby roster and player rank */
+.host-reset-session-btn{border-color:rgba(255,120,147,.3)!important;color:#ff9db0!important;background:rgba(255,70,99,.055)!important}
+.host-reset-session-btn:hover{border-color:rgba(255,120,147,.55)!important;background:rgba(255,70,99,.11)!important}
+.host-player-roster-card{padding:16px 18px!important}
+.host-player-roster-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}
+.host-player-roster-head h3{margin:3px 0 0;font-size:18px}
+.host-player-roster-list{display:flex;flex-wrap:wrap;gap:8px;min-height:34px;align-items:center}
+.host-player-roster-empty{font-size:12px;color:var(--muted)}
+.host-player-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:999px;border:1px solid rgba(130,160,220,.14);background:rgba(255,255,255,.035);font-size:11px;font-weight:800;color:var(--ink)}
+.host-player-chip b{width:20px;height:20px;border-radius:999px;display:grid;place-items:center;background:rgba(111,91,255,.14);color:#cfc8ff;font-size:9px}
+.host-player-chip small{font-size:9px;font-weight:700;color:var(--muted);padding-left:3px}
+.host-live-room-actions{justify-self:end;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.player-rank-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(111,91,255,.11);border:1px solid rgba(111,91,255,.24);font-size:10px;font-weight:900;color:#cfc8ff}
+.player-rank-card{margin:12px auto 0;max-width:420px;padding:13px 15px;border-radius:16px;border:1px solid rgba(111,91,255,.2);background:rgba(111,91,255,.07);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.player-rank-card span{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.player-rank-card strong{font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--ink)}
+.player-score-strip{grid-template-columns:repeat(auto-fit,minmax(105px,1fr))}
+@media(max-width:640px){.host-player-roster-head{align-items:flex-start;flex-direction:column}.host-live-room-actions{justify-self:end;gap:5px}.host-reset-session-btn{font-size:10px!important;padding:7px 9px!important}.player-rank-card{align-items:flex-start;flex-direction:column}}
 
 </style>
 </head>
@@ -4490,7 +4510,7 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.18.3";
+  const APP_VERSION = "3.18.4";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -5719,6 +5739,7 @@ authPromise.then(() => {
     const activeEl = $('hd-active-room');
     if(savedSession && savedSession.code && activeSt && (!activeSt.hostUid || activeSt.hostUid===currentUserUid)){
       const playerCount = activePlayers ? Object.keys(activePlayers).length : 0;
+      const activePlayerNames = activePlayers ? Object.values(activePlayers).map(p=>String(p?.name||'Player')).filter(Boolean).sort((a,b)=>a.localeCompare(b)) : [];
       const sameController = !activeSt.hostControllerId || activeSt.hostControllerId===getHostControllerId();
       activeEl.innerHTML =
         '<div class="hd-active">'+
@@ -5727,11 +5748,24 @@ authPromise.then(() => {
             '<div class="hd-status"><span class="hd-dot"></span>'+escapeHtml(hostPhaseLabel(activeSt))+'</div>'+
           '</div>'+
           '<div class="hd-active-meta"><span class="hd-mini">'+playerCount+' player'+(playerCount===1?'':'s')+'</span><span class="hd-mini">'+((activeSt.questions||[]).length)+' questions</span><span class="hd-mini">'+(activeSt.gameMode==='teams'?'👥 Team Battle':'👤 Individual')+'</span><span class="hd-mini">'+(sameController?'This device controls session':'Another device controls session')+'</span></div>'+
-          '<button class="btn btn-primary btn-block" id="hd-resume-room">'+(sameController?'Resume session':'Take over & resume')+'</button>'+
+          (activePlayerNames.length?'<div class="hd-row-sub" style="margin:10px 0 12px;line-height:1.55;"><strong style="color:var(--ink);">Joined:</strong> '+escapeHtml(activePlayerNames.slice(0,12).join(', '))+(activePlayerNames.length>12?' +'+(activePlayerNames.length-12)+' more':'')+'</div>':'')+
+          '<div style="display:grid;grid-template-columns:1fr auto;gap:8px;">'+
+            '<button class="btn btn-primary" id="hd-resume-room">'+(sameController?'Resume session':'Take over & resume')+'</button>'+ 
+            '<button class="btn btn-ghost host-reset-session-btn" id="hd-reset-room">↻ Reset</button>'+ 
+          '</div>'+
         '</div>';
       $('hd-resume-room').onclick = async ()=>{
         if(!sameController) await recoverHostRoomByCode(savedSession.code);
         else await tryResumeHostSession(true);
+      };
+      $('hd-reset-room').onclick = async ()=>{
+        if(!sameController){
+          const claimed = await claimHostControl(savedSession.code);
+          if(!claimed) return;
+        }
+        S.code = savedSession.code;
+        saveHostSession(S.code);
+        await resetCurrentHostSession();
       };
     }else{
       if(savedSession && !activeSt) clearHostSession();
@@ -5790,6 +5824,68 @@ authPromise.then(() => {
 
   function clearHostSession(){
     lsRemove(HOST_SESSION_KEY);
+  }
+
+  let hostResetInProgress = false;
+
+  function hostResetButtonHtml(label='Reset session'){
+    return '<button class="btn btn-ghost host-reset-session-btn" type="button" data-reset-session="1" title="End this room, disconnect joined players and create a fresh session">↻ '+escapeHtml(label)+'</button>';
+  }
+
+  function wireHostResetButtons(scope){
+    const root = scope || document;
+    root.querySelectorAll('[data-reset-session]').forEach(btn=>{
+      btn.onclick = ()=>resetCurrentHostSession();
+    });
+  }
+
+  async function resetCurrentHostSession(){
+    if(hostResetInProgress) return;
+    const oldCode = String(S.code || '').toUpperCase();
+    if(!oldCode){
+      await startHostFlow('launch');
+      return;
+    }
+    const ok = confirm(
+      'Reset session '+oldCode+'?\n\nThis will end the current live room, disconnect all joined players, clear live answers and the current unsaved question queue, then create a NEW session code. Saved quizzes will not be deleted.'
+    );
+    if(!ok) return;
+
+    hostResetInProgress = true;
+    clearInterval(S.hostTimerHandle);
+    clearInterval(S.hostPollHandle);
+    clearTimeout(S.lateReconcileHandle);
+    clearTimeout(S.hostRecoveryHandle);
+    stopHostControlWatch();
+    try{ stopFinalConfetti(); }catch(_){ }
+    S.hostControlLost = false;
+    showConnectionBanner('Ending session '+oldCode+' and creating a fresh room…', false);
+
+    try{
+      const removed = await fbDelete(roomPath(oldCode));
+      if(!removed) throw new Error('Could not remove the current room from Firebase.');
+
+      clearHostSession();
+      S.code = null;
+      S.questionsDraft = [];
+      S.loadedQuizId = null;
+      S.editingQuestionIndex = null;
+      S.viewingArchive = false;
+      S.hostRevealing = false;
+      S.lastPhaseKey = null;
+
+      await startHostFlow('launch');
+      showConnectionBanner('Previous session ended. Fresh session '+S.code+' is ready.', true);
+    }catch(error){
+      console.error('session reset failed', error);
+      S.code = oldCode;
+      saveHostSession(oldCode);
+      startHostControlWatch(oldCode);
+      showConnectionBanner('Could not reset the session. The existing room was kept where possible.', false);
+      try{ await tryResumeHostSession(true); }catch(_){ }
+    }finally{
+      hostResetInProgress = false;
+    }
   }
 
   function ensureConnectionBanner(){
@@ -6251,6 +6347,7 @@ authPromise.then(() => {
           '<div class="chip">Session code <span class="code-text">'+S.code+'</span></div>'+
           '<button class="btn btn-ghost" id="btn-host-dashboard" style="padding:6px 12px; font-size:12px;">Dashboard</button>'+
           '<button class="btn btn-ghost" id="btn-host-device-info" style="padding:6px 12px; font-size:12px;">Move host</button>'+
+          '<button class="btn btn-ghost host-reset-session-btn" data-reset-session="1" style="padding:6px 12px; font-size:12px;">↻ Reset session</button>'+
           '<button class="btn btn-ghost" id="btn-host-logout" style="padding:6px 12px; font-size:12px;">Log out</button>'+
         '</div>'+
         '<div class="chip" id="host-setup-playercount">0 joined</div>'+
@@ -6276,6 +6373,11 @@ authPromise.then(() => {
           '</div>'+
           '<div class="err-msg" id="host-link-msg"></div>'+
         '</div>'+
+      '</div>'+
+
+      '<div class="card host-launch-only host-player-roster-card" id="host-player-roster-card" style="margin-bottom:16px;">'+
+        '<div class="host-player-roster-head"><div><div class="eyebrow">Joined players</div><h3>Lobby roster</h3></div><span class="chip" id="host-player-roster-count">0 players</span></div>'+ 
+        '<div class="host-player-roster-list" id="host-player-roster-list"><span class="host-player-roster-empty">No players have joined yet.</span></div>'+ 
       '</div>'+
 
       '<div class="mode-card host-launch-only session-mode-card" id="host-session-mode-card">'+
@@ -6318,13 +6420,11 @@ authPromise.then(() => {
       // QZMAX 3.8 Verified AI + Document Quiz Engine
       '<div class="card host-studio-only verified-ai-card" id="host-ai-generator-card" style="margin-bottom:16px;">'+
         '<div class="verified-ai-head">'+
-          '<div><div class="eyebrow">QZMAX CREATE</div><h3>How do you want to create?</h3><p>Create with AI, choose from the QZMAX Library, use instant puzzles, school practice, your own source — or create manually.</p></div>'+
+          '<div><div class="eyebrow">QZMAX CREATE</div><h3>How do you want to create?</h3><p>Create with AI, school practice, your own document or source link — or create manually.</p></div>'+
           '<span class="verified-engine-badge">BETA</span>'+
         '</div>'+
         '<div class="ai-source-tabs" role="tablist" aria-label="Quiz creation source">'+
           '<button type="button" class="ai-source-tab active" id="ai-source-ai">✦ AI Generator</button>'+
-          '<button type="button" class="ai-source-tab" id="ai-source-library">📚 QZMAX Library</button>'+
-          '<button type="button" class="ai-source-tab" id="ai-source-puzzle">🧩 Puzzle Mode</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-school">🎓 School / Education</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-document">▣ My Document</button>'+
           '<button type="button" class="ai-source-tab" id="ai-source-link">↗ Source Link</button>'+
@@ -6352,47 +6452,7 @@ authPromise.then(() => {
               '</div>'+
             '</details>'+
             '<div class="guided-scope-preview" id="ai-guided-preview"></div>'+
-            '<div class="ai-engine-route-note"><span>QZMAX AI</span><strong>Fast generation • automatic fallback</strong><small>Current/recent topics are web-grounded automatically. QZMAX Library content is never mixed into an AI request.</small></div>'+
-          '</div>'+
-        '</div>'+
-
-        '<div id="ai-source-panel-library" class="ai-source-panel" style="display:none;">'+
-          '<div class="ai-source-notice qz-library-notice"><strong>Stored questions only • No AI • No web search</strong><span>Every dropdown is built from questions that actually exist in QZMAX Verified, QZMAX Knowledge and Study Bible content. Selecting a field automatically removes combinations that have no stored questions.</span></div>'+
-          '<div class="qz-library-panel">'+
-            '<div class="eyebrow guided-ai-kicker">QZMAX LIBRARY</div>'+
-            '<div class="qz-library-primary-grid">'+
-              '<div class="qform-row"><label>Category</label><select id="qz-library-category" disabled><option>Loading…</option></select></div>'+
-              '<div class="qform-row"><label>Topic</label><select id="qz-library-topic" disabled><option>Loading…</option></select></div>'+
-            '</div>'+
-            '<div class="qz-library-filter-grid">'+
-              '<div class="qform-row"><label>Language</label><select id="qz-library-language" disabled></select></div>'+
-              '<div class="qform-row"><label>Difficulty</label><select id="qz-library-difficulty" disabled></select></div>'+
-              '<div class="qform-row"><label>Country / Region</label><select id="qz-library-region" disabled></select></div>'+
-              '<div class="qform-row"><label>Time period</label><select id="qz-library-period" disabled></select></div>'+
-              '<div class="qform-row"><label>Question format</label><select id="qz-library-format" disabled></select></div>'+
-            '</div>'+
-            '<div class="qz-library-coverage" id="qz-library-coverage"><span class="verified-kb-icon">📚</span><span>Loading QZMAX Library…</span></div>'+
-            '<div class="qz-library-add-grid">'+
-              '<div class="qform-row"><label>Questions to add</label><input type="number" id="qz-library-count" value="10" min="1" max="10" inputmode="numeric"></div>'+
-              '<div class="qform-row"><label>Time each</label><input type="number" id="qz-library-time" value="20" min="3" max="600" step="1" inputmode="numeric"></div>'+
-              '<div class="qform-row"><label>Points each</label><input type="number" id="qz-library-points" value="100" min="0" max="100000" step="10" inputmode="numeric"></div>'+
-            '</div>'+
-            '<button class="btn btn-primary btn-block ai-generate-hero" id="qz-library-add" disabled>Add from QZMAX Library</button>'+
-            '<div class="err-msg" id="qz-library-msg"></div>'+
-            '<div class="qz-library-trust"><span><b class="verify-dot qzmax"></b> QZMAX Verified</span><span><b class="verify-dot knowledge"></b> QZMAX Knowledge</span><span><b class="verify-dot studybible"></b> Study Bible Grounded</span></div>'+
-          '</div>'+
-        '</div>'+
-
-        '<div id="ai-source-panel-puzzle" class="ai-source-panel" style="display:none;">'+
-          '<div class="ai-source-notice puzzle-mode-notice"><strong>Instant curated puzzles • No AI wait</strong><span>Choose a puzzle family and QZMAX pulls unused Ready puzzles directly from the Puzzle Bank. No AI provider or web search is called.</span></div>'+
-          '<div class="puzzle-mode-panel">'+
-            '<div class="eyebrow guided-ai-kicker">QZMAX PUZZLE MODE</div>'+
-            '<div class="guided-ai-grid">'+
-              '<div class="qform-row"><label>Puzzle type</label><select id="qz-puzzle-type"></select></div>'+
-              '<div class="qform-row"><label>Topic</label><select id="qz-puzzle-topic"><option value="">All Topics</option></select></div>'+
-            '</div>'+
-            '<div class="puzzle-mode-coverage" id="qz-puzzle-coverage"><span class="puzzle-mode-icon">🧩</span><span>Loading Puzzle Bank…</span></div>'+
-            '<div class="puzzle-mode-types" id="qz-puzzle-types-note">Emoji Rebus · Word Rebus · Anagrams · Missing Letters · Unscramble · 3 Clues · Who/What Am I? · Odd One Out · Connections · Riddles · Sequences</div>'+
+            '<div class="ai-engine-route-note"><span>QZMAX AI</span><strong>Fast generation • automatic fallback</strong><small>Current/recent topics are web-grounded automatically. Another free AI provider is used only if the first route fails.</small></div>'+
           '</div>'+
         '</div>'+
 
@@ -6635,6 +6695,8 @@ authPromise.then(() => {
       buildHostDashboard();
     };
 
+    wireHostResetButtons($('screen-host-setup'));
+
     $('btn-host-device-info').onclick = ()=>{
       alert('To move host control: open QZMAX on the other device, log in with this same host account, choose “Recover / take over session”, and enter session '+S.code+'. This device will lock automatically when the other device takes control.');
     };
@@ -6671,46 +6733,25 @@ authPromise.then(() => {
       setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
     };
 
-    // QZMAX 3.18.3 — separate AI Generator and QZMAX Library
+    // QZMAX 3.18.4 — streamlined creator + live session controls
     let isSchoolMode = false;
     let aiSourceMode = 'ai';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
     let aiLinkState = { url:'', title:'', domain:'', text:'', chars:0, words:0, truncated:false, extractDepth:'basic' };
 
     function setAISourceMode(mode){
-      aiSourceMode = ['ai','library','puzzle','school','document','link','manual'].includes(mode) ? mode : 'ai';
+      aiSourceMode = ['ai','school','document','link','manual'].includes(mode) ? mode : 'ai';
       isSchoolMode = aiSourceMode === 'school';
-      ['ai','library','puzzle','school','document','link','manual'].forEach(m=>{
+      ['ai','school','document','link','manual'].forEach(m=>{
         const tab = $('ai-source-'+m);
         const panel = $('ai-source-panel-'+m);
         if(tab) tab.classList.toggle('active', m===aiSourceMode);
         if(panel) panel.style.display = m===aiSourceMode ? '' : 'none';
       });
       const controls = $('ai-generation-controls');
-      if(controls) controls.style.display = (aiSourceMode==='manual' || aiSourceMode==='library') ? 'none' : '';
+      if(controls) controls.style.display = aiSourceMode==='manual' ? 'none' : '';
       if($('ai-msg')) $('ai-msg').textContent = '';
 
-      const puzzleMode = aiSourceMode==='puzzle';
-      const qType=$('ai-question-type');
-      const opts=$('ai-opts-per-q');
-      const lang=$('ai-language');
-      if(qType){
-        if(puzzleMode) qType.value='multiple_choice';
-        qType.disabled=puzzleMode;
-      }
-      if(opts){
-        if(puzzleMode) opts.value='4';
-        opts.disabled=puzzleMode;
-      }
-      if(lang){
-        if(puzzleMode) lang.value='English';
-        lang.disabled=puzzleMode;
-      }
-      if(puzzleMode){
-        updateAIQuestionTypeUI();
-        schedulePuzzleCoverage();
-      }
-      if(aiSourceMode==='library') ensureQZMAXLibraryReady();
 
       updateAIGenerateButton();
       updateAIDifficultyHint();
@@ -6721,7 +6762,6 @@ authPromise.then(() => {
       if(!btn) return;
       if(aiSourceMode==='document') btn.textContent = 'Generate from Document';
       else if(aiSourceMode==='link') btn.textContent = 'Generate from Source Link';
-      else if(aiSourceMode==='puzzle') btn.textContent = 'Add Puzzles Instantly';
       else if(aiSourceMode==='school') btn.textContent = 'Generate Year-Level Exam Questions';
       else btn.textContent = 'Generate with AI';
 
@@ -6731,25 +6771,19 @@ authPromise.then(() => {
           note.innerHTML = '<strong>Document grounding:</strong> QZMAX generates from the uploaded document only. The document itself is treated as the host-selected source of truth.';
         }else if(aiSourceMode==='link'){
           note.innerHTML = '<strong>Source Link grounding:</strong> Every accepted question must include supporting evidence found in the extracted page content. QZMAX does not independently certify the factual accuracy of the page itself.';
-        }else if(aiSourceMode==='puzzle'){
-          note.innerHTML = '<strong>QZMAX Puzzle Bank:</strong> Puzzle Mode uses curated Ready records stored with the app. It does not call AI or web search. Review-queue and ambiguous puzzle records are excluded from gameplay.';
         }else if(aiSourceMode==='school'){
           note.innerHTML = '<strong>Curriculum-guided review:</strong> QZMAX follows the selected year, subject and difficulty guidance. Host review remains important because this mode is not an official curriculum certification.';
         }else{
-          note.innerHTML = '<strong>QZMAX AI:</strong> QZMAX Library records are not consulted here. Ordinary topics use one fast AI call plus local validation; current/recent topics automatically use fresh web evidence. Another free AI provider is used only if the first route fails.';
+          note.innerHTML = '<strong>QZMAX AI:</strong> Ordinary topics use one fast AI call plus local validation; current/recent topics automatically use fresh web evidence. Another free AI provider is used only if the first route fails.';
         }
       }
     }
 
     $('ai-source-ai').onclick = ()=>setAISourceMode('ai');
-    $('ai-source-library').onclick = ()=>setAISourceMode('library');
-    $('ai-source-puzzle').onclick = ()=>setAISourceMode('puzzle');
     $('ai-source-school').onclick = ()=>setAISourceMode('school');
     $('ai-source-document').onclick = ()=>setAISourceMode('document');
     $('ai-source-link').onclick = ()=>setAISourceMode('link');
     $('ai-source-manual').onclick = ()=>setAISourceMode('manual');
-    $('qz-puzzle-type').onchange=populateQZMAXPuzzleTopics;
-    $('qz-puzzle-topic').onchange=schedulePuzzleCoverage;
 
     $('ai-manual-jump').onclick = ()=>{
       const pane = $('host-question-editor-pane');
@@ -7913,7 +7947,7 @@ authPromise.then(() => {
       if(el) el.addEventListener('change',refreshQZMAXLibraryFilters);
     });
 
-    $('qz-library-add').onclick=async()=>{
+    if($('qz-library-add')) $('qz-library-add').onclick=async()=>{
       const msg=$('qz-library-msg');
       const btn=$('qz-library-add');
       if(!qzLibraryMatches.length){
@@ -7968,66 +8002,118 @@ authPromise.then(() => {
     const GUIDED_AI_TOPICS = {
       'General Knowledge':[
         'Mixed General Knowledge','Australia','Egypt','Middle East','World','Science & Nature',
-        'Entertainment','Sports','History & Geography','People & Places','Other'
+        'History','Geography','Entertainment','Sports','Food & Drink','Travel & Landmarks',
+        'Technology & Inventions','Pop Culture','Animals','People & Places','Other'
       ],
       'History':[
         'Australian History','Australian Indigenous History','Egyptian History','Ancient Egypt',
-        'World History','World War I','World War II','Modern World History','Other'
+        'Middle Eastern History','Ancient Civilisations','Ancient Greece','Roman Empire','Medieval History',
+        'Renaissance','Islamic History','World History','World War I','World War II','Cold War',
+        'Modern World History','Famous Historical Figures','Other'
       ],
       'Geography':[
-        'Australia','Egypt','Middle East','World Geography','Countries & Capitals',
-        'Landforms & Landscapes','Oceans & Rivers','Flags & Nations','Human Geography','Other'
+        'Australia','Egypt','Middle East','World Geography','Countries & Capitals','Cities & Landmarks',
+        'Flags & Nations','Maps & Borders','Mountains & Deserts','Oceans, Rivers & Lakes',
+        'Landforms & Landscapes','Islands','Human Geography','Natural Wonders','Other'
       ],
       'Science & Nature':[
         'General Science','Biology','Physics','Chemistry','Chemical Elements','Astronomy',
-        'Earth & Space','Human Body','Ecology & Environment','Animals & Plants','Other'
+        'Earth & Space','Human Body','Ecology & Environment','Animals & Plants','Weather & Climate',
+        'Dinosaurs & Prehistoric Life','Scientific Discoveries','Famous Scientists','Other'
       ],
       'Mathematics':[
-        'Arithmetic','Fractions & Decimals','Percentages','Algebra','Geometry',
-        'Measurement','Statistics & Probability','Logic & Problem Solving','Other'
+        'Arithmetic','Fractions & Decimals','Percentages','Algebra','Geometry','Measurement',
+        'Statistics & Probability','Number Patterns','Mental Maths','Logic & Problem Solving','Other'
       ],
       'Technology':[
-        'Computers & Internet','AI & Robotics','Inventions','Space Technology',
-        'Cybersecurity','Programming','Consumer Technology','Other'
+        'Computers & Internet','AI & Robotics','Inventions','Space Technology','Cybersecurity',
+        'Programming','Smartphones & Gadgets','Internet History','Social Media Technology',
+        'Famous Tech Companies','Consumer Technology','Other'
       ],
       'Film & Television':[
         'Australian Film & TV','Egyptian Cinema','Egyptian Television','Egyptian TV Programs',
-        'Egyptian Film & TV Quotes','Hollywood','International Cinema','Animation',
-        'Actors & Directors','Awards & Classics','Other'
+        'Egyptian Film & TV Quotes','Arabic Cinema & TV','Hollywood','International Cinema',
+        'TV Series','Streaming Shows','Animation','Actors & Directors','Awards & Classics','Other'
       ],
       'Music':[
-        'Australian Music','Egyptian Music','Egyptian Albums','Egyptian Songs',
+        'Australian Music','Egyptian Music','Arabic Music','Egyptian Albums','Egyptian Songs',
         'Egyptian Songwriters','Egyptian Song Lyrics','International Pop','Rock','Classical',
-        'Albums & Artists','Music History','Other'
+        '80s Music','90s Music','2000s Music','Albums & Artists','Music Instruments','Music History','Other'
       ],
       'Sports':[
-        'Australian Sports','Football / Soccer','Rugby','Cricket','Tennis',
-        'Basketball','Olympics','Motorsport','Other'
+        'Australian Sports','Football / Soccer','Rugby','Cricket','Tennis','Basketball','Olympics',
+        'Formula 1','Motorsport','Boxing & MMA','Swimming','Athletics','Golf','Baseball',
+        'Sports Legends','World Cups & Championships','Other'
       ],
       'Arts & Literature':[
-        'Australian Literature','World Literature','Egyptian Arts','Authors & Books','Visual Arts',
-        'Theatre','Poetry','Mythology','Other'
+        'Australian Literature','World Literature','Egyptian Arts','Authors & Books','Famous Novels',
+        'Visual Arts','Famous Paintings','Theatre','Poetry','Mythology','Architecture','Other'
       ],
       'Culture & Society':[
-        'Australian Culture','Egyptian Culture','Egyptian Proverbs','World Cultures',
-        'Food & Traditions','Festivals & Traditions','Languages','Social Customs','Other'
+        'Australian Culture','Egyptian Culture','Egyptian Proverbs','World Cultures','Food & Traditions',
+        'Festivals & Traditions','Languages','Social Customs','Famous People','Fashion & Style',
+        'Internet Culture','Other'
+      ],
+      'Food & Drink':[
+        'World Cuisine','Egyptian Food','Middle Eastern Food','Australian Food','Italian Food','Asian Food',
+        'Desserts & Sweets','Ingredients & Spices','Fruit & Vegetables','Fast Food & Brands',
+        'Coffee & Tea','Food Trivia','Other'
+      ],
+      'Travel & Landmarks':[
+        'World Landmarks','Famous Cities','Tourist Attractions','Wonders of the World','Australia Travel',
+        'Egypt Travel','Middle East Travel','Europe Travel','Asia Travel','Africa Travel','Airports & Airlines',
+        'Beaches & Islands','Other'
+      ],
+      'Games & Gaming':[
+        'Video Games','Classic Video Games','PlayStation','Xbox','Nintendo','PC Gaming','Mobile Games',
+        'Board Games','Card Games','Gaming Characters','Gaming History','Esports','Other'
+      ],
+      'Pop Culture & Celebrities':[
+        'Mixed Pop Culture','Celebrities','Famous Actors','Famous Musicians','TV Personalities',
+        'Internet & Social Media','Awards & Red Carpets','Fashion','Memes & Viral Culture',
+        '20th Century Pop Culture','21st Century Pop Culture','Other'
+      ],
+      'Cars, Transport & Aviation':[
+        'Cars & Brands','Classic Cars','Supercars','Motorcycles','Road Transport','Trains',
+        'Aviation','Airlines','Ships & Maritime','Public Transport','Transport History','Other'
+      ],
+      'Health & Human Body':[
+        'Human Anatomy','Body Systems','Nutrition Basics','Fitness & Exercise','Healthy Habits',
+        'Medicine History','Medical Discoveries','First Aid Basics','Health Science','Other'
+      ],
+      'Nature & Animals':[
+        'Animals','Wildlife','Birds','Marine Life','Reptiles & Amphibians','Insects','Plants & Trees',
+        'Rainforests','Deserts','Oceans','Australian Wildlife','African Wildlife','Animal Records','Other'
+      ],
+      'Language & Words':[
+        'English Language','Arabic Language','Egyptian Arabic','Vocabulary','Spelling','Grammar',
+        'Idioms & Sayings','Proverbs','Word Origins','Synonyms & Antonyms','Famous Quotes','Other'
       ],
       'Business & Economics':[
-        'Australian Economy','Personal Finance','Business Basics','Markets & Trade',
-        'Brands & Companies','Entrepreneurship','Other'
+        'Australian Economy','Personal Finance','Business Basics','Markets & Trade','Brands & Companies',
+        'Entrepreneurship','Money & Currency','Famous Businesses','Advertising & Marketing','Other'
       ],
       'Civics & Government':[
         'Australian Civics','Australian Government','Egypt','World Governments','Democracy & Elections',
-        'Law & Citizenship','International Organisations','Other'
+        'Law & Citizenship','International Organisations','Flags & National Symbols','Other'
       ],
       'Bible & Christianity':[
-        'Orthodox Study Bible — Mixed','Bible Structure','Law / Torah','History','Prophets',
-        'Wisdom and Poetry','Gospels','Acts','Epistles','Revelation','Bible People',
-        'OSB Introduction','Orthodox Canon','Orthodox Church','Reading the Bible','Other'
+        'Bible Structure','Old Testament','New Testament','Law / Torah','History','Prophets',
+        'Wisdom and Poetry','Psalms','Gospels','Life of Jesus','Miracles & Parables','Acts','Apostles',
+        'Epistles','Revelation','Bible People','Bible Places','Orthodox Church','Coptic Orthodox Church',
+        'Church History','Saints & Martyrs','Sacraments','Liturgical Year','Reading the Bible','Other'
+      ],
+      'Religion & World Faiths':[
+        'World Religions','Christianity','Judaism','Islam','Hinduism','Buddhism','Religious Festivals',
+        'Sacred Places','Religious History','Beliefs & Traditions','Other'
+      ],
+      'Kids & Family':[
+        'Kids General Knowledge','Cartoons','Animated Movies','Childrens Books','Animals for Kids',
+        'Science for Kids','Geography for Kids','History for Kids','Fun Facts','Riddles & Brain Teasers','Other'
       ],
       'Current Affairs':[
         'Australia','Egypt','Middle East','World','Science & Technology','Business & Economy',
-        'Sports','Entertainment','Other'
+        'Sports','Entertainment','Environment','Other'
       ],
       'Other':['Other']
     };
@@ -8124,14 +8210,7 @@ authPromise.then(() => {
       const hint=$('ai-difficulty-hint');
       if(!hint) return;
       const diff=$('ai-difficulty')?.value || 'Medium';
-      if(aiSourceMode==='puzzle'){
-        hint.textContent = diff==='Easy'
-          ? 'Straightforward puzzle patterns and familiar clues.'
-          : diff==='Hard'
-          ? 'More demanding wordplay, deduction or pattern recognition.'
-          : 'Balanced puzzle difficulty for general play.';
-        schedulePuzzleCoverage();
-      }else if(aiSourceMode==='school'){
+      if(aiSourceMode==='school'){
         hint.textContent = diff==='Easy'
           ? 'Straightforward year-level knowledge and one-step application.'
           : diff==='Hard'
@@ -8194,16 +8273,8 @@ authPromise.then(() => {
     $('ai-question-type').onchange = ()=>{
       updateAIQuestionTypeUI();
     };
-    ['ai-count','ai-opts-per-q','ai-language'].forEach(id=>{
-      const el=$(id);
-      if(el){
-        el.addEventListener('input',()=>schedulePuzzleCoverage());
-        el.addEventListener('change',()=>schedulePuzzleCoverage());
-      }
-    });
     updateAIQuestionTypeUI();
     setAISourceMode('ai');
-    loadQZMAXPuzzleBank().then(()=>schedulePuzzleCoverage());
 
     $('ai-document-file').onchange = async ()=>{
       const file = $('ai-document-file').files && $('ai-document-file').files[0];
@@ -8412,22 +8483,6 @@ authPromise.then(() => {
           topic:focus || aiLinkState.title || aiLinkState.domain || 'Source link',
           difficulty:selectedDifficulty
         };
-      }else if(aiSourceMode==='puzzle'){
-        const pf=currentPuzzleFilters();
-        if(!pf.type){
-          $('ai-msg').style.color='var(--wrong)';
-          $('ai-msg').textContent='Choose a puzzle type.';
-          return;
-        }
-        topic=[pf.type,pf.topic||'All Topics'].join(' — ');
-        sourceType='puzzle';
-        sourceName='QZMAX Puzzle Bank';
-        structuredScope={
-          mode:'puzzle',
-          puzzleType:pf.type,
-          topic:pf.topic||'',
-          difficulty:selectedDifficulty
-        };
       }else if(aiSourceMode==='school'){
         const grade = $('ai-grade').value;
         const subject = $('ai-subject').value;
@@ -8482,8 +8537,6 @@ authPromise.then(() => {
           ? 'Preparing document source…'
           : aiSourceMode==='link'
           ? 'Preparing extracted source link…'
-          : aiSourceMode==='puzzle'
-          ? 'Selecting unused Ready puzzles…'
           : 'Preparing AI request…'
       );
       msg.textContent = '';
@@ -8492,17 +8545,7 @@ authPromise.then(() => {
       try{
         let generatedAI = [];
 
-        if(aiSourceMode==='puzzle'){
-          setAIProgress(35,'Selecting matching puzzles from QZMAX Puzzle Bank…');
-          generatedAI=await selectQZMAXPuzzles({
-            target:count,
-            timePerQuestion,
-            pointsPerQuestion,
-            generationId,
-            existingQuestions:S.questionsDraft
-          });
-          setAIProgress(92,'Puzzle selection complete — checking duplicates and answer positions…');
-        }else{
+        {
           if(aiSourceMode==='ai'){
             sourceText = '';
             sourceUrls = [];
@@ -10153,6 +10196,24 @@ authPromise.then(() => {
           if(roster) roster.innerHTML = '';
         }
       }
+
+      const rosterCount = $('host-player-roster-count');
+      const rosterList = $('host-player-roster-list');
+      if(rosterCount) rosterCount.textContent = players.length+' player'+(players.length===1?'':'s');
+      if(rosterList){
+        if(!players.length){
+          rosterList.innerHTML = '<span class="host-player-roster-empty">No players have joined yet.</span>';
+        }else{
+          const teams = st && st.gameMode==='teams' ? normalizeTeams(st.teams,st.teamCount) : [];
+          rosterList.innerHTML = players
+            .slice()
+            .sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')))
+            .map((p,i)=>{
+              const team = teams.find(t=>t.id===p.teamId);
+              return '<span class="host-player-chip"><b>'+(i+1)+'</b><span>'+escapeHtml(p.name||'Player')+'</span>'+(team?'<small>'+escapeHtml(team.name)+'</small>':'')+'</span>';
+            }).join('');
+        }
+      }
     }, 1800);
   }
 
@@ -10335,7 +10396,7 @@ authPromise.then(() => {
 
     $('screen-host-question').innerHTML =
       '<div class="exam-host-shell">'+
-        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="team-badge">📝 Exam Mode</div></div>'+
+        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="team-badge">📝 Exam Mode</div>'+hostResetButtonHtml('Reset session')+'</div></div>'+
         '<div class="exam-host-hero">'+
           '<div><div class="eyebrow">Timed assessment</div><h1>Exam in progress</h1><p>'+totalQuestions+' questions · '+durationMin+' minute'+(durationMin===1?'':'s')+' · no speed bonus</p></div>'+
           '<div class="exam-clock-card"><span>Time remaining</span><strong id="host-exam-clock">--:--</strong></div>'+
@@ -10350,6 +10411,7 @@ authPromise.then(() => {
         '<button class="btn btn-danger" id="btn-end-exam-now">End exam & grade now</button>'+
       '</div>';
     showScreen('screen-host-question');
+    wireHostResetButtons($('screen-host-question'));
 
     $('btn-end-exam-now').onclick = ()=>{
       if(confirm('End the exam now? All saved answers will be graded immediately.')) finalizeExam(st,'host');
@@ -10407,7 +10469,7 @@ authPromise.then(() => {
         '<div class="live-game-top">'+
           '<div class="live-progress-wrap"><span class="live-q-meta">Question '+(st.currentIndex+1)+' of '+total+'</span><div class="live-progress"><span style="width:'+progress+'%;"></span></div></div>'+
           '<div class="live-timer-shell">'+ringSvg('host-ring')+'</div>'+
-          '<div class="live-room-pill"><span>Session</span><strong>'+S.code+'</strong></div>'+
+          '<div class="host-live-room-actions"><div class="live-room-pill"><span>Session</span><strong>'+S.code+'</strong></div>'+hostResetButtonHtml('Reset')+'</div>'+
         '</div>'+
         '<div class="live-question-panel">'+
           '<div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap;"><div class="live-category">'+(st.gameMode==='teams'?'👥 Team Battle':'✦ Live host view')+'</div><span class="qtype-pill">'+questionTypeLabel(q)+'</span></div>'+
@@ -10420,6 +10482,7 @@ authPromise.then(() => {
         '</div>'+
       '</div>';
     showScreen('screen-host-question');
+    wireHostResetButtons($('screen-host-question'));
 
     $('btn-end-early').onclick = () => hostEndQuizEarly(st);
 
@@ -10804,7 +10867,7 @@ authPromise.then(() => {
 
     $('screen-host-reveal').innerHTML =
       '<div class="reveal-shell">'+
-        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="chip">Question '+(st.currentIndex+1)+' / '+st.questions.length+'</div></div>'+
+        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="chip">Question '+(st.currentIndex+1)+' / '+st.questions.length+'</div>'+hostResetButtonHtml('Reset')+'</div></div>'+
         '<div class="reveal-hero">'+
           '<div class="reveal-kicker">'+questionTypeLabel(q)+' · Answer reveal</div>'+
           '<div class="reveal-answer-big good">✓ '+escapeHtml(getCorrectAnswerDisplay(q))+'</div>'+
@@ -10825,6 +10888,7 @@ authPromise.then(() => {
         buildQuestionReviewPanel(st, st.currentIndex)+
       '</div>';
     showScreen('screen-host-reveal');
+    wireHostResetButtons($('screen-host-reveal'));
     $('btn-to-leaderboard').onclick = ()=>hostGoToLeaderboard(st);
     $('btn-end-early-reveal').onclick = () => hostEndQuizEarly(st);
 
@@ -10852,8 +10916,33 @@ authPromise.then(() => {
   async function fetchAllPlayers(code){
     const obj = await fbGet(playersPath(code));
     const players = obj ? Object.values(obj) : [];
-    players.sort((a,b)=>(b.score||0)-(a.score||0));
+    players.sort((a,b)=>(b.score||0)-(a.score||0) || String(a.name||'').localeCompare(String(b.name||'')));
     return players;
+  }
+
+  function playerRankInfo(players,pid,st){
+    const list = Array.isArray(players) ? players : [];
+    const index = list.findIndex(p=>p.id===pid);
+    const me = index>=0 ? list[index] : null;
+    const info = { me, rank:index>=0 ? index+1 : null, total:list.length, teamRank:null, teamTotal:0, team:null };
+    if(st && st.gameMode==='teams' && me && me.teamId){
+      const standings = getTeamStandings(list,st);
+      const ti = standings.findIndex(t=>t.id===me.teamId);
+      info.teamRank = ti>=0 ? ti+1 : null;
+      info.teamTotal = standings.length;
+      info.team = ti>=0 ? standings[ti] : null;
+    }
+    return info;
+  }
+
+  function playerRankLabel(info,st,{includeIndividualInTeams=false}={}){
+    if(!info) return 'Rank —';
+    if(st && st.gameMode==='teams'){
+      const teamPart = info.teamRank ? 'Team #'+info.teamRank+' of '+info.teamTotal : 'Team rank —';
+      if(includeIndividualInTeams && info.rank) return teamPart+' · You #'+info.rank+' of '+info.total;
+      return teamPart;
+    }
+    return info.rank ? '#'+info.rank+' of '+info.total : 'Rank —';
   }
 
 
@@ -10884,7 +10973,7 @@ authPromise.then(() => {
       const roundStar = standings.slice().sort((a,b)=>b.lastPoints-a.lastPoints)[0];
       $('screen-host-leaderboard').innerHTML =
         '<div class="leader-shell">'+
-          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="team-badge">👥 Team Battle · After Q'+(st.currentIndex+1)+'</div></div>'+
+          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="team-badge">👥 Team Battle · After Q'+(st.currentIndex+1)+'</div>'+hostResetButtonHtml('Reset')+'</div></div>'+
           '<div class="leader-head">'+
             '<div class="eyebrow">Team leaderboard</div>'+
             '<div class="leader-title">'+(standings.length?escapeHtml(standings[0].name)+' leads the battle':'Team standings')+'</div>'+
@@ -10907,7 +10996,7 @@ authPromise.then(() => {
       const roundStar = players.slice().sort((a,b)=>(b.lastPoints||0)-(a.lastPoints||0))[0];
       $('screen-host-leaderboard').innerHTML =
         '<div class="leader-shell">'+
-          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div class="chip">After Q'+(st.currentIndex+1)+'</div></div>'+
+          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="chip">After Q'+(st.currentIndex+1)+'</div>'+hostResetButtonHtml('Reset')+'</div></div>'+
           '<div class="leader-head">'+
             '<div class="eyebrow">Leaderboard</div>'+
             '<div class="leader-title">'+(players.length ? escapeHtml(players[0].name)+' leads the session' : 'Current standings')+'</div>'+
@@ -10932,6 +11021,7 @@ authPromise.then(() => {
     }
 
     showScreen('screen-host-leaderboard');
+    wireHostResetButtons($('screen-host-leaderboard'));
     $('btn-host-next').onclick = ()=> isLast ? hostGoToFinal(st) : hostNextQuestion(st);
     if($('btn-end-early-lb')) $('btn-end-early-lb').onclick = () => hostEndQuizEarly(st);
     wireQuestionReviewPanel($('screen-host-leaderboard'), async ()=>{
@@ -11209,12 +11299,14 @@ authPromise.then(() => {
           '<button class="btn btn-primary" id="btn-new-quiz">Play another quiz — same session</button>'+
           '<button class="btn btn-ghost" id="btn-final-analytics">View game analytics</button>'+
           '<button class="btn btn-ghost" id="btn-final-dashboard">Return to dashboard</button>'+
+          hostResetButtonHtml('End room & new session')+
         '</div>'+
 
         buildQuestionReviewPanel(st, st.questions.length-1)+
       '</div>';
 
     showScreen('screen-host-final');
+    wireHostResetButtons($('screen-host-final'));
     startHostFinalCelebration(
       st,
       teamMode ? (winningTeam ? winningTeam.score : 0) : (winner ? winner.score : 0)
@@ -11681,10 +11773,12 @@ authPromise.then(() => {
   async function enterPlayerQuestion(st){
     const q = st.questions[st.currentIndex];
     const type = normalizedQuestionType(q);
-    const [existingAnswer, currentPlayer] = await Promise.all([
+    const [existingAnswer, players] = await Promise.all([
       fbGet(answerPath(S.code, st.currentIndex, S.pid)),
-      fbGet(playerPath(S.code, S.pid))
+      fetchAllPlayers(S.code)
     ]);
+    const currentPlayer = players.find(p=>p.id===S.pid) || null;
+    const rankInfo = playerRankInfo(players,S.pid,st);
     if(currentPlayer && currentPlayer.teamId){
       S.teamId = currentPlayer.teamId;
       savePlayerSession();
@@ -11741,7 +11835,7 @@ authPromise.then(() => {
           answerArea+
           '<div id="pq-status" class="live-answer-status">'+(answered?'<strong>Your answer is already locked in.</strong> Waiting for the reveal…':'Choose your answer to lock it in.')+'</div>'+
         '</div>'+
-        '<div class="live-question-footer"><span class="live-micro-pill">'+(questionsAfter>0 ? questionsAfter+' questions after this' : 'Final question')+'</span><span class="live-micro-pill">Faster correct answers earn more points</span>'+(st.gameMode==='teams'?'<span class="team-badge">👥 '+escapeHtml(teamName(st,S.teamId))+'</span>':'')+'</div>'+
+        '<div class="live-question-footer"><span class="live-micro-pill">'+(questionsAfter>0 ? questionsAfter+' questions after this' : 'Final question')+'</span><span class="live-micro-pill">Faster correct answers earn more points</span>'+((st.currentIndex>0 || players.some(p=>Number(p.score||0)>0))?'<span class="player-rank-pill">Rank '+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</span>':'<span class="live-micro-pill">'+players.length+' player'+(players.length===1?'':'s')+' joined</span>')+(st.gameMode==='teams'?'<span class="team-badge">👥 '+escapeHtml(teamName(st,S.teamId))+'</span>':'')+'</div>'+
       '</div>';
     showScreen('screen-player-question');
 
@@ -11870,7 +11964,9 @@ authPromise.then(() => {
 
   async function enterPlayerReveal(st){
     clearInterval(S.playerTimerHandle);
-    const me = await fbGet(playerPath(S.code, S.pid));
+    const players = await fetchAllPlayers(S.code);
+    const rankInfo = playerRankInfo(players,S.pid,st);
+    const me = rankInfo.me;
     if(me && me.teamId){ S.teamId = me.teamId; savePlayerSession(); }
     const q = st.questions[st.currentIndex];
     const correct = me ? me.lastCorrect : false;
@@ -11891,6 +11987,7 @@ authPromise.then(() => {
           (q.explanation ? '<p style="margin-top:10px;">'+escapeHtml(q.explanation)+'</p>' : '')+
           '<div class="player-score-strip">'+
             '<div class="player-score-cell"><span>Total score</span><strong>'+score.toLocaleString()+'</strong></div>'+
+            '<div class="player-score-cell"><span>Current rank</span><strong>'+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</strong></div>'+
             '<div class="player-score-cell"><span>Question</span><strong>'+(st.currentIndex+1)+' / '+st.questions.length+'</strong></div>'+
           '</div>'+
           '<p style="margin-top:15px;font-size:11px;">Waiting for the host to show the leaderboard…</p>'+
@@ -11908,6 +12005,7 @@ authPromise.then(() => {
       const standings = getTeamStandings(players, st);
       const myTeamRank = standings.findIndex(t=>t.id===S.teamId)+1;
       const myTeam = standings.find(t=>t.id===S.teamId);
+      const rankInfo = playerRankInfo(players,S.pid,st);
 
       $('screen-player-leaderboard').innerHTML =
         '<div class="leader-shell">'+
@@ -11917,7 +12015,7 @@ authPromise.then(() => {
             '<div class="leader-round-star">'+(me&&me.lastCorrect?('You added +'+me.lastPoints+' points'):'No points this round')+' · Team total '+(myTeam?(myTeam.score||0).toLocaleString():0)+'</div>'+
           '</div>'+
           '<div class="team-leader-list">'+renderTeamRows(standings,S.teamId)+'</div>'+
-          '<div style="text-align:center;margin-top:15px;"><span class="live-micro-pill">Your score: '+(me?(me.score||0).toLocaleString():0)+'</span><p style="margin-top:12px;">Waiting for the next question…</p></div>'+
+          '<div style="text-align:center;margin-top:15px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;"><span class="live-micro-pill">Your score: '+(me?(me.score||0).toLocaleString():0)+'</span><span class="player-rank-pill">'+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</span></div><p style="margin-top:12px;text-align:center;">Waiting for the next question…</p>'+
         '</div>';
     }else{
       const myRank = players.findIndex(p=>p.id===S.pid)+1;
@@ -11932,7 +12030,7 @@ authPromise.then(() => {
         '<div class="leader-shell">'+
           '<div class="leader-head">'+
             '<div class="eyebrow">Leaderboard</div>'+
-            '<div class="leader-title">'+(myRank===1?'You’re leading!':'You’re #'+(myRank||'-'))+'</div>'+
+            '<div class="leader-title">'+(myRank===1?'You’re leading!':'You’re #'+(myRank||'-')+' of '+players.length)+'</div>'+
             '<div class="leader-round-star">'+movementText+' · '+(me&&me.lastCorrect?('+'+me.lastPoints+' this round'):'+0 this round')+'</div>'+
           '</div>'+
           '<div class="momentum-list">'+
@@ -11945,10 +12043,11 @@ authPromise.then(() => {
               '</div>'
             ).join('')+
           '</div>'+
-          '<div style="text-align:center;margin-top:15px;">'+
+          (myRank>8 && me ? '<div class="player-rank-card"><span>Your current rank</span><strong>#'+myRank+' of '+players.length+' · '+Number(me.score||0).toLocaleString()+' pts</strong></div>' : '')+
+          '<div style="text-align:center;margin-top:15px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">'+
             '<span class="live-micro-pill">Total score: '+(me?(me.score||0).toLocaleString():0)+'</span>'+
-            '<p style="margin-top:12px;">Waiting for the next question…</p>'+
-          '</div>'+
+            '<span class="player-rank-pill">#'+(myRank||'-')+' of '+players.length+'</span>'+
+          '</div><p style="margin-top:12px;text-align:center;">Waiting for the next question…</p>'+
         '</div>';
     }
     showScreen('screen-player-leaderboard');
@@ -11966,6 +12065,7 @@ authPromise.then(() => {
       const standings = getTeamStandings(players,st);
       const myTeamRank = standings.findIndex(t=>t.id===S.teamId)+1;
       const myTeam = standings.find(t=>t.id===S.teamId);
+      const rankInfo = playerRankInfo(players,S.pid,st);
 
       $('screen-player-final').innerHTML =
         '<div class="center-stage">'+
@@ -11976,6 +12076,7 @@ authPromise.then(() => {
             '<div class="score">'+(myTeam?(myTeam.score||0).toLocaleString():0)+' team points</div>'+
             '<p style="margin-top:7px;">Your contribution: '+(me?(me.score||0).toLocaleString():0)+' points</p>'+
           '</div>'+
+          '<div class="player-rank-card"><span>Your final standing</span><strong>'+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</strong></div>'+
           '<div class="team-leader-list">'+renderTeamRows(standings,S.teamId)+'</div>'+
           '<p style="margin-top:14px;">Stay here — if the host starts another quiz, you’ll rejoin automatically.</p>'+
           '<div class="chip" style="margin-top:4px;">Session <span class="code-text">'+S.code+'</span></div>'+
@@ -11988,8 +12089,10 @@ authPromise.then(() => {
           '<div class="eyebrow">'+(st&&st.sessionMode==='exam'?'Exam results':'Final results')+'</div>'+
           '<h1 style="font-size:33px;">'+(st&&st.sessionMode==='exam' ? ('You scored '+(me?me.score:0)+' points') : (myRank===1?'You won! 🏆':'You finished #'+myRank))+'</h1>'+
           '<div class="chip">Your score: '+(me?me.score:0)+'</div>'+
+          '<div class="player-rank-card"><span>Final rank</span><strong>#'+(myRank||'-')+' of '+players.length+'</strong></div>'+
           '<div style="display:flex; flex-direction:column; gap:8px; width:100%; max-width:420px;">'+
             players.slice(0,5).map((p,i)=>'<div class="lb-row'+(p.id===S.pid?' me':'')+'"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+escapeHtml(p.name)+'</span><span class="lb-score">'+p.score+'</span></div>').join('')+
+            (myRank>5 && me ? '<div class="lb-row me"><span class="lb-rank">'+myRank+'</span><span class="lb-name">'+escapeHtml(me.name)+' · You</span><span class="lb-score">'+Number(me.score||0).toLocaleString()+'</span></div>' : '')+
           '</div>'+
           '<p style="margin-top:14px;">Stay here — if the host starts another quiz, you’ll rejoin automatically.</p>'+
           '<div class="chip" style="margin-top:4px;">Session <span class="code-text">'+S.code+'</span></div>'+
