@@ -4287,6 +4287,82 @@ html[data-theme="light"] .qz-account-stage .qz-account-card p{
   border:1px solid rgba(117,91,255,.15);
 }
 .school-guided-notice strong{color:#b6a3ff;}
+
+/* QZMAX 3.18.7 — Young Learners Years 1–4 */
+.young-learner-zone{
+  margin-top:12px;
+  padding:14px;
+  border-radius:18px;
+  border:1px solid rgba(115,92,255,.22);
+  background:
+    radial-gradient(circle at 9% 12%,rgba(255,207,76,.18),transparent 28%),
+    radial-gradient(circle at 88% 20%,rgba(69,211,255,.15),transparent 28%),
+    linear-gradient(135deg,rgba(122,92,255,.10),rgba(35,194,255,.06));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.young-learner-head{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.young-learner-star{
+  width:40px;height:40px;border-radius:14px;display:grid;place-items:center;
+  font-size:21px;color:#1e163f;
+  background:linear-gradient(135deg,#ffd95a,#ff9d54);
+  box-shadow:0 8px 22px rgba(255,174,70,.20);
+}
+.young-learner-head strong{display:block;font-size:14px;color:#f3f6ff;letter-spacing:.01em;}
+.young-learner-head span{display:block;margin-top:2px;font-size:10px;color:#aab9d3;font-weight:700;}
+.young-year-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;}
+.young-year-card{
+  min-height:91px;padding:10px 8px;border-radius:15px;cursor:pointer;
+  border:1px solid rgba(132,153,207,.18);
+  background:rgba(9,18,40,.46);color:#eef4ff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;
+  font-family:inherit;
+}
+.young-year-card:hover{transform:translateY(-2px);border-color:rgba(122,104,255,.5);background:rgba(29,35,72,.68);}
+.young-year-card.active{
+  border-color:#8d75ff;
+  background:linear-gradient(145deg,rgba(120,91,255,.28),rgba(33,181,235,.15));
+  box-shadow:0 8px 22px rgba(86,75,255,.16),inset 0 0 0 1px rgba(255,255,255,.05);
+}
+.young-year-emoji{font-size:24px;line-height:1.1;}
+.young-year-card b{font-size:12px;}
+.young-year-card small{font-size:8.5px;color:#aab9d3;font-weight:700;line-height:1.2;text-align:center;}
+.young-year-card.active small{color:#d9e4ff;}
+.young-learner-tip,.school-level-note{
+  margin-top:10px;padding:8px 10px;border-radius:11px;
+  font-size:9.5px;line-height:1.45;font-weight:650;
+  color:#9eb0cc;background:rgba(4,11,26,.28);border:1px solid rgba(130,151,205,.10);
+}
+.school-year-divider{display:flex;align-items:center;gap:8px;margin:12px 0 8px;color:#7285a4;font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;}
+.school-year-divider:before,.school-year-divider:after{content:"";height:1px;background:rgba(132,153,207,.13);flex:1;}
+.school-practice-kicker{margin:0 0 8px;}
+#ai-source-panel-school.young-active .school-level-note{
+  color:#c8d8f1;border-color:rgba(122,104,255,.18);background:rgba(112,84,255,.07);
+}
+html[data-theme="light"] .young-learner-zone{
+  border-color:rgba(91,72,186,.18);
+  background:
+    radial-gradient(circle at 9% 12%,rgba(255,201,68,.22),transparent 28%),
+    radial-gradient(circle at 88% 20%,rgba(60,190,235,.15),transparent 28%),
+    linear-gradient(135deg,rgba(121,93,234,.09),rgba(62,174,219,.07));
+}
+html[data-theme="light"] .young-learner-head strong{color:#253b58;}
+html[data-theme="light"] .young-learner-head span{color:#5c7390;}
+html[data-theme="light"] .young-year-card{background:rgba(248,251,255,.82);border-color:rgba(66,99,145,.16);color:#20364f;}
+html[data-theme="light"] .young-year-card:hover{background:#fff;border-color:rgba(91,72,186,.35);}
+html[data-theme="light"] .young-year-card.active{
+  background:linear-gradient(145deg,rgba(131,104,242,.18),rgba(76,188,230,.12));
+  border-color:#765ed0;box-shadow:0 7px 18px rgba(85,72,170,.12);
+}
+html[data-theme="light"] .young-year-card small{color:#607994;}
+html[data-theme="light"] .young-year-card.active small{color:#425d79;}
+html[data-theme="light"] .young-learner-tip,
+html[data-theme="light"] .school-level-note{color:#526d88;background:rgba(236,244,252,.72);border-color:rgba(54,91,133,.12);}
+html[data-theme="light"] #ai-source-panel-school.young-active .school-level-note{color:#4b6280;background:rgba(110,87,213,.07);border-color:rgba(91,72,186,.16);}
+html[data-theme="light"] .school-year-divider{color:#617a95;}
+html[data-theme="light"] .school-year-divider:before,
+html[data-theme="light"] .school-year-divider:after{background:rgba(55,91,132,.13);}
+@media(max-width:760px){.young-year-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.young-year-card{min-height:82px;}}
 .ai-difficulty-row{margin-top:13px;}
 .ai-difficulty-row select{min-height:50px;}
 html[data-theme="light"] .guided-ai-panel{
@@ -4467,7 +4543,7 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 @media(max-width:1350px){.ai-source-tabs{grid-template-columns:repeat(4,minmax(0,1fr))!important;}}@media(max-width:1000px){.qz-library-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}@media(max-width:760px){.ai-source-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.qz-library-primary-grid,.qz-library-filter-grid,.qz-library-add-grid{grid-template-columns:1fr;}}@media(max-width:480px){.ai-source-tabs{grid-template-columns:1fr!important;}}
 
 
-/* QZMAX 3.18.4 — session controls, lobby roster and player rank */
+/* QZMAX 3.18.7 — young learners + bright mode + stable player reveal */
 .host-reset-session-btn{border-color:rgba(255,120,147,.3)!important;color:#ff9db0!important;background:rgba(255,70,99,.055)!important}
 .host-reset-session-btn:hover{border-color:rgba(255,120,147,.55)!important;background:rgba(255,70,99,.11)!important}
 .host-player-roster-card{padding:16px 18px!important}
@@ -4485,6 +4561,127 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 .player-rank-card strong{font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--ink)}
 .player-score-strip{grid-template-columns:repeat(auto-fit,minmax(105px,1fr))}
 @media(max-width:640px){.host-player-roster-head{align-items:flex-start;flex-direction:column}.host-live-room-actions{justify-self:end;gap:5px}.host-reset-session-btn{font-size:10px!important;padding:7px 9px!important}.player-rank-card{align-items:flex-start;flex-direction:column}}
+
+
+/* =========================================================
+   QZMAX 3.18.7 — Young Learners + Bright Mode + stable live screens
+   ========================================================= */
+html[data-theme="light"] #screen-host-question,
+html[data-theme="light"] #screen-host-reveal,
+html[data-theme="light"] #screen-host-leaderboard,
+html[data-theme="light"] #screen-host-final{color:#14253b!important;}
+
+/* Live host question: use a genuinely light surface instead of a dark card with light-mode text. */
+html[data-theme="light"] #screen-host-question .live-question-panel{
+  background:radial-gradient(circle at 50% -18%,rgba(93,139,255,.12),transparent 44%),linear-gradient(145deg,rgba(242,248,255,.97),rgba(218,232,247,.96))!important;
+  border-color:rgba(35,73,119,.22)!important;
+  box-shadow:0 24px 64px rgba(35,62,93,.15)!important;
+}
+html[data-theme="light"] #screen-host-question .live-question-panel:before{background:rgba(8,117,223,.065)!important;}
+html[data-theme="light"] #screen-host-question .live-question-text{color:#10243a!important;text-shadow:none!important;}
+html[data-theme="light"] #screen-host-question .live-question-help{color:#58718d!important;}
+html[data-theme="light"] #screen-host-question .live-category{
+  color:#5841aa!important;background:rgba(111,91,255,.09)!important;border-color:rgba(93,69,190,.20)!important;
+}
+html[data-theme="light"] #screen-host-question .qtype-pill{
+  color:#6048ad!important;background:rgba(111,91,255,.075)!important;border-color:rgba(93,69,190,.18)!important;
+}
+html[data-theme="light"] #screen-host-question .live-answer.opt-card,
+html[data-theme="light"] #screen-host-question .live-host-answer{
+  background:rgba(248,252,255,.90)!important;
+  color:#18304a!important;
+  border-color:rgba(35,73,119,.20)!important;
+  box-shadow:0 8px 20px rgba(43,69,99,.055)!important;
+}
+html[data-theme="light"] #screen-host-question .live-answer.opt-card:hover{
+  background:#f8fbff!important;border-color:rgba(8,117,223,.40)!important;box-shadow:0 10px 25px rgba(34,74,115,.10)!important;
+}
+html[data-theme="light"] #screen-host-question .live-answer.opt-card .opt-letter,
+html[data-theme="light"] #screen-host-question .live-host-answer .opt-letter{
+  background:#e7f0fa!important;color:#38536f!important;border-color:rgba(35,73,119,.15)!important;
+}
+html[data-theme="light"] #screen-host-question .live-answer-text,
+html[data-theme="light"] #screen-host-question .live-host-answer-text{color:#18304a!important;}
+html[data-theme="light"] #screen-host-question .live-answer-status{color:#5b7188!important;}
+html[data-theme="light"] #screen-host-question .live-answer-status strong{color:#17314c!important;}
+html[data-theme="light"] #screen-host-question .live-host-status .chip{
+  background:rgba(235,244,252,.96)!important;color:#223d59!important;border-color:rgba(35,73,119,.18)!important;
+}
+html[data-theme="light"] #screen-host-question .live-end-btn{
+  color:#b9224b!important;background:rgba(204,49,90,.075)!important;border-color:rgba(185,35,76,.24)!important;font-weight:800!important;
+}
+html[data-theme="light"] #screen-host-question .live-end-btn:hover{background:rgba(204,49,90,.13)!important;border-color:rgba(185,35,76,.38)!important;}
+html[data-theme="light"] .live-room-pill{
+  background:rgba(236,244,252,.90)!important;border-color:rgba(35,73,119,.18)!important;color:#5a7089!important;
+}
+html[data-theme="light"] .live-room-pill strong{color:#17314c!important;}
+html[data-theme="light"] .live-q-meta{color:#58708b!important;}
+html[data-theme="light"] .live-progress{background:rgba(39,77,119,.12)!important;border-color:rgba(35,73,119,.08)!important;}
+html[data-theme="light"] .live-micro-pill{background:rgba(232,241,250,.90)!important;border-color:rgba(35,73,119,.16)!important;color:#4d6580!important;}
+
+/* Reveal and leaderboard: stronger text, score and badge contrast. */
+html[data-theme="light"] #screen-host-reveal .reveal-kicker,
+html[data-theme="light"] #screen-host-leaderboard .reveal-kicker{color:#596f88!important;}
+html[data-theme="light"] #screen-host-reveal .reveal-answer-text,
+html[data-theme="light"] #screen-host-leaderboard .leader-title{color:#10243a!important;}
+html[data-theme="light"] #screen-host-reveal .reveal-stat{
+  background:rgba(239,247,254,.90)!important;border-color:rgba(35,73,119,.18)!important;
+}
+html[data-theme="light"] #screen-host-reveal .reveal-stat span{color:#59718b!important;}
+html[data-theme="light"] #screen-host-reveal .reveal-stat strong{color:#152d47!important;}
+html[data-theme="light"] #screen-host-reveal .reveal-option{
+  background:rgba(239,247,254,.88)!important;border-color:rgba(35,73,119,.18)!important;color:#17314c!important;
+}
+html[data-theme="light"] #screen-host-reveal .reveal-option.correct{
+  background:rgba(8,121,92,.09)!important;border-color:rgba(8,121,92,.28)!important;
+}
+html[data-theme="light"] #screen-host-reveal .reveal-option .answer-label,
+html[data-theme="light"] #screen-host-reveal .reveal-option .count{color:#17314c!important;}
+html[data-theme="light"] #screen-host-reveal .reveal-explainer{
+  background:rgba(239,247,254,.90)!important;border-color:rgba(35,73,119,.18)!important;color:#17314c!important;
+}
+html[data-theme="light"] .leader-round-star{
+  color:#865a00!important;background:rgba(255,211,110,.22)!important;border-color:rgba(180,124,0,.22)!important;
+}
+html[data-theme="light"] .momentum-row{
+  background:rgba(235,244,252,.88)!important;border-color:rgba(35,73,119,.18)!important;color:#17314c!important;
+  box-shadow:0 8px 22px rgba(39,66,96,.055)!important;
+}
+html[data-theme="light"] .momentum-row.first{
+  background:linear-gradient(90deg,rgba(255,221,133,.25),rgba(235,244,252,.90))!important;border-color:rgba(179,127,17,.24)!important;
+}
+html[data-theme="light"] .momentum-row.me{background:rgba(99,119,255,.11)!important;border-color:rgba(75,95,211,.28)!important;}
+html[data-theme="light"] .momentum-rank{background:rgba(35,73,119,.08)!important;color:#3e5874!important;}
+html[data-theme="light"] .momentum-row.first .momentum-rank{background:rgba(213,159,29,.17)!important;color:#7e5700!important;}
+html[data-theme="light"] .momentum-name{color:#17314c!important;}
+html[data-theme="light"] .momentum-score{color:#16304a!important;}
+html[data-theme="light"] .rank-same{color:#546b84!important;background:rgba(35,73,119,.08)!important;}
+html[data-theme="light"] .rank-up{color:#08795c!important;background:rgba(8,121,92,.10)!important;}
+html[data-theme="light"] .rank-down{color:#b9224b!important;background:rgba(185,34,75,.09)!important;}
+
+/* Host review card and small helper labels were too washed out in Bright mode. */
+html[data-theme="light"] #screen-host-leaderboard .card,
+html[data-theme="light"] #screen-host-reveal .card{
+  background:rgba(230,240,250,.92)!important;border-color:rgba(35,73,119,.20)!important;color:#17314c!important;
+}
+html[data-theme="light"] #screen-host-leaderboard .qtype-review,
+html[data-theme="light"] #screen-host-reveal .qtype-review{color:#58708a!important;}
+html[data-theme="light"] #screen-host-leaderboard .eyebrow,
+html[data-theme="light"] #screen-host-reveal .eyebrow{color:#6d59d8!important;}
+html[data-theme="light"] #screen-host-leaderboard .correct-toggle:not(.on),
+html[data-theme="light"] #screen-host-reveal .correct-toggle:not(.on){background:#eef4fb!important;color:#415a75!important;border-color:rgba(35,73,119,.18)!important;}
+html[data-theme="light"] #screen-host-leaderboard .btn-danger,
+html[data-theme="light"] #screen-host-reveal .btn-danger{color:#b9224b!important;border-color:rgba(185,34,75,.25)!important;background:rgba(204,49,90,.075)!important;}
+
+/* Player reveal remains a light card and can now refresh score/rank without rebuilding. */
+html[data-theme="light"] .player-reveal-card{color:#14253b!important;}
+html[data-theme="light"] .player-reveal-card.correct{background:radial-gradient(circle at 50% 0,rgba(8,121,92,.10),transparent 45%),linear-gradient(180deg,rgba(231,243,249,.96),rgba(214,230,244,.96))!important;border-color:rgba(8,121,92,.24)!important;}
+html[data-theme="light"] .player-reveal-card.wrong{background:radial-gradient(circle at 50% 0,rgba(204,49,90,.09),transparent 45%),linear-gradient(180deg,rgba(238,241,248,.96),rgba(217,229,242,.96))!important;border-color:rgba(185,34,75,.20)!important;}
+html[data-theme="light"] .player-score-cell{background:rgba(242,248,254,.82)!important;border-color:rgba(35,73,119,.14)!important;}
+html[data-theme="light"] .player-score-cell strong{color:#17314c!important;}
+html[data-theme="light"] .player-reveal-card p{color:#526a84!important;}
+
+@media(prefers-reduced-motion:reduce){.player-reveal-card{animation:none!important;}}
 
 </style>
 </head>
@@ -4510,7 +4707,7 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.18.4";
+  const APP_VERSION = "3.18.7";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -4715,7 +4912,7 @@ authPromise.then(() => {
     hostRevealReason:'', lateReconcileHandle:null,
     hostControlWatchUnsub:null, hostControlLost:false,
     playerTimerHandle:null, playerPollHandle:null,
-    lastPhaseKey:null, questionsDraft:[],
+    lastPhaseKey:null, lastRevealReconciledAt:null, questionsDraft:[],
     gameMode:'individual', teams:[], teamId:null,
     sessionMode:'live', examDurationMinutes:30, examQuestionIndex:0,
     questionType:'multiple_choice',
@@ -5967,6 +6164,7 @@ authPromise.then(() => {
     S.name = player.name || saved.name || 'Player';
     S.teamId = player.teamId || saved.teamId || null;
     S.lastPhaseKey = null;
+    S.lastRevealReconciledAt = null;
     S.hadRoom = true;
     savePlayerSession();
     startPlayerPoll();
@@ -5980,7 +6178,7 @@ authPromise.then(() => {
     const pid = S.pid;
     clearPlayerSession();
     if(code && pid) await fbDelete(playerPath(code,pid));
-    S.code = null; S.pid = null; S.name = ''; S.teamId = null; S.lastPhaseKey = null; S.hadRoom = false;
+    S.code = null; S.pid = null; S.name = ''; S.teamId = null; S.lastPhaseKey = null; S.lastRevealReconciledAt = null; S.hadRoom = false;
     buildRoleScreen();
     showScreen('screen-role');
   }
@@ -6457,16 +6655,26 @@ authPromise.then(() => {
         '</div>'+
 
         '<div id="ai-source-panel-school" class="ai-source-panel" style="display:none;">'+
-          '<div class="ai-source-notice school-guided-notice"><strong>Structured school generation</strong><span>Choose the year and subject. Difficulty, language and format are shared below. QZMAX keeps the questions at the selected year level.</span></div>'+
-          '<div class="eyebrow" style="margin:13px 0 8px;">SCHOOL EXAM PRACTICE</div>'+
+          '<div class="ai-source-notice school-guided-notice"><strong>School & learning</strong><span>Choose the year and subject. QZMAX keeps the wording, knowledge and reasoning at the selected year level.</span></div>'+ 
+          '<div class="young-learner-zone" id="young-learner-zone">'+
+            '<div class="young-learner-head"><div class="young-learner-star">★</div><div><strong>Young Learners</strong><span>Years 1–4 • short, friendly and fun</span></div></div>'+ 
+            '<div class="young-year-grid" role="group" aria-label="Young learner year">'+
+              '<button type="button" class="young-year-card" data-school-year="Year 1"><span class="young-year-emoji">🌈</span><b>Year 1</b><small>Explore & learn</small></button>'+ 
+              '<button type="button" class="young-year-card" data-school-year="Year 2"><span class="young-year-emoji">🚀</span><b>Year 2</b><small>Build confidence</small></button>'+ 
+              '<button type="button" class="young-year-card" data-school-year="Year 3"><span class="young-year-emoji">🧠</span><b>Year 3</b><small>Think & discover</small></button>'+ 
+              '<button type="button" class="young-year-card" data-school-year="Year 4"><span class="young-year-emoji">🏆</span><b>Year 4</b><small>Ready for a challenge</small></button>'+ 
+            '</div>'+ 
+            '<div class="young-learner-tip" id="young-learner-tip">Pick a year above for age-friendly subjects such as Maths, Reading, Science & Nature and Fun Mixed Learning.</div>'+ 
+          '</div>'+ 
+          '<div class="school-year-divider"><span>or choose any school year</span></div>'+ 
+          '<div class="eyebrow school-practice-kicker">SCHOOL PRACTICE</div>'+ 
           '<div class="guided-ai-grid school-guided-grid">'+
             '<div class="qform-row"><label>Grade / Year</label><select id="ai-grade">'+
-              '<option value="Year 5">Year 5</option><option value="Year 6">Year 6</option><option value="Year 7">Year 7</option><option value="Year 8">Year 8</option><option value="Year 9">Year 9</option><option value="Year 10">Year 10</option><option value="Year 11">Year 11</option><option value="Year 12">Year 12</option>'+
-            '</select></div>'+
-            '<div class="qform-row"><label>Subject</label><select id="ai-subject">'+
-              '<option value="Mathematics">Mathematics</option><option value="English">English</option><option value="Science / Biology">Science / Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option><option value="History">History</option><option value="Geography">Geography</option><option value="Economics">Economics</option><option value="Computer Science">Computer Science</option>'+
-            '</select></div>'+
-          '</div>'+
+              '<option value="Year 1">Year 1</option><option value="Year 2">Year 2</option><option value="Year 3">Year 3</option><option value="Year 4">Year 4</option><option value="Year 5" selected>Year 5</option><option value="Year 6">Year 6</option><option value="Year 7">Year 7</option><option value="Year 8">Year 8</option><option value="Year 9">Year 9</option><option value="Year 10">Year 10</option><option value="Year 11">Year 11</option><option value="Year 12">Year 12</option>'+
+            '</select></div>'+ 
+            '<div class="qform-row"><label>Subject</label><select id="ai-subject"></select></div>'+ 
+          '</div>'+ 
+          '<div class="school-level-note" id="school-level-note">Year 5–12 mode: subject-focused school practice at the selected year level.</div>'+ 
         '</div>'+
 
         '<div id="ai-source-panel-document" class="ai-source-panel" style="display:none;">'+
@@ -6733,7 +6941,7 @@ authPromise.then(() => {
       setTimeout(()=>{ btn.textContent = 'Copy join link'; }, 1500);
     };
 
-    // QZMAX 3.18.4 — streamlined creator + live session controls
+    // QZMAX 3.18.7 — young learners + bright mode + stable player reveal
     let isSchoolMode = false;
     let aiSourceMode = 'ai';
     let aiDocumentState = { name:'', type:'', text:'', pages:0, chars:0 };
@@ -6762,7 +6970,10 @@ authPromise.then(() => {
       if(!btn) return;
       if(aiSourceMode==='document') btn.textContent = 'Generate from Document';
       else if(aiSourceMode==='link') btn.textContent = 'Generate from Source Link';
-      else if(aiSourceMode==='school') btn.textContent = 'Generate Year-Level Exam Questions';
+      else if(aiSourceMode==='school'){
+        const yearNum=schoolYearNumber($('ai-grade')?.value||'');
+        btn.textContent = yearNum>=1 && yearNum<=4 ? '✨ Create Young Learner Quiz' : 'Generate Year-Level Exam Questions';
+      }
       else btn.textContent = 'Generate with AI';
 
       const note = $('ai-accuracy-note');
@@ -6772,7 +6983,10 @@ authPromise.then(() => {
         }else if(aiSourceMode==='link'){
           note.innerHTML = '<strong>Source Link grounding:</strong> Every accepted question must include supporting evidence found in the extracted page content. QZMAX does not independently certify the factual accuracy of the page itself.';
         }else if(aiSourceMode==='school'){
-          note.innerHTML = '<strong>Curriculum-guided review:</strong> QZMAX follows the selected year, subject and difficulty guidance. Host review remains important because this mode is not an official curriculum certification.';
+          const yearNum=schoolYearNumber($('ai-grade')?.value||'');
+          note.innerHTML = yearNum>=1 && yearNum<=4
+            ? '<strong>Young Learner mode:</strong> QZMAX keeps questions short, friendly and age-appropriate for the selected year. Host review is still recommended before a live game.'
+            : '<strong>Curriculum-guided review:</strong> QZMAX follows the selected year, subject and difficulty guidance. Host review remains important because this mode is not an official curriculum certification.';
         }else{
           note.innerHTML = '<strong>QZMAX AI:</strong> Ordinary topics use one fast AI call plus local validation; current/recent topics automatically use fresh web evidence. Another free AI provider is used only if the first route fails.';
         }
@@ -8068,6 +8282,11 @@ authPromise.then(() => {
         'Video Games','Classic Video Games','PlayStation','Xbox','Nintendo','PC Gaming','Mobile Games',
         'Board Games','Card Games','Gaming Characters','Gaming History','Esports','Other'
       ],
+      'Brain Puzzles & Riddles':[
+        'Mixed Short Brain Teasers','Classic Riddles','Logic Riddles','Lateral Thinking',
+        'Wordplay Riddles','Funny Riddles','What Am I?','Everyday Object Riddles',
+        'Number & Math Riddles','Patterns & Sequences','Kids Riddles','Other'
+      ],
       'Pop Culture & Celebrities':[
         'Mixed Pop Culture','Celebrities','Famous Actors','Famous Musicians','TV Personalities',
         'Internet & Social Media','Awards & Red Carpets','Fashion','Memes & Viral Culture',
@@ -8188,9 +8407,11 @@ authPromise.then(() => {
       const s=guidedScopeFromUI();
       const category=s.category || 'Choose a category';
       const topic=s.topic || 'Choose or enter a topic';
-      el.innerHTML='<strong>Scope:</strong> '+escapeHtml(
-        [category,topic,s.region,s.timePeriod,s.focus].filter(Boolean).join(' · ')
-      );
+      const scopeText=escapeHtml([category,topic,s.region,s.timePeriod,s.focus].filter(Boolean).join(' · '));
+      const riddleNote=s.category==='Brain Puzzles & Riddles'
+        ? '<span style="display:block;margin-top:5px;color:var(--accent);font-weight:800;">🧩 Close-choice riddle mode — QZMAX will make all answer choices plausible and deliberately hard to eliminate at a glance.</span>'
+        : '';
+      el.innerHTML='<strong>Scope:</strong> '+scopeText+riddleNote;
     }
 
     function buildGuidedAITopic(scope){
@@ -8211,11 +8432,20 @@ authPromise.then(() => {
       if(!hint) return;
       const diff=$('ai-difficulty')?.value || 'Medium';
       if(aiSourceMode==='school'){
-        hint.textContent = diff==='Easy'
-          ? 'Straightforward year-level knowledge and one-step application.'
-          : diff==='Hard'
-          ? 'Exam-style multi-step reasoning without exceeding the selected year level.'
-          : 'Balanced year-level knowledge and one- or two-step reasoning.';
+        const schoolYearNum = parseInt(String($('ai-grade')?.value||'').match(/\d+/)?.[0]||'0',10);
+        if(schoolYearNum>=1 && schoolYearNum<=4){
+          hint.textContent = diff==='Easy'
+            ? 'Gentle confidence-building questions with short wording and one clear idea at a time.'
+            : diff==='Hard'
+            ? 'A fun challenge for this year level — more thinking, but never content above the selected year.'
+            : 'Friendly year-level questions with a balanced mix of recall, understanding and simple problem solving.';
+        }else{
+          hint.textContent = diff==='Easy'
+            ? 'Straightforward year-level knowledge and one-step application.'
+            : diff==='Hard'
+            ? 'Exam-style multi-step reasoning without exceeding the selected year level.'
+            : 'Balanced year-level knowledge and one- or two-step reasoning.';
+        }
       }else if(aiSourceMode==='document' || aiSourceMode==='link'){
         hint.textContent = diff==='Easy'
           ? 'Direct recall and straightforward understanding from the selected source.'
@@ -8232,6 +8462,55 @@ authPromise.then(() => {
       updateGuidedScopePreview();
     }
 
+
+    const YOUNG_LEARNER_SUBJECTS = [
+      'Fun Mixed Learning','Mathematics','English','Reading & Comprehension',
+      'Spelling & Vocabulary','Science & Nature','HASS / Our World','General Knowledge'
+    ];
+    const SENIOR_SCHOOL_SUBJECTS = [
+      'Mathematics','English','Science / Biology','Chemistry','Physics',
+      'History','Geography','Economics','Computer Science'
+    ];
+
+    function schoolYearNumber(value){
+      const match=String(value||'').match(/\d+/);
+      return match ? parseInt(match[0],10) : 0;
+    }
+
+    function updateSchoolYearUI(){
+      const gradeEl=$('ai-grade');
+      const subjectEl=$('ai-subject');
+      if(!gradeEl || !subjectEl) return;
+      const grade=gradeEl.value || 'Year 5';
+      const yearNum=schoolYearNumber(grade);
+      const isYoung=yearNum>=1 && yearNum<=4;
+      const subjects=isYoung ? YOUNG_LEARNER_SUBJECTS : SENIOR_SCHOOL_SUBJECTS;
+      const previous=subjectEl.value;
+      subjectEl.innerHTML=subjects.map(subject=>'<option value="'+escapeHtml(subject)+'">'+escapeHtml(subject)+'</option>').join('');
+      if(subjects.includes(previous)) subjectEl.value=previous;
+      else subjectEl.value=isYoung ? 'Fun Mixed Learning' : 'Mathematics';
+
+      const panel=$('ai-source-panel-school');
+      if(panel) panel.classList.toggle('young-active',isYoung);
+      document.querySelectorAll('.young-year-card[data-school-year]').forEach(btn=>{
+        btn.classList.toggle('active',btn.dataset.schoolYear===grade);
+      });
+      const note=$('school-level-note');
+      if(note){
+        note.textContent=isYoung
+          ? `${grade} Young Learner mode: short, friendly questions, simple instructions and age-appropriate vocabulary. No trick wording or content above ${grade}.`
+          : `${grade} mode: subject-focused school practice at the selected year level.`;
+      }
+      const tip=$('young-learner-tip');
+      if(tip){
+        tip.textContent=isYoung
+          ? `${grade} selected — choose a playful mixed quiz or focus on Maths, Reading, Words, Science & Nature, Our World or General Knowledge.`
+          : 'Pick a year above for age-friendly subjects such as Maths, Reading, Science & Nature and Fun Mixed Learning.';
+      }
+      if(aiSourceMode==='school') updateAIGenerateButton();
+      updateAIDifficultyHint();
+    }
+
     populateGuidedCategories();
     $('ai-guided-category').onchange=populateGuidedTopics;
     $('ai-guided-topic').onchange=()=>{updateGuidedOtherFields();updateGuidedScopePreview();};
@@ -8245,6 +8524,15 @@ authPromise.then(() => {
     $('ai-difficulty').onchange=()=>{
       updateAIDifficultyHint();
     };
+
+    $('ai-grade').onchange=updateSchoolYearUI;
+    document.querySelectorAll('.young-year-card[data-school-year]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        $('ai-grade').value=btn.dataset.schoolYear;
+        updateSchoolYearUI();
+      });
+    });
+    updateSchoolYearUI();
 
     function updateAIQuestionTypeUI(){
       const type = $('ai-question-type').value || 'multiple_choice';
@@ -8415,9 +8703,17 @@ authPromise.then(() => {
     });
 
     function buildSchoolExamTopic(grade, subject, diff){
+      const yearNum = schoolYearNumber(grade);
+      const isYoungLearner = yearNum>=1 && yearNum<=4;
       const subjectGuidance = {
+        'Fun Mixed Learning': 'Create a playful mixed learning quiz across age-appropriate number skills, words and reading, science and nature, everyday knowledge, our world, simple patterns and light reasoning. Vary the subjects so the quiz feels fun rather than like a worksheet.',
         'Mathematics': 'Test mathematical knowledge and skills directly: number operations, place value, fractions, decimals, percentages where year-appropriate, patterns/algebraic thinking, measurement, geometry/space, data/statistics, probability, and practical problem solving.',
         'English': 'Test English knowledge and skills directly: reading comprehension, vocabulary, spelling, grammar, punctuation, sentence structure, text features, inference, and age-appropriate language analysis.',
+        'Reading & Comprehension': 'Use short age-appropriate sentences or mini-passages and test meaning, sequencing, simple inference, main idea, character/action understanding and basic text comprehension. Keep reading load suitable for the selected year.',
+        'Spelling & Vocabulary': 'Test age-appropriate spelling, word meaning, synonyms and antonyms, simple prefixes or suffixes where appropriate, word families and choosing the best word in a sentence. Avoid obscure vocabulary.',
+        'Science & Nature': 'Test age-appropriate science and nature knowledge: living things, habitats, body basics, materials, weather, Earth and sky, simple forces and changes, observations and everyday scientific reasoning.',
+        'HASS / Our World': 'Test age-appropriate knowledge of people, places, communities, maps and directions, past and present, local environments, simple civics and how people live and work together. Keep concepts concrete and familiar.',
+        'General Knowledge': 'Create broad, age-appropriate general knowledge about animals, places, everyday life, simple science, famous landmarks, basic culture and familiar facts. Prefer widely known, confidence-building facts over obscure trivia.',
         'Science / Biology': 'Test science knowledge and scientific reasoning directly: living things, physical sciences, Earth/space sciences, materials, systems, observations, evidence and age-appropriate scientific interpretation.',
         'Chemistry': 'Test chemistry knowledge and problem solving directly at the selected year level. Avoid university-level concepts unless the selected year genuinely requires them.',
         'Physics': 'Test physics knowledge and problem solving directly at the selected year level. Focus on age-appropriate forces, motion, energy, waves, electricity, measurement and interpretation.',
@@ -8427,19 +8723,30 @@ authPromise.then(() => {
         'Computer Science': 'Test computing knowledge and problem solving directly: algorithms, data, digital systems, programming concepts, networks, cyber safety and computational thinking appropriate to the selected year.'
       };
       const difficultyRule = diff === 'Easy'
-        ? 'Easy means straightforward knowledge, recognition, or one-step application appropriate for this year level.'
+        ? (isYoungLearner
+          ? 'Easy means gentle confidence-building recall or one very simple step. Keep the wording short and the distractors clearly plausible without being tricky.'
+          : 'Easy means straightforward knowledge, recognition, or one-step application appropriate for this year level.')
         : diff === 'Hard'
-        ? 'Hard / Exam Style means challenging multi-step reasoning and application, but NEVER content above the selected year level.'
-        : 'Medium means a balanced mix of knowledge and one- or two-step reasoning appropriate for this year level.';
+        ? (isYoungLearner
+          ? 'Hard / Challenging means a fun stretch for this year level using simple two-step thinking or closer distractors, but NEVER content, vocabulary or reading demands above the selected year level.'
+          : 'Hard / Exam Style means challenging multi-step reasoning and application, but NEVER content above the selected year level.')
+        : (isYoungLearner
+          ? 'Medium means friendly year-level questions mixing recall, understanding and simple problem solving while keeping the language clear and encouraging.'
+          : 'Medium means a balanced mix of knowledge and one- or two-step reasoning appropriate for this year level.');
+
+      const youngLearnerRule = isYoungLearner
+        ? `YOUNG LEARNER RULES FOR ${grade.toUpperCase()}: Keep each question short and concrete. Test one main idea at a time. Use familiar everyday examples, age-appropriate vocabulary and short answer choices. Avoid trick questions, double negatives, advanced jargon, long passages, obscure facts and content above ${grade}. Make the quiz lively and encouraging without sounding babyish. For mathematics, keep calculations and number sizes appropriate to ${grade}. For reading questions, keep any passage very short and fully contained in the question.`
+        : '';
 
       return [
         `Create ${grade} ${subject} assessment questions that directly test a ${grade} student's knowledge and skills in ${subject}.`,
         subjectGuidance[subject] || `Test ${subject} knowledge and skills directly at the selected year level.`,
         difficultyRule,
+        youngLearnerRule,
         'CRITICAL RELEVANCE RULE: Do NOT ask about education systems, schooling, teaching methods, curriculum terminology, PISA, assessment organisations, school administration, or the history of education unless those are explicitly the subject being studied.',
         `Every question must be something a ${grade} student could reasonably be expected to answer in a ${subject} class.`,
         'Use varied question content and avoid repeatedly testing the same fact or skill.'
-      ].join(' ');
+      ].filter(Boolean).join(' ');
     }
 
     $('ai-generate').onclick = async ()=>{
@@ -9073,6 +9380,32 @@ authPromise.then(() => {
     return 'Medium';
   }
 
+  function isBrainPuzzleScope(topic,structuredScope={}){
+    const category=normalizedTopicKey(structuredScope?.category || '');
+    const selectedTopic=normalizedTopicKey(structuredScope?.topic || '');
+    const raw=normalizedTopicKey(topic || '');
+    return category==='brain puzzles riddles' ||
+      /(?:^|\s)(?:riddle|riddles|brain teaser|brain teasers|brain puzzle|brain puzzles|lateral thinking)(?:\s|$)/.test(selectedTopic+' '+raw);
+  }
+
+  function brainPuzzleGenerationInstruction(difficulty='Medium',questionLanguage='English'){
+    const diff=String(difficulty||'Medium');
+    return [
+      'BRAIN PUZZLE / RIDDLE QUALITY CONTRACT.',
+      'Create SHORT, self-contained riddles or brain teasers that can be solved from the clues in the question. Do not require obscure trivia unless the selected topic explicitly asks for it.',
+      'For Multiple Choice, ALL answer choices must be genuinely plausible interpretations of the same clues and belong to the same semantic answer type. Never use one sensible answer plus three random or obviously impossible distractors.',
+      'Make distractors CLOSE to the correct answer: each wrong option should fit several clues but fail one decisive clue. The correct answer must still be uniquely defensible.',
+      'Keep option wording, specificity and approximate length naturally similar. Do not make the correct answer the only detailed, grammatical, familiar or category-matching option.',
+      'Avoid giveaway distractors such as unrelated objects, absurd answers, joke filler, or answers from a different category unless the selected topic is Funny Riddles and the alternatives remain plausible.',
+      'Silently test every option against every clue before returning it. If two options could reasonably work, rewrite the riddle or replace an option.',
+      'Prefer original riddles and fresh clue combinations. Do not reproduce long or distinctive wording from published riddle collections.',
+      'If the requested language uses wordplay, create wordplay that works NATIVELY in '+String(questionLanguage||'the requested language')+'. Do not translate an English spelling, letter-name or sound pun if the trick stops working after translation.',
+      diff==='Easy' ? 'EASY: use familiar objects or simple one-step insight, but still keep all four choices plausible.' : '',
+      diff==='Hard' ? 'HARD / CHALLENGING: use layered clues, lateral thinking or two-step reasoning; do not make difficulty depend on obscure vocabulary or trivia.' : '',
+      diff==='Medium' ? 'MEDIUM: require a clear moment of inference or wordplay with close alternatives, without becoming obscure.' : ''
+    ].filter(Boolean).join(' ');
+  }
+
   function buildGenerationScope(topic,count,attempt=0,structuredScope={}){
     const structuredParts = [
       structuredScope.category ? 'Category: '+structuredScope.category : '',
@@ -9086,6 +9419,8 @@ authPromise.then(() => {
     ].filter(Boolean);
 
     if(!isGeneralKnowledgeTopic(topic)){
+      const brainPuzzleScope=isBrainPuzzleScope(topic,structuredScope);
+      const requestedLanguage=$('ai-language')?.value || 'English';
       return {
         generalKnowledge:false,
         coverageCategories:[],
@@ -9094,6 +9429,7 @@ authPromise.then(() => {
           structuredParts.length ? 'STRUCTURED HOST SCOPE: '+structuredParts.join(' | ') : '',
           'Generate only questions that directly belong to this host-requested scope.',
           'Treat every populated structured field as a required scope constraint, not a suggestion.',
+          brainPuzzleScope ? brainPuzzleGenerationInstruction(structuredScope.difficulty || topicDifficultyLabel(topic),requestedLanguage) : '',
           'Do not import themes, entities, examples, places, eras, or subject matter from any previous quiz generation.'
         ].filter(Boolean).join(' ')
       };
@@ -11554,7 +11890,10 @@ authPromise.then(() => {
     const teamKey = st.gameMode==='teams' ? ':'+JSON.stringify(st.teams||[]) : '';
     const currentQ = st.questions && st.currentIndex>=0 ? st.questions[st.currentIndex] : null;
     const mediaKey = currentQ ? ':'+(currentQ.imageUrl||'')+':'+normalizedQuestionType(currentQ) : '';
-    const phaseKey = st.status + ':' + st.currentIndex + ':' + (st.gameMode||'individual') + ':'+(st.sessionMode||'live') + ':'+(st.examEndsAt||'') + ':'+(st.lastReconciledAt||'') + teamKey + mediaKey + ':'+(st.appVersion||'');
+    // Structural screen identity only. lastReconciledAt is deliberately excluded so a
+    // late score reconciliation cannot destroy/rebuild the Reveal card and replay its animation.
+    const phaseKey = st.status + ':' + st.currentIndex + ':' + (st.gameMode||'individual') + ':'+(st.sessionMode||'live') + ':'+(st.examEndsAt||'') + teamKey + mediaKey + ':'+(st.appVersion||'');
+    const reconcileKey = String(st.lastReconciledAt||'');
     if(st.status==='setup'){
       if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; buildPlayerLobby(st); }
     } else if(st.status==='exam'){
@@ -11562,7 +11901,14 @@ authPromise.then(() => {
     } else if(st.status==='question'){
       if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerQuestion(st); }
     } else if(st.status==='reveal'){
-      if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerReveal(st); }
+      if(S.lastPhaseKey!==phaseKey){
+        S.lastPhaseKey = phaseKey;
+        S.lastRevealReconciledAt = reconcileKey;
+        await enterPlayerReveal(st);
+      }else if(S.lastRevealReconciledAt!==reconcileKey){
+        S.lastRevealReconciledAt = reconcileKey;
+        await refreshPlayerRevealData(st);
+      }
     } else if(st.status==='leaderboard'){
       if(S.lastPhaseKey!==phaseKey){ S.lastPhaseKey = phaseKey; await enterPlayerLeaderboard(st); }
     } else if(st.status==='final'){
@@ -11962,6 +12308,38 @@ authPromise.then(() => {
     }, 150);
   }
 
+  async function refreshPlayerRevealData(st){
+    const card = $('player-reveal-card');
+    if(!card){
+      await enterPlayerReveal(st);
+      return;
+    }
+    const players = await fetchAllPlayers(S.code);
+    const rankInfo = playerRankInfo(players,S.pid,st);
+    const me = rankInfo.me;
+    if(me && me.teamId){ S.teamId = me.teamId; savePlayerSession(); }
+    const correct = me ? !!me.lastCorrect : false;
+    const points = me ? Number(me.lastPoints||0) : 0;
+    const score = me ? Number(me.score||0) : 0;
+
+    card.classList.toggle('correct', correct);
+    card.classList.toggle('wrong', !correct);
+    const icon = $('player-reveal-icon');
+    const kicker = $('player-reveal-kicker');
+    const pointsEl = $('player-reveal-points');
+    const totalEl = $('player-reveal-total');
+    const rankEl = $('player-reveal-rank');
+    if(icon) icon.textContent = correct ? '✓' : '×';
+    if(kicker) kicker.textContent = correct ? 'Correct answer' : 'Not this time';
+    if(pointsEl){
+      pointsEl.textContent = correct ? '+'+points : '+0';
+      pointsEl.classList.toggle('good', correct);
+      pointsEl.classList.toggle('zero', !correct);
+    }
+    if(totalEl) totalEl.textContent = score.toLocaleString();
+    if(rankEl) rankEl.textContent = playerRankLabel(rankInfo,st,{includeIndividualInTeams:true});
+  }
+
   async function enterPlayerReveal(st){
     clearInterval(S.playerTimerHandle);
     const players = await fetchAllPlayers(S.code);
@@ -11969,16 +12347,16 @@ authPromise.then(() => {
     const me = rankInfo.me;
     if(me && me.teamId){ S.teamId = me.teamId; savePlayerSession(); }
     const q = st.questions[st.currentIndex];
-    const correct = me ? me.lastCorrect : false;
-    const points = me ? me.lastPoints : 0;
-    const score = me ? me.score : 0;
+    const correct = me ? !!me.lastCorrect : false;
+    const points = me ? Number(me.lastPoints||0) : 0;
+    const score = me ? Number(me.score||0) : 0;
 
     $('screen-player-reveal').innerHTML =
       '<div class="center-stage">'+
-        '<div class="player-reveal-card '+(correct?'correct':'wrong')+'">'+
-          '<div class="player-result-icon">'+(correct?'✓':'×')+'</div>'+
-          '<div class="reveal-kicker">'+(correct?'Correct answer':'Not this time')+'</div>'+
-          '<div class="player-points '+(correct?'good':'zero')+'">'+(correct?'+'+points:'+0')+'</div>'+
+        '<div id="player-reveal-card" class="player-reveal-card '+(correct?'correct':'wrong')+'">'+
+          '<div id="player-reveal-icon" class="player-result-icon">'+(correct?'✓':'×')+'</div>'+
+          '<div id="player-reveal-kicker" class="reveal-kicker">'+(correct?'Correct answer':'Not this time')+'</div>'+
+          '<div id="player-reveal-points" class="player-points '+(correct?'good':'zero')+'">'+(correct?'+'+points:'+0')+'</div>'+
           '<p style="font-size:12px;">'+(st.gameMode==='teams'?'points added to '+escapeHtml(teamName(st,S.teamId)):'points this round')+'</p>'+
           '<div style="height:1px;background:rgba(130,160,220,.12);margin:18px 0;"></div>'+
           '<p style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#7f8da5;">Correct answer</p>'+
@@ -11986,8 +12364,8 @@ authPromise.then(() => {
           questionMediaHtml(q)+
           (q.explanation ? '<p style="margin-top:10px;">'+escapeHtml(q.explanation)+'</p>' : '')+
           '<div class="player-score-strip">'+
-            '<div class="player-score-cell"><span>Total score</span><strong>'+score.toLocaleString()+'</strong></div>'+
-            '<div class="player-score-cell"><span>Current rank</span><strong>'+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</strong></div>'+
+            '<div class="player-score-cell"><span>Total score</span><strong id="player-reveal-total">'+score.toLocaleString()+'</strong></div>'+
+            '<div class="player-score-cell"><span>Current rank</span><strong id="player-reveal-rank">'+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</strong></div>'+
             '<div class="player-score-cell"><span>Question</span><strong>'+(st.currentIndex+1)+' / '+st.questions.length+'</strong></div>'+
           '</div>'+
           '<p style="margin-top:15px;font-size:11px;">Waiting for the host to show the leaderboard…</p>'+
