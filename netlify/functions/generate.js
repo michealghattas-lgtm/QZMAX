@@ -1,6 +1,6 @@
 'use strict';
 
-// QZMAX 3.18.4 — Fast AI Generator + Conditional Web Grounding
+// QZMAX 3.18.8 — Fast AI Generator + Conditional Web Grounding
 //
 // The QZMAX Library is stored content and never enters this function.
 // Normal AI Generator requests use ONE free AI provider plus deterministic
@@ -415,12 +415,31 @@ function schemaInstruction({ count, optsPerQ, questionType }) {
   return common.join('\n');
 }
 
+function brainPuzzleSystemInstruction(request) {
+  const s = request?.structuredScope || {};
+  const combined = [s.category, s.topic, request?.originalTopic, request?.topic]
+    .filter(Boolean).join(' ').toLowerCase();
+  if (!/(brain puzzles|brain puzzle|riddles|riddle|brain teasers|brain teaser|lateral thinking)/.test(combined)) return '';
+  const language = String(request?.questionLanguage || 'the requested language').trim();
+  return [
+    'RIDDLE / BRAIN-TEASER QUALITY GATE:',
+    'Keep each puzzle concise and solvable from its own clues.',
+    'For multiple-choice items, every distractor must be a plausible near-miss in the SAME answer class as the correct answer, not random filler.',
+    'Each wrong option should satisfy some clues but fail at least one decisive clue; exactly one option must satisfy the complete riddle.',
+    'Keep answer choices naturally similar in wording, specificity and length so the correct answer is not visually obvious.',
+    'Silently test every option against every clue. If more than one answer is defensible, rewrite the riddle or the options before returning JSON.',
+    'Prefer original wording and fresh clue combinations instead of reproducing distinctive published riddles.',
+    'For wordplay, create a puzzle that works natively in '+language+'; do not translate English-only spelling or sound tricks that stop working in the requested language.'
+  ].join(' ');
+}
+
 function buildMessages(request) {
   const system = [
     'You are the QZMAX quiz-generation engine.',
     'Follow the current host scope, language, format, difficulty, coverage, and same-topic fact-avoidance instructions in the user prompt exactly.',
     'Never infer subject matter from prior requests; only the current request is authoritative.',
     'For ordinary AI generation, use established knowledge and silently self-check every question before returning it. If you are not highly confident that exactly one configured answer is defensible, replace that question with a safer fact.',
+    brainPuzzleSystemInstruction(request),
     'Never invent a fact that is not supported when the prompt contains source material or a web evidence pack.',
     structuredScopeText(request) ? 'STRUCTURED HOST SCOPE — TREAT EVERY POPULATED FIELD AS REQUIRED: '+structuredScopeText(request) : '',
     'When generating from supplied source material, write natural stand-alone question stems. Never start visible questions with "According to the source", "According to the text", "According to the document", "Based on the source", "From the text", or equivalent source-referencing phrases.',
@@ -1155,7 +1174,7 @@ function attachAndValidateEvidence(items, evidence) {
   return accepted;
 }
 
-// QZMAX 3.18.4 keeps Tavily only for current/recent AI requests. Standard AI
+// QZMAX 3.18.8 keeps Tavily only for current/recent AI requests. Standard AI
 // generation is one provider plus deterministic QZMAX validation; fallbacks run
 // only when the selected provider fails or returns no usable questions.
 
@@ -1354,7 +1373,7 @@ exports.handler = async function handler(event) {
   // Lightweight status endpoint — does not spend AI quota.
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      version:'3.18.4',
+      version:'3.18.8',
       freeOnly:true,
       standardAI:'One free AI provider + deterministic QZMAX structural validation',
       factualRetrieval:'Tavily only for current/recent AI requests + Tavily Extract for host-selected Source Links',

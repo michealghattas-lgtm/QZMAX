@@ -4564,7 +4564,7 @@ html[data-theme="light"] .qz-library-notice{background:rgba(204,142,39,.07)!impo
 
 
 /* =========================================================
-   QZMAX 3.18.7 — Young Learners + Bright Mode + stable live screens
+   QZMAX 3.18.8 — Full-Screen Player + Player Management
    ========================================================= */
 html[data-theme="light"] #screen-host-question,
 html[data-theme="light"] #screen-host-reveal,
@@ -4683,6 +4683,135 @@ html[data-theme="light"] .player-reveal-card p{color:#526a84!important;}
 
 @media(prefers-reduced-motion:reduce){.player-reveal-card{animation:none!important;}}
 
+
+
+/* =========================================================
+   QZMAX 3.18.8 — Full-Screen Player + Host Player Management
+   ========================================================= */
+.host-player-chip{padding-right:5px}
+.host-player-remove{width:24px;height:24px;border:0;border-radius:999px;display:grid;place-items:center;cursor:pointer;background:rgba(255,78,110,.08);color:#ff9aae;font-size:16px;line-height:1;transition:background .15s ease,transform .15s ease,color .15s ease}
+.host-player-remove:hover{background:rgba(255,78,110,.18);color:#ffd7df;transform:scale(1.05)}
+.host-manage-players-btn{border-color:rgba(99,189,255,.25)!important;color:#9edfff!important;background:rgba(44,158,225,.055)!important}
+.host-manage-players-btn:hover{border-color:rgba(99,189,255,.46)!important;background:rgba(44,158,225,.12)!important}
+.qz-player-manager-overlay{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:18px;background:rgba(2,6,18,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.qz-player-manager{width:min(620px,96vw);max-height:min(720px,88dvh);overflow:auto;border-radius:24px;border:1px solid rgba(129,160,220,.2);background:linear-gradient(160deg,rgba(16,25,48,.98),rgba(7,12,26,.99));box-shadow:0 32px 90px rgba(0,0,0,.46);padding:20px}
+.qz-player-manager-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
+.qz-player-manager-head h3{margin:3px 0 0;font-size:23px}
+.qz-player-manager-close{width:36px;height:36px;border-radius:12px;border:1px solid rgba(130,160,220,.14);background:rgba(255,255,255,.035);color:var(--ink);cursor:pointer;font-size:19px}
+.qz-player-manager-list{display:flex;flex-direction:column;gap:8px}
+.qz-player-manager-row{display:grid;grid-template-columns:38px minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:11px 12px;border-radius:15px;border:1px solid rgba(130,160,220,.12);background:rgba(255,255,255,.028)}
+.qz-player-manager-avatar{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(111,91,255,.13);color:#d6d0ff;font-weight:900;font-size:12px}
+.qz-player-manager-name{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qz-player-manager-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.qz-player-manager-score{font-family:'Space Grotesk',system-ui,sans-serif;font-weight:850;color:#c9d9ee;white-space:nowrap}
+.qz-player-manager-remove{padding:8px 10px!important;font-size:10px!important;white-space:nowrap}
+.qz-player-manager-empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:13px}
+html[data-theme="light"] .host-player-remove{background:rgba(190,44,78,.07);color:#b9224b}
+html[data-theme="light"] .host-player-remove:hover{background:rgba(190,44,78,.14);color:#8f1739}
+html[data-theme="light"] .host-manage-players-btn{background:rgba(26,126,185,.06)!important;border-color:rgba(26,126,185,.2)!important;color:#236b96!important}
+html[data-theme="light"] .qz-player-manager-overlay{background:rgba(30,49,72,.42)}
+html[data-theme="light"] .qz-player-manager{background:linear-gradient(160deg,rgba(252,254,255,.99),rgba(237,244,251,.99));border-color:rgba(35,73,119,.17);box-shadow:0 30px 80px rgba(45,70,100,.22)}
+html[data-theme="light"] .qz-player-manager-row{background:rgba(255,255,255,.76);border-color:rgba(35,73,119,.12)}
+html[data-theme="light"] .qz-player-manager-avatar{background:rgba(94,75,210,.10);color:#5a4ac8}
+html[data-theme="light"] .qz-player-manager-score{color:#294b6a}
+html[data-theme="light"] .qz-player-manager-close{background:rgba(255,255,255,.78);border-color:rgba(35,73,119,.14);color:#213d59}
+
+/* The live PLAYER question uses the actual device viewport. The panel itself remains
+   the emergency overflow surface for unusually long content; the page does not scroll. */
+@media(max-width:720px){
+  #screen-player-question.active{
+    height:100dvh;min-height:100dvh;max-height:100dvh;overflow:hidden!important;
+    padding:max(7px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))!important;
+  }
+  #screen-player-question .live-game-shell{
+    height:100%;min-height:0!important;padding:0!important;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:6px;
+  }
+  #screen-player-question .live-game-top{grid-template-columns:minmax(0,1fr) 56px auto!important;grid-template-rows:auto!important;gap:7px!important;margin:0!important;align-items:center}
+  #screen-player-question .live-progress-wrap{grid-column:1!important;grid-row:1!important;display:flex;flex-direction:column;align-items:stretch;gap:4px!important;min-width:0}
+  #screen-player-question .live-q-meta{font-size:9px!important;letter-spacing:.1em;overflow:hidden;text-overflow:ellipsis}
+  #screen-player-question .live-progress{width:100%;height:5px;max-width:none!important}
+  #screen-player-question .live-timer-shell{grid-column:2!important;grid-row:1!important}
+  #screen-player-question .live-timer-shell .ring-wrap,#screen-player-question .live-timer-shell .ring-wrap svg{width:54px!important;height:54px!important}
+  #screen-player-question .live-timer-shell .ring-num{font-size:19px!important}
+  #screen-player-question .live-room-pill{grid-column:3!important;grid-row:1!important;justify-self:end!important;padding:6px 8px!important;border-radius:10px!important;font-size:9px!important;gap:4px!important}
+  #screen-player-question .live-room-pill span{display:none}
+  #screen-player-question .live-room-pill strong{font-size:11px!important;letter-spacing:.08em!important}
+  #screen-player-question .live-question-panel{min-height:0!important;height:100%;overflow:auto!important;overscroll-behavior:contain;justify-content:flex-start!important;padding:10px 9px!important;border-radius:18px!important}
+  #screen-player-question .qz-live-badges{gap:5px!important;min-height:24px}
+  #screen-player-question .live-category,#screen-player-question .qtype-pill{padding:4px 7px!important;font-size:8px!important;letter-spacing:.09em!important}
+  #screen-player-question .qz-version-pill{display:none}
+  #screen-player-question .live-question-text{font-size:clamp(18px,5.1vw,25px)!important;line-height:1.12!important;padding:0!important;margin:8px auto 0!important;max-width:100%!important}
+  #screen-player-question .question-media{width:min(100%,420px)!important;max-width:420px!important;max-height:min(18dvh,135px)!important;margin:7px auto 1px!important;border-radius:13px!important}
+  #screen-player-question .question-media img{max-height:min(18dvh,135px)!important;width:100%!important;object-fit:contain!important}
+  #screen-player-question .live-question-help{font-size:9.5px!important;margin:6px 0 0!important;line-height:1.25}
+  #screen-player-question .live-answer-grid{gap:7px!important;margin-top:8px!important}
+  #screen-player-question .live-answer-grid.qz-answer-compact{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #screen-player-question .live-answer-grid.qz-answer-stack{grid-template-columns:1fr!important;gap:5px!important}
+  #screen-player-question .live-answer.opt-card{min-height:54px!important;padding:7px 8px!important;border-radius:13px!important;gap:7px!important;font-size:12.5px!important;line-height:1.2}
+  #screen-player-question .live-answer.opt-card .opt-letter{width:29px!important;height:29px!important;min-width:29px!important;border-radius:9px!important;font-size:12px!important}
+  #screen-player-question .live-answer-text{font-size:12px!important;line-height:1.22!important;font-weight:750;overflow-wrap:anywhere}
+  #screen-player-question .live-answer-status{min-height:18px!important;margin-top:6px!important;font-size:9px!important;line-height:1.25!important;letter-spacing:.02em!important;text-transform:none!important}
+  #screen-player-question .multi-cue{font-size:9px!important;margin-top:5px!important}
+  #screen-player-question .multi-submit-wrap{margin-top:6px!important}
+  #screen-player-question .multi-submit-wrap .btn{min-height:38px!important;padding:8px 13px!important}
+  #screen-player-question .typed-player-box{margin-top:9px!important;gap:7px!important}
+  #screen-player-question .typed-player-box input{min-height:44px!important;padding:9px 11px!important}
+  #screen-player-question .typed-player-box .btn{min-height:42px!important;padding:8px 12px!important}
+  #screen-player-question .live-question-footer{margin:0!important;gap:5px!important;min-height:27px;align-items:center;overflow:hidden;flex-wrap:nowrap!important}
+  #screen-player-question .live-micro-pill,#screen-player-question .player-rank-pill,#screen-player-question .team-badge{padding:5px 7px!important;font-size:8.5px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #screen-player-question .qz-footer-speed{display:none!important}
+
+  #screen-player-reveal.active,#screen-player-leaderboard.active,#screen-player-final.active{
+    padding:max(8px,env(safe-area-inset-top)) max(9px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(9px,env(safe-area-inset-left))!important;
+  }
+  #screen-player-reveal .center-stage,#screen-player-final .center-stage{min-height:100%;justify-content:center}
+  #screen-player-reveal .player-reveal-card{padding:18px 14px!important;border-radius:20px!important;max-height:calc(100dvh - 16px);overflow:auto}
+  #screen-player-reveal .player-result-icon{width:54px;height:54px;border-radius:17px;font-size:27px;margin-bottom:9px}
+  #screen-player-reveal .player-points{font-size:clamp(32px,10vw,46px)!important;margin:1px 0}
+  #screen-player-reveal .question-media{max-width:220px!important;margin:7px auto 2px!important}
+  #screen-player-reveal .question-media img{max-height:120px!important}
+  #screen-player-reveal .player-score-strip{gap:6px!important;margin-top:10px!important}
+  #screen-player-reveal .player-score-cell{padding:8px 6px!important}
+  #screen-player-reveal .player-score-cell strong{font-size:15px!important}
+  #screen-player-leaderboard .leader-shell{padding:2px 0 10px!important}
+  #screen-player-leaderboard .leader-head{margin-bottom:9px!important}
+  #screen-player-leaderboard .leader-title{font-size:clamp(24px,7vw,34px)!important;margin:3px 0!important}
+  #screen-player-leaderboard .leader-round-star{padding:6px 9px!important;font-size:9.5px!important}
+  #screen-player-leaderboard .momentum-list{gap:5px!important}
+  #screen-player-leaderboard .momentum-row{grid-template-columns:34px minmax(0,1fr) auto auto!important;gap:7px!important;padding:8px 9px!important;border-radius:12px!important}
+  #screen-player-leaderboard .momentum-rank{width:28px;height:28px;border-radius:9px;font-size:11px}
+  #screen-player-leaderboard .momentum-name,#screen-player-leaderboard .momentum-score{font-size:11px!important}
+  #screen-player-final .player-rank-card{margin-top:8px!important;padding:9px 10px!important}
+  #screen-player-final .lb-row{padding:8px 10px!important}
+}
+@media(max-width:720px) and (max-height:740px){
+  #screen-player-question.active{padding-top:max(4px,env(safe-area-inset-top))!important;padding-bottom:max(4px,env(safe-area-inset-bottom))!important}
+  #screen-player-question .live-game-shell{gap:4px}
+  #screen-player-question .live-timer-shell .ring-wrap,#screen-player-question .live-timer-shell .ring-wrap svg{width:47px!important;height:47px!important}
+  #screen-player-question .live-timer-shell .ring-num{font-size:17px!important}
+  #screen-player-question .live-question-panel{padding:7px 7px!important;border-radius:15px!important}
+  #screen-player-question .live-question-text{font-size:clamp(17px,4.8vw,22px)!important;margin-top:5px!important}
+  #screen-player-question .question-media,#screen-player-question .question-media img{max-height:min(14dvh,92px)!important}
+  #screen-player-question .live-question-help{margin-top:4px!important;font-size:8.5px!important}
+  #screen-player-question .live-answer-grid{margin-top:6px!important;gap:5px!important}
+  #screen-player-question .live-answer.opt-card{min-height:47px!important;padding:5px 7px!important}
+  #screen-player-question .live-answer.opt-card .opt-letter{width:26px!important;height:26px!important;min-width:26px!important}
+  #screen-player-question .live-answer-text{font-size:11px!important}
+  #screen-player-question .live-answer-status{margin-top:4px!important;min-height:15px!important;font-size:8px!important}
+  #screen-player-question .qz-footer-remaining{display:none!important}
+  #screen-player-question .live-question-footer{justify-content:center}
+  #screen-player-reveal .player-reveal-card{padding:13px 11px!important}
+  #screen-player-reveal .player-result-icon{width:46px;height:46px;font-size:23px;margin-bottom:6px}
+  #screen-player-reveal .question-media,#screen-player-reveal .question-media img{max-height:80px!important}
+  #screen-player-leaderboard .leader-head{margin-bottom:6px!important}
+  #screen-player-leaderboard .momentum-row{padding:6px 8px!important}
+}
+@media(max-width:430px){
+  .qz-player-manager-row{grid-template-columns:34px minmax(0,1fr) auto;gap:8px}
+  .qz-player-manager-score{display:none}
+  .qz-player-manager{padding:15px;border-radius:20px}
+}
+
 </style>
 </head>
 <body>
@@ -4707,7 +4836,7 @@ html[data-theme="light"] .player-reveal-card p{color:#526a84!important;}
 </div>
 
 <script type="module">
-  const APP_VERSION = "3.18.7";
+  const APP_VERSION = "3.18.8";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, get, set, remove, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -6029,11 +6158,98 @@ authPromise.then(() => {
     return '<button class="btn btn-ghost host-reset-session-btn" type="button" data-reset-session="1" title="End this room, disconnect joined players and create a fresh session">↻ '+escapeHtml(label)+'</button>';
   }
 
+  function hostPlayersButtonHtml(label='Players'){
+    return '<button class="btn btn-ghost host-manage-players-btn" type="button" data-manage-players="1" title="View joined players or remove someone from this session">👥 '+escapeHtml(label)+'</button>';
+  }
+
   function wireHostResetButtons(scope){
     const root = scope || document;
     root.querySelectorAll('[data-reset-session]').forEach(btn=>{
       btn.onclick = ()=>resetCurrentHostSession();
     });
+    root.querySelectorAll('[data-manage-players]').forEach(btn=>{
+      btn.onclick = ()=>showHostPlayerManager();
+    });
+  }
+
+  function closeHostPlayerManager(){
+    const overlay = $('qz-player-manager-overlay');
+    if(overlay) overlay.remove();
+  }
+
+  async function showHostPlayerManager(){
+    closeHostPlayerManager();
+    const overlay = document.createElement('div');
+    overlay.id = 'qz-player-manager-overlay';
+    overlay.className = 'qz-player-manager-overlay';
+    overlay.innerHTML = '<div class="qz-player-manager"><div class="qz-player-manager-head"><div><div class="eyebrow">Current session</div><h3>Joined players</h3><p style="font-size:11px;margin-top:5px;">Remove players who are no longer participating. They can join again later as a new player.</p></div><button class="qz-player-manager-close" type="button" aria-label="Close">×</button></div><div id="qz-player-manager-list" class="qz-player-manager-list"><div class="qz-player-manager-empty">Loading players…</div></div></div>';
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click',e=>{ if(e.target===overlay) closeHostPlayerManager(); });
+    const closeBtn = overlay.querySelector('.qz-player-manager-close');
+    if(closeBtn) closeBtn.onclick = closeHostPlayerManager;
+    await refreshHostPlayerManager();
+  }
+
+  async function refreshHostPlayerManager(){
+    const listEl = $('qz-player-manager-list');
+    if(!listEl || !S.code) return;
+    let players=[], st=null;
+    try{
+      [players,st] = await Promise.all([fetchAllPlayers(S.code),fbGet(statePath(S.code))]);
+    }catch(e){
+      listEl.innerHTML = '<div class="qz-player-manager-empty">Could not refresh the player list yet.</div>';
+      return;
+    }
+    if(!players.length){
+      listEl.innerHTML = '<div class="qz-player-manager-empty">No players are currently joined.</div>';
+      return;
+    }
+    const teams = st && st.gameMode==='teams' ? normalizeTeams(st.teams,st.teamCount) : [];
+    listEl.innerHTML = players.map((p,i)=>{
+      const team = teams.find(t=>t.id===p.teamId);
+      const initials = String(p.name||'P').trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join('').toUpperCase().slice(0,2) || 'P';
+      const meta = (team?team.name+' · ':'')+(st && st.status==='setup'?'In lobby':'Joined session');
+      return '<div class="qz-player-manager-row"><div class="qz-player-manager-avatar">'+escapeHtml(initials)+'</div><div style="min-width:0;"><div class="qz-player-manager-name">'+escapeHtml(p.name||'Player')+'</div><div class="qz-player-manager-meta">'+escapeHtml(meta)+'</div></div><div class="qz-player-manager-score">'+Number(p.score||0).toLocaleString()+' pts</div><button class="btn btn-danger qz-player-manager-remove" type="button" data-remove-player="'+escapeHtml(p.id)+'">Remove</button></div>';
+    }).join('');
+    listEl.querySelectorAll('[data-remove-player]').forEach(btn=>{
+      btn.onclick = async ()=>{
+        const player = players.find(p=>String(p.id)===String(btn.dataset.removePlayer));
+        if(player) await hostRemovePlayer(player.id,player.name||'Player');
+      };
+    });
+  }
+
+  async function hostRemovePlayer(pid,name='Player'){
+    if(!S.code || !pid) return false;
+    const ok = confirm('Remove '+name+' from session '+S.code+'?\n\nThey will be disconnected from this room and their answers will no longer count. They can join again later if needed.');
+    if(!ok) return false;
+    try{
+      const st = await fbGetStrict(statePath(S.code));
+      if(!st) throw new Error('Session not found');
+      const updates = {};
+      updates[playerPath(S.code,pid)] = null;
+      const qCount = Array.isArray(st.questions) ? st.questions.length : 0;
+      for(let qi=0; qi<qCount; qi++) updates[answerPath(S.code,qi,pid)] = null;
+      updates[statePath(S.code)+'/removedPlayers/'+pid] = {name:String(name||'Player'),removedAt:getSyncedTime()};
+      await fbAtomicUpdate(updates);
+
+      let fresh = await fbGetStrict(statePath(S.code));
+      if(fresh && fresh.currentIndex>=0 && (fresh.status==='reveal' || fresh.status==='leaderboard')){
+        try{ fresh = await reconcileQuestionScores(fresh.currentIndex) || fresh; }catch(_){ }
+      }
+      if(fresh){
+        if(fresh.status==='reveal') buildHostReveal(fresh,fresh.optionCounts||[]);
+        else if(fresh.status==='leaderboard') buildHostLeaderboard(fresh,await fetchAllPlayers(S.code));
+        else if(fresh.status==='final') buildHostFinal(fresh,await fetchAllPlayers(S.code));
+      }
+      showConnectionBanner(name+' was removed from the session.', true);
+      await refreshHostPlayerManager();
+      return true;
+    }catch(e){
+      console.error('remove player failed',e);
+      showConnectionBanner('Could not remove '+name+' yet — please try again.', false);
+      return false;
+    }
   }
 
   async function resetCurrentHostSession(){
@@ -6545,6 +6761,7 @@ authPromise.then(() => {
           '<div class="chip">Session code <span class="code-text">'+S.code+'</span></div>'+
           '<button class="btn btn-ghost" id="btn-host-dashboard" style="padding:6px 12px; font-size:12px;">Dashboard</button>'+
           '<button class="btn btn-ghost" id="btn-host-device-info" style="padding:6px 12px; font-size:12px;">Move host</button>'+
+          '<button class="btn btn-ghost host-manage-players-btn" data-manage-players="1" style="padding:6px 12px; font-size:12px;">👥 Players</button>'+
           '<button class="btn btn-ghost host-reset-session-btn" data-reset-session="1" style="padding:6px 12px; font-size:12px;">↻ Reset session</button>'+
           '<button class="btn btn-ghost" id="btn-host-logout" style="padding:6px 12px; font-size:12px;">Log out</button>'+
         '</div>'+
@@ -10546,8 +10763,15 @@ authPromise.then(() => {
             .sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')))
             .map((p,i)=>{
               const team = teams.find(t=>t.id===p.teamId);
-              return '<span class="host-player-chip"><b>'+(i+1)+'</b><span>'+escapeHtml(p.name||'Player')+'</span>'+(team?'<small>'+escapeHtml(team.name)+'</small>':'')+'</span>';
+              return '<span class="host-player-chip"><b>'+(i+1)+'</b><span>'+escapeHtml(p.name||'Player')+'</span>'+(team?'<small>'+escapeHtml(team.name)+'</small>':'')+'<button type="button" class="host-player-remove" data-remove-player="'+escapeHtml(p.id)+'" title="Remove '+escapeHtml(p.name||'player')+' from this session" aria-label="Remove '+escapeHtml(p.name||'player')+'">×</button></span>';
             }).join('');
+          rosterList.querySelectorAll('[data-remove-player]').forEach(btn=>{
+            btn.onclick = async e=>{
+              e.stopPropagation();
+              const player = players.find(p=>String(p.id)===String(btn.dataset.removePlayer));
+              if(player) await hostRemovePlayer(player.id,player.name||'Player');
+            };
+          });
         }
       }
     }, 1800);
@@ -10732,7 +10956,7 @@ authPromise.then(() => {
 
     $('screen-host-question').innerHTML =
       '<div class="exam-host-shell">'+
-        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="team-badge">📝 Exam Mode</div>'+hostResetButtonHtml('Reset session')+'</div></div>'+
+        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="team-badge">📝 Exam Mode</div>'+hostPlayersButtonHtml('Players')+hostResetButtonHtml('Reset session')+'</div></div>'+
         '<div class="exam-host-hero">'+
           '<div><div class="eyebrow">Timed assessment</div><h1>Exam in progress</h1><p>'+totalQuestions+' questions · '+durationMin+' minute'+(durationMin===1?'':'s')+' · no speed bonus</p></div>'+
           '<div class="exam-clock-card"><span>Time remaining</span><strong id="host-exam-clock">--:--</strong></div>'+
@@ -10805,7 +11029,7 @@ authPromise.then(() => {
         '<div class="live-game-top">'+
           '<div class="live-progress-wrap"><span class="live-q-meta">Question '+(st.currentIndex+1)+' of '+total+'</span><div class="live-progress"><span style="width:'+progress+'%;"></span></div></div>'+
           '<div class="live-timer-shell">'+ringSvg('host-ring')+'</div>'+
-          '<div class="host-live-room-actions"><div class="live-room-pill"><span>Session</span><strong>'+S.code+'</strong></div>'+hostResetButtonHtml('Reset')+'</div>'+
+          '<div class="host-live-room-actions"><div class="live-room-pill"><span>Session</span><strong>'+S.code+'</strong></div>'+hostPlayersButtonHtml('Players')+hostResetButtonHtml('Reset')+'</div>'+
         '</div>'+
         '<div class="live-question-panel">'+
           '<div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap;"><div class="live-category">'+(st.gameMode==='teams'?'👥 Team Battle':'✦ Live host view')+'</div><span class="qtype-pill">'+questionTypeLabel(q)+'</span></div>'+
@@ -10836,8 +11060,8 @@ authPromise.then(() => {
         fbGet(answersPath(S.code, st.currentIndex)),
         fbGet(playersPath(S.code))
       ]);
-      const answeredCount = answersObj ? Object.values(answersObj).filter(a=>answerEligibleForScoring(q,a)).length : 0;
       const playerCount = playersObj ? Object.keys(playersObj).length : 0;
+      const answeredCount = answersObj && playersObj ? Object.entries(answersObj).filter(([pid,a])=>playersObj[pid] && answerEligibleForScoring(q,a)).length : 0;
       const el = $('host-q-answered');
       if(el) el.textContent = answeredCount + ' of ' + playerCount + ' answered';
       if(playerCount>0 && answeredCount>=playerCount && !S.hostRevealing) scheduleReveal(st, 'Everyone answered!', 800);
@@ -10898,6 +11122,7 @@ authPromise.then(() => {
       let totalAnswered = 0;
 
       for(const pid in answers){
+        if(!players[pid]) continue;
         const a = answers[pid];
         if(!answerEligibleForScoring(q,a)) continue;
         totalAnswered++;
@@ -11004,6 +11229,7 @@ authPromise.then(() => {
     let correctCount=0;
 
     for(const pid in answers){
+      if(!players[pid]) continue;
       const a=answers[pid];
       if(!answerEligibleForScoring(q,a)) continue;
       totalAnswered++;
@@ -11203,7 +11429,7 @@ authPromise.then(() => {
 
     $('screen-host-reveal').innerHTML =
       '<div class="reveal-shell">'+
-        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="chip">Question '+(st.currentIndex+1)+' / '+st.questions.length+'</div>'+hostResetButtonHtml('Reset')+'</div></div>'+
+        '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="chip">Question '+(st.currentIndex+1)+' / '+st.questions.length+'</div>'+hostPlayersButtonHtml('Players')+hostResetButtonHtml('Reset')+'</div></div>'+
         '<div class="reveal-hero">'+
           '<div class="reveal-kicker">'+questionTypeLabel(q)+' · Answer reveal</div>'+
           '<div class="reveal-answer-big good">✓ '+escapeHtml(getCorrectAnswerDisplay(q))+'</div>'+
@@ -11309,7 +11535,7 @@ authPromise.then(() => {
       const roundStar = standings.slice().sort((a,b)=>b.lastPoints-a.lastPoints)[0];
       $('screen-host-leaderboard').innerHTML =
         '<div class="leader-shell">'+
-          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="team-badge">👥 Team Battle · After Q'+(st.currentIndex+1)+'</div>'+hostResetButtonHtml('Reset')+'</div></div>'+
+          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="team-badge">👥 Team Battle · After Q'+(st.currentIndex+1)+'</div>'+hostPlayersButtonHtml('Players')+hostResetButtonHtml('Reset')+'</div></div>'+
           '<div class="leader-head">'+
             '<div class="eyebrow">Team leaderboard</div>'+
             '<div class="leader-title">'+(standings.length?escapeHtml(standings[0].name)+' leads the battle':'Team standings')+'</div>'+
@@ -11332,7 +11558,7 @@ authPromise.then(() => {
       const roundStar = players.slice().sort((a,b)=>(b.lastPoints||0)-(a.lastPoints||0))[0];
       $('screen-host-leaderboard').innerHTML =
         '<div class="leader-shell">'+
-          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="chip">After Q'+(st.currentIndex+1)+'</div>'+hostResetButtonHtml('Reset')+'</div></div>'+
+          '<div class="topbar"><div class="chip">Session <span class="code-text">'+S.code+'</span></div><div style="display:flex;align-items:center;gap:8px;"><div class="chip">After Q'+(st.currentIndex+1)+'</div>'+hostPlayersButtonHtml('Players')+hostResetButtonHtml('Reset')+'</div></div>'+
           '<div class="leader-head">'+
             '<div class="eyebrow">Leaderboard</div>'+
             '<div class="leader-title">'+(players.length ? escapeHtml(players[0].name)+' leads the session' : 'Current standings')+'</div>'+
@@ -11635,7 +11861,7 @@ authPromise.then(() => {
           '<button class="btn btn-primary" id="btn-new-quiz">Play another quiz — same session</button>'+
           '<button class="btn btn-ghost" id="btn-final-analytics">View game analytics</button>'+
           '<button class="btn btn-ghost" id="btn-final-dashboard">Return to dashboard</button>'+
-          hostResetButtonHtml('End room & new session')+
+          hostPlayersButtonHtml('Players')+hostResetButtonHtml('End room & new session')+
         '</div>'+
 
         buildQuestionReviewPanel(st, st.questions.length-1)+
@@ -11873,6 +12099,24 @@ authPromise.then(() => {
     if(homeBtn) homeBtn.onclick = ()=>{ buildRoleScreen(); showScreen('screen-role'); };
   }
 
+
+  function showPlayerRemovedScreen(){
+    clearInterval(S.playerPollHandle);
+    clearInterval(S.playerTimerHandle);
+    clearPlayerSession();
+    S.code = null; S.pid = null; S.name = ''; S.teamId = null; S.lastPhaseKey = null; S.lastRevealReconciledAt = null; S.hadRoom = false;
+    $('screen-player-ended').innerHTML =
+      '<div class="center-stage">'+
+        '<div class="eyebrow">Session updated</div>'+
+        '<h2 style="font-size:28px;">You were removed from this session</h2>'+
+        '<p>The host has removed your player entry. If this was accidental, you can return home and join the room again.</p>'+
+        '<button class="btn btn-primary" id="player-removed-home">Return home</button>'+
+      '</div>';
+    showScreen('screen-player-ended');
+    const homeBtn = $('player-removed-home');
+    if(homeBtn) homeBtn.onclick = ()=>{ buildRoleScreen(); showScreen('screen-role'); };
+  }
+
   async function playerPollTick(){
     const st = await fbGet(statePath(S.code));
     if(!st){
@@ -11884,6 +12128,10 @@ authPromise.then(() => {
       return;
     }
     S.hadRoom = true;
+    if(st.removedPlayers && S.pid && st.removedPlayers[S.pid]){
+      showPlayerRemovedScreen();
+      return;
+    }
     if(st.appVersion && st.appVersion !== APP_VERSION){
       showConnectionBanner('This session is using QZMAX v'+st.appVersion+'. Refresh this page if the question display looks out of date.', false);
     }
@@ -12142,6 +12390,9 @@ authPromise.then(() => {
 
     let answerArea = '';
     let help = 'Choose the best answer';
+    const playerOptions = Array.isArray(q.options) ? q.options : [];
+    const optionChars = playerOptions.reduce((sum,o)=>sum+String(o||'').length,0);
+    const stackPlayerAnswers = playerOptions.length>4 || playerOptions.some(o=>String(o||'').length>34) || optionChars>118;
 
     if(type==='typed'){
       help = 'Type your answer, then lock it in';
@@ -12153,7 +12404,7 @@ authPromise.then(() => {
     }else{
       if(type==='multiple_correct') help = 'Select all correct answers, then submit';
       answerArea =
-        '<div class="live-answer-grid">'+
+        '<div class="live-answer-grid '+(stackPlayerAnswers?'qz-answer-stack':'qz-answer-compact')+'">'+
           (q.options||[]).map((o,i)=>{
             const selected = type==='multiple_correct'
               ? selectedExisting.has(i)
@@ -12174,14 +12425,14 @@ authPromise.then(() => {
           '<div class="live-room-pill"><span>Session</span><strong>'+S.code+'</strong></div>'+
         '</div>'+
         '<div class="live-question-panel">'+
-          '<div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap;"><div class="live-category qz-live-brand">✦ QZMAX</div><span class="qtype-pill">'+questionTypeLabel(q)+'</span><span class="qtype-pill">v'+APP_VERSION+'</span></div>'+
+          '<div class="qz-live-badges" style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap;"><div class="live-category qz-live-brand">✦ QZMAX</div><span class="qtype-pill">'+questionTypeLabel(q)+'</span><span class="qtype-pill qz-version-pill">v'+APP_VERSION+'</span></div>'+
           '<h2 class="live-question-text">'+escapeHtml(q.q)+'</h2>'+
           questionMediaHtml(q)+
           '<p class="live-question-help">'+help+'</p>'+
           answerArea+
           '<div id="pq-status" class="live-answer-status">'+(answered?'<strong>Your answer is already locked in.</strong> Waiting for the reveal…':'Choose your answer to lock it in.')+'</div>'+
         '</div>'+
-        '<div class="live-question-footer"><span class="live-micro-pill">'+(questionsAfter>0 ? questionsAfter+' questions after this' : 'Final question')+'</span><span class="live-micro-pill">Faster correct answers earn more points</span>'+((st.currentIndex>0 || players.some(p=>Number(p.score||0)>0))?'<span class="player-rank-pill">Rank '+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</span>':'<span class="live-micro-pill">'+players.length+' player'+(players.length===1?'':'s')+' joined</span>')+(st.gameMode==='teams'?'<span class="team-badge">👥 '+escapeHtml(teamName(st,S.teamId))+'</span>':'')+'</div>'+
+        '<div class="live-question-footer"><span class="live-micro-pill qz-footer-remaining">'+(questionsAfter>0 ? questionsAfter+' questions after this' : 'Final question')+'</span><span class="live-micro-pill qz-footer-speed">Faster correct answers earn more points</span>'+((st.currentIndex>0 || players.some(p=>Number(p.score||0)>0))?'<span class="player-rank-pill qz-footer-rank">Rank '+escapeHtml(playerRankLabel(rankInfo,st,{includeIndividualInTeams:true}))+'</span>':'<span class="live-micro-pill qz-footer-joined">'+players.length+' player'+(players.length===1?'':'s')+' joined</span>')+(st.gameMode==='teams'?'<span class="team-badge qz-footer-team">👥 '+escapeHtml(teamName(st,S.teamId))+'</span>':'')+'</div>'+
       '</div>';
     showScreen('screen-player-question');
 
@@ -12403,6 +12654,7 @@ authPromise.then(() => {
       let movementText = 'Holding position';
       if(moved > 0) movementText = '↑ Up '+moved+' place'+(moved===1?'':'s');
       if(moved < 0) movementText = '↓ Down '+Math.abs(moved)+' place'+(Math.abs(moved)===1?'':'s');
+      const leaderboardLimit = window.innerHeight < 760 ? 5 : 8;
 
       $('screen-player-leaderboard').innerHTML =
         '<div class="leader-shell">'+
@@ -12412,7 +12664,7 @@ authPromise.then(() => {
             '<div class="leader-round-star">'+movementText+' · '+(me&&me.lastCorrect?('+'+me.lastPoints+' this round'):'+0 this round')+'</div>'+
           '</div>'+
           '<div class="momentum-list">'+
-            players.slice(0,8).map((p,i)=>
+            players.slice(0,leaderboardLimit).map((p,i)=>
               '<div class="momentum-row'+(i===0?' first':'')+(p.id===S.pid?' me':'')+'">'+
                 '<span class="momentum-rank">'+(i+1)+'</span>'+
                 '<span class="momentum-name">'+escapeHtml(p.name)+(p.id===S.pid?' · You':'')+'</span>'+
@@ -12421,7 +12673,7 @@ authPromise.then(() => {
               '</div>'
             ).join('')+
           '</div>'+
-          (myRank>8 && me ? '<div class="player-rank-card"><span>Your current rank</span><strong>#'+myRank+' of '+players.length+' · '+Number(me.score||0).toLocaleString()+' pts</strong></div>' : '')+
+          (myRank>leaderboardLimit && me ? '<div class="player-rank-card"><span>Your current rank</span><strong>#'+myRank+' of '+players.length+' · '+Number(me.score||0).toLocaleString()+' pts</strong></div>' : '')+
           '<div style="text-align:center;margin-top:15px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">'+
             '<span class="live-micro-pill">Total score: '+(me?(me.score||0).toLocaleString():0)+'</span>'+
             '<span class="player-rank-pill">#'+(myRank||'-')+' of '+players.length+'</span>'+
