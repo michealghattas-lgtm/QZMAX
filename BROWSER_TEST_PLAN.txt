@@ -1,0 +1,757 @@
+3.18.7 BRAIN PUZZLES & RIDDLES TESTS
+------------------------------------
+[ ] AI Generator category list includes Brain Puzzles & Riddles.
+[ ] Topics include Mixed Short Brain Teasers, Classic Riddles, Logic Riddles, Lateral Thinking, Wordplay Riddles, Funny Riddles, What Am I?, Everyday Object Riddles, Number & Math Riddles, Patterns & Sequences and Kids Riddles.
+[ ] Selecting the category shows the Close-choice riddle mode note in the Scope box.
+[ ] Generate 10 Medium Multiple Choice riddles with 4 options; distractors are plausible same-type near-misses rather than random filler.
+[ ] Correct answer is not consistently longer, more detailed, or grammatically unique.
+[ ] No item has two defensible answers.
+[ ] Egyptian Simple Arabic wordplay is native to Arabic/Egyptian Arabic and not a broken translation of an English spelling/sound trick.
+[ ] Kids & Family -> Riddles & Brain Teasers receives the same close-choice quality behaviour.
+
+
+3.18.6 YOUNG LEARNER TESTS
+--------------------------
+[ ] School / Education shows a Young Learners panel with Year 1, Year 2, Year 3 and Year 4 cards.
+[ ] Grade / Year dropdown contains Year 1 through Year 12.
+[ ] Selecting Year 1–4 switches Subject options to Fun Mixed Learning, Mathematics, English, Reading & Comprehension, Spelling & Vocabulary, Science & Nature, HASS / Our World and General Knowledge.
+[ ] Selecting Year 5–12 restores Mathematics, English, Science / Biology, Chemistry, Physics, History, Geography, Economics and Computer Science.
+[ ] Young Learner card selection stays synchronized with the Grade / Year dropdown.
+[ ] Difficulty helper text changes to child-friendly wording for Years 1–4.
+[ ] A Year 1–4 generation request uses the selected year and subject and keeps content below/at that year level.
+[ ] Bright and Dark themes both render the Young Learners cards with readable text and clear selected state.
+
+QZMAX 3.18.7 BROWSER TEST PLAN
+
+
+
+3.18.5 BRIGHT MODE / PLAYER REVEAL STABILITY TESTS
+===================================================
+
+[ ] In Bright mode, Host live question panel is light with dark readable question text.
+[ ] Host answer choices are readable with clear option letters and borders.
+[ ] Answer counter and End quiz early remain clearly visible.
+[ ] Reveal statistics/distribution rows are readable in Bright mode.
+[ ] Leaderboard names, scores, rank movement and round-high-score pill are readable in Bright mode.
+[ ] Fix Question helper text and controls are readable in Bright mode.
+[ ] Let a question time out; player Reveal card appears once and stays visible for at least 4 seconds.
+[ ] Late Firebase reconciliation can update score/rank without the Reveal card disappearing or replaying its entrance animation.
+[ ] Repeat one question in Dark mode and confirm no visual regression.
+[ ] GET /.netlify/functions/generate reports version 3.18.7.
+
+3.18.4 STREAMLINED CREATE / SESSION / RANK TESTS
+------------------------------------------------
+[ ] Create tabs show AI Generator, School / Education, My Document, Source Link and Manual only.
+[ ] QZMAX Library is not shown.
+[ ] Puzzle Mode is not shown.
+[ ] Bible topics do NOT include Orthodox Study Bible — Mixed, Orthodox Canon, or OSB Introduction.
+[ ] New categories such as Food & Drink, Travel & Landmarks, Games & Gaming and Nature & Animals are visible.
+[ ] Join 3 players and confirm all names appear in the Lobby roster.
+[ ] Reset Session from setup; old players receive session-ended state and host gets a new room code.
+[ ] Resume an old live session and confirm Reset Session is available from the active host screen.
+[ ] After question 1, player question/reveal screens show current rank.
+[ ] Player leaderboard shows #X of total players.
+[ ] Final player screen shows Final rank #X of Y.
+[ ] Team mode shows team rank and individual rank.
+
+QZMAX 3.18.4 CORE TESTS
+
+STANDARD AI — IMPORTANT
+[ ] AI Generator -> General Knowledge -> Mixed General Knowledge
+[ ] Language = Egyptian Simple Arabic
+[ ] Difficulty = Medium
+[ ] Questions = 20, Options = 4
+[ ] Progress says QZMAX AI / creating questions, not mandatory web research or independent QA
+[ ] 20 valid questions are returned in one normal pass when the primary provider succeeds
+[ ] Result questions show QZMAX AI badge, not Web Grounded
+[ ] No timeout / grounded-batch QA error appears
+[ ] Questions remain varied and duplicate checks pass
+
+CONDITIONAL WEB GROUNDING
+[ ] Choose Current Affairs -> World
+[ ] Generate 5 questions
+[ ] Progress says fresh web information / web grounding
+[ ] Result questions show Web Grounded badge
+[ ] Evidence/source metadata is present for grounded questions
+[ ] A normal stable topic does not call Tavily
+
+FALLBACK
+[ ] Temporarily make primary Gemini unavailable in a local/debug environment
+[ ] Confirm Groq is used as generator fallback rather than as a mandatory reviewer
+[ ] Confirm a useful partial result is retained and only the shortage is requested
+
+STATUS ENDPOINT
+[ ] Historical 3.18.4 status test superseded by 3.18.5 version check above
+[ ] Status describes one-provider standard AI and conditional web grounding
+
+LIVE ANSWER REGRESSION
+[ ] Saving your answer appears while Firebase write is pending
+[ ] Answer locked in appears only after confirmation
+[ ] Correct in-time answer submitted near time-up is reconciled before leaderboard
+
+THEME
+[ ] Main page Dark -> Bright -> Dark
+[ ] Login screen theme
+[ ] Dashboard theme
+[ ] Quiz Studio theme
+[ ] My Quizzes / Launch theme
+[ ] Player Join theme
+[ ] Live player question/reveal theme
+[ ] Refresh: theme persists
+
+LANDING
+[ ] Commercial main screen layout
+[ ] Features scroll
+[ ] For Australia scroll
+[ ] Create a quiz
+[ ] Join a live game
+[ ] Sign in
+
+ACCOUNT
+[ ] Email sign-up shows Educator / Student
+[ ] Email login
+[ ] Google button visible
+[ ] New Google user gets role onboarding
+[ ] Educator -> Host Dashboard
+[ ] Student -> Student workspace
+[ ] Dashboard has My Account instead of Home
+[ ] Save name / role / organisation / state
+[ ] Switch theme from My Account
+
+EDITING
+[ ] Pencil on a question lower in queue
+[ ] Smooth scroll to editor
+[ ] Editor highlights
+[ ] Save Changes returns to same question
+[ ] Cancel Edit returns to same question
+
+DOCUMENT - FULL LOCAL PREVIEW
+[ ] PDF/DOCX/TXT generation
+[ ] No "According to the source"
+[ ] No "According to the text"
+[ ] No "According to the document"
+[ ] No Arabic/Egyptian equivalent source-opening phrases
+[ ] Question remains document-grounded
+
+REGRESSION
+[ ] General Knowledge isolation
+[ ] Multiple topics can append to same quiz
+[ ] Same topic repeated batch avoids duplicate facts
+[ ] Live Quiz
+[ ] Exam Mode
+
+
+3.13.1 BRIGHT MODE REVIEW
+[ ] Bright mode feels cool blue, not washed-out white
+[ ] Dashboard atmosphere remains visible
+[ ] Dashboard cards feel blue-glass, not pure white
+[ ] Login Back control is dark/clear
+[ ] Supplied Google logo appears correctly
+[ ] Continue with Google has hover/press feedback
+[ ] Create an account instead has hover feedback
+[ ] Get Started main container stays dark in Bright mode
+[ ] Get Started Back and Welcome label are clearly legible
+[ ] Australian flag has equal visual prominence to the kicker text
+[ ] Australian roadmap icons/text are larger
+
+
+3.13.2 HOST CONTRAST REVIEW
+[ ] Dashboard HOST DASHBOARD eyebrow is readable
+[ ] Dashboard subtitle under Welcome back is readable
+[ ] Quick Action titles are dark and clearly readable
+[ ] Room code in Launch header and Scan-to-Join card is clearly readable
+[ ] My Quizzes / Launch dark header uses white title text
+[ ] Session Mode / Live Scoring dark cards use light headings/subtext
+[ ] Quiz Preview question text is dark on pale cards
+[ ] Question type badges have stronger purple contrast
+[ ] Curriculum Guided / Review badge has stronger amber contrast
+[ ] Quiz Studio dark header uses white title text
+[ ] AI Knowledge + Search selected tab is readable
+[ ] Questions / Options / Time / Points cards match Bright theme
+[ ] Format helper strip is readable
+[ ] Add a question / Question queue headings are strong
+[ ] Clear Queue is clearly visible but not overpowering
+[ ] Question Queue question text is dark and readable
+
+
+3.13.3 CONSOLIDATED REVIEW
+
+MAIN SCREEN
+[ ] No `AU` appears before BUILT WITH AUSTRALIAN CLASSROOMS IN MIND
+[ ] No `AU` appears before AUSTRALIAN-FIRST ROADMAP
+[ ] Hero supporting paragraph is clearly darker
+[ ] "Simple enough for students..." is clearly darker
+[ ] Australian roadmap supporting paragraph is clearly darker
+[ ] Get smart. Play smarter. is readable
+[ ] Commercial preview · Australia is readable
+
+DASHBOARD
+[ ] QZ app icon is square, centred and not cropped awkwardly
+[ ] Dashboard QZMAX wordmark has correct Bright-mode contrast
+[ ] "Create your next game..." is clearly readable
+[ ] Active-room room code is a strong blue/teal
+[ ] Lobby / Setup badge is readable teal, not neon
+[ ] player/question/mode/device metadata pills are clearly readable
+
+MY QUIZZES / LAUNCH
+[ ] Main My Quizzes / Launch header is Bright blue-glass, not dark navy
+[ ] Header title/subtitle are dark and readable
+[ ] Session Mode outer panel is Bright blue-glass
+[ ] Live Scoring Mode outer panel is Bright blue-glass
+[ ] Selected mode is visually obvious with QZMAX blue/purple
+[ ] Unselected mode remains readable
+[ ] Mode status badge is readable on Bright mode
+
+
+3.13.4 BRIGHT WORKSPACE POLISH
+
+QUIZ STUDIO
+[ ] Quiz Studio header is Bright blue-glass
+[ ] CREATE is purple and readable
+[ ] Quiz Studio title is dark and readable
+[ ] Supporting description is dark enough
+[ ] selected Quiz Studio tab remains visually obvious
+
+ADD / EDIT QUESTION
+[ ] Add a question heading sits in a subtle pane header
+[ ] Question queue heading sits in a matching pane header
+[ ] headings no longer float over the background
+[ ] Save / Update saved quiz panel is Bright blue-glass
+[ ] save-name input is readable
+[ ] Save / Update button has QZMAX blue/purple CTA styling
+
+MY QUIZZES / LAUNCH
+[ ] Saved Quizzes selector and Quiz Preview feel like one connected workflow
+[ ] Quiz Preview has a clear card heading
+[ ] empty preview says No quiz loaded
+[ ] empty-state help text is readable
+[ ] loaded question cards remain inside the preview workspace
+[ ] disabled Start Quiz is clearly visible
+[ ] enabled Start Quiz uses the QZMAX gradient
+
+
+3.14.0 SOURCE LINK GENERATION
+
+FULL LOCAL PREVIEW REQUIRED FOR FUNCTIONAL TEST
+[ ] Run START_FULL_LOCAL_PREVIEW.bat / npx netlify-cli dev
+[ ] Source Link appears as the third Quiz Studio creation tab
+[ ] Paste a normal public article URL
+[ ] Fetch source shows loading state
+[ ] Detected source title/domain appear
+[ ] Word and character counts appear
+[ ] Extracted-content preview opens
+[ ] Open source link points to the original page
+
+GENERATION
+[ ] Add optional focus/instructions
+[ ] Generate 5 Multiple Choice questions
+[ ] Questions append to the existing quiz
+[ ] Questions are natural stand-alone questions
+[ ] No question starts "According to the source/webpage/link/text"
+[ ] Questions show Link Grounded badge
+[ ] Evidence comes from the selected page
+[ ] Custom Topic two-source checking is not incorrectly applied to Source Link
+[ ] Generate another batch from the same link
+[ ] Exact/near duplicate questions are rejected
+
+MULTI-SOURCE QUIZ
+[ ] Generate from Source Link A
+[ ] Add questions from My Document
+[ ] Add Custom Topic questions
+[ ] Generate from Source Link B
+[ ] All remain in the same quiz queue
+
+FAILURE CASES
+[ ] Invalid URL gives a clear message
+[ ] localhost/private URL is rejected
+[ ] inaccessible/paywalled URL fails instead of inventing content
+[ ] changing the URL after extraction requires Fetch source again
+
+REGRESSION
+[ ] AI Knowledge + Search still works
+[ ] My Document still works
+[ ] Manual still works
+[ ] School Exam Mode still works
+[ ] Mixed generation still works
+[ ] Bright / Dark theme switch still works
+[ ] Live Quiz / Exam Mode still work
+
+
+3.14.1 SOURCE LINK RELIABILITY
+
+LONG PAGE TEST
+[ ] Fetch https://en.wikipedia.org/wiki/Australia
+[ ] Confirm source ready
+[ ] Focus = History
+[ ] Request 10 Multiple Choice questions
+[ ] QZMAX cycles through multiple relevant source sections/windows
+[ ] 10 Link Grounded questions are produced when the source supports them
+[ ] No repeated facts/questions appear
+[ ] Every accepted question retains exact source evidence
+[ ] Requested total remains 10
+
+RETRY / DIVERSITY
+[ ] Generate another 10 with Focus = History
+[ ] Existing 10 stay in the queue
+[ ] New batch avoids previous same-topic fact keys
+[ ] New batch explores additional relevant source material
+
+BROADENING
+[ ] Repeat with Focus left blank
+[ ] QZMAX uses broader page coverage
+[ ] Questions remain Link Grounded
+
+ERROR COPY
+[ ] If the page genuinely cannot support the requested unique total, message says Link Grounded/source sections
+[ ] Generic "after verification" wording is not shown for Source Link
+
+
+3.14.2 UI / TERMINOLOGY
+
+QUIZ STUDIO
+[ ] Bright mode: No questions yet message is light and clearly readable
+[ ] Save button visually matches Add question
+[ ] Save still works
+
+SESSION TERMINOLOGY
+[ ] Dashboard says Active session
+[ ] Dashboard says Session code
+[ ] Recover / take over a session
+[ ] Host setup says Session code
+[ ] Host live/exam screens say Session
+[ ] Player Join asks for Session code
+[ ] Player lobby says Session
+[ ] Leave this session wording
+[ ] Final results say same session / session standing
+[ ] Analytics heading/export uses Session terminology
+[ ] No user-facing Room / room labels remain
+
+DASHBOARD
+[ ] Bright mode Dashboard subtitle is light and readable
+
+THEME BUTTON
+[ ] Button is at the top, not bottom
+[ ] Bright theme shows Dark Mode
+[ ] Dark theme shows Bright Mode
+[ ] Button sits beside top-right actions when space allows
+[ ] Mobile label remains visible
+
+MY ACCOUNT
+[ ] Dark mode uses QZMAX background photo + dark overlay
+[ ] Bright mode uses QZMAX background photo + bright overlay
+[ ] Cards remain readable in both themes
+
+
+3.14.3 THEME BUTTON
+[ ] Dark Mode / Bright Mode switch is bottom-right on all screens
+[ ] Button does not move to the top after screen navigation
+[ ] Label remains visible on desktop and mobile
+
+
+3.14.4 RELIABILITY REGRESSION
+
+AI KNOWLEDGE + SEARCH
+[ ] Australian History / English / Multiple Choice / 10
+[ ] progress advances through small independently verified passes
+[ ] total requested remains 10
+[ ] questions remain 2-Source Checked
+[ ] no duplicate facts
+[ ] no opaque unreadable-server-response error
+
+SOURCE LINK
+[ ] https://en.wikipedia.org/wiki/Australia
+[ ] Focus: History
+[ ] Multiple Choice / 10
+[ ] extraction succeeds
+[ ] multiple Link Grounded passes aggregate
+[ ] evidence remains from the selected page only
+[ ] no duplicate facts
+
+
+3.15.0 GUIDED AI GENERATOR
+
+CREATION TABS
+[ ] Guided AI + Search
+[ ] School / Education
+[ ] My Document
+[ ] Source Link
+[ ] Manual
+
+GUIDED AI
+[ ] Category list loads
+[ ] Topic list changes when Category changes
+[ ] Category = Other shows custom category field
+[ ] Topic = Other shows custom topic field
+[ ] Refine scope opens and accepts Region / Time Period / Focus
+[ ] Scope preview updates live
+[ ] Difficulty applies to Guided AI
+[ ] Generate Australian History / Medium / English / MC / 10
+[ ] Questions remain 2-Source Checked
+[ ] No unrelated subject drift
+[ ] Generate another batch with identical scope and confirm no repeated facts
+
+EGYPTIAN ENTERTAINMENT REGRESSION
+[ ] Category = Film & Television
+[ ] Topic = Egyptian Cinema
+[ ] Region = Egypt
+[ ] Time period = 2000–present
+[ ] Focus = films, actors and directors
+[ ] No unrelated world events/science/economics appear
+
+SCHOOL
+[ ] School / Education opens directly as its own tab
+[ ] Year / Subject / shared Difficulty work
+[ ] Year 5 Physics / Hard produces year-appropriate subject questions
+[ ] School does not ask about PISA, education systems or teaching methods
+
+DOCUMENT / SOURCE LINK
+[ ] Shared Difficulty control is visible
+[ ] Easy / Medium / Hard changes question complexity without adding outside facts
+[ ] Existing Document Grounded / Link Grounded safeguards remain intact
+
+REGRESSION
+[ ] Requested question total is preserved
+[ ] Mixed format works
+[ ] Multiple topics can be appended to one quiz
+[ ] Dark / Bright modes work
+[ ] Session terminology remains
+
+
+3.15.1 SPEED REGRESSION
+
+GUIDED AI
+[ ] General Knowledge > Australia
+[ ] Region = Australia
+[ ] Time period = 2000–Present
+[ ] Medium / English / Multiple Choice / 5
+[ ] First progress message says Verified pass 1
+[ ] Generation completes in a reasonable tens-of-seconds range, not several minutes
+[ ] No more than 3 frontend passes are possible for this 5-question request
+[ ] Requested total remains 5
+[ ] All accepted factual questions remain 2-Source Checked
+
+AUSTRALIAN HISTORY
+[ ] History > Australian History / Medium / MC / 5
+[ ] Structured scope is preserved
+[ ] No unrelated topic drift
+[ ] Blind verification remains enabled
+
+FAILURE BEHAVIOUR
+[ ] A stuck backend pass is stopped by the browser timeout
+[ ] QZMAX retries the next pass rather than waiting indefinitely
+
+
+3.15.2 VERIFIED DATA FIRST
+
+ZERO-AI TEST
+[ ] Guided AI + Search
+[ ] General Knowledge > Australia
+[ ] Region = Australia
+[ ] Time period = 2000 - Present
+[ ] Medium / English / Multiple Choice / 4 options / 5 questions
+[ ] Coverage box reports at least 5 ready QZMAX Verified questions
+[ ] Generate completes essentially immediately
+[ ] No AI/web-search call is needed
+[ ] All queue items show QZMAX Verified
+[ ] Correct answers are not all in option A
+
+PARTIAL TEST
+[ ] History > Australian History
+[ ] Medium / English / Multiple Choice / 5
+[ ] Verified questions are used first
+[ ] AI only generates/verifies the remaining shortfall
+[ ] Queue can contain both QZMAX Verified and 2-Source Checked
+
+DUPLICATE TEST
+[ ] Repeat the same request
+[ ] Previously used factKeys are not served again
+[ ] AI fills only coverage that is no longer available from unused verified records
+
+FILTERS
+[ ] English records are not served for Arabic
+[ ] Medium records are not silently served for Hard
+[ ] 2000-present does not serve 1901 Federation facts
+[ ] Expired dynamic facts are suppressed
+
+REGRESSION
+[ ] School unchanged
+[ ] Document unchanged
+[ ] Source Link unchanged
+[ ] 3.15.1 bounded verification architecture preserved
+
+
+3.16.0 PUZZLE MODE
+
+TAB / UI
+[ ] Puzzle Mode appears as a creation tab
+[ ] Puzzle Type list contains 11 puzzle families
+[ ] Topic dropdown changes with Puzzle Type
+[ ] Difficulty changes coverage
+[ ] Question Language is locked to English in Puzzle Mode v0.1
+[ ] Question Format is locked to Multiple Choice
+[ ] Options Each is locked to 4
+[ ] Count / Time / Points remain editable
+
+INSTANT GENERATION
+[ ] Emoji Rebus > choose a topic with enough coverage > Medium > 5
+[ ] Coverage says request can be added instantly
+[ ] Add Puzzles Instantly completes without AI progress delay
+[ ] Every added question shows QZMAX Puzzle badge
+[ ] No AI / web search call is needed
+[ ] Answer positions are shuffled
+
+NEW TYPES
+[ ] Word Rebus renders line breaks correctly
+[ ] Anagrams works
+[ ] Missing Letters works
+[ ] Unscramble works
+[ ] 3 Clues works
+[ ] Who / What Am I? works
+[ ] Odd One Out works
+[ ] Connections works
+[ ] Riddles works
+[ ] Sequences works
+
+DUPLICATES
+[ ] Generate the same puzzle type again
+[ ] Previously used puzzleKey records are not reused
+[ ] Coverage falls as unused puzzles are consumed
+
+QUALITY
+[ ] Review / Rewrite emoji records never appear in runtime
+[ ] Backup Phrases flagged for review do not appear
+[ ] Ambiguous duplicate-clue rows do not appear
+
+REGRESSION
+[ ] Guided AI Verified Data First still works
+[ ] School / Education works
+[ ] My Document works
+[ ] Source Link works
+[ ] Manual works
+[ ] Dark / Bright mode works
+
+
+3.17.0 UNIFIED CONTENT ENGINE
+
+TRUST LAYERS
+[ ] Legend shows QZMAX Verified
+[ ] Legend shows QZMAX Knowledge
+[ ] Legend shows Study Bible Grounded
+[ ] Legend still shows QZMAX Puzzle and 2-Source Checked
+[ ] Imported Knowledge records never display QZMAX Verified
+
+AUSTRALIA KNOWLEDGE
+[ ] Guided AI > General Knowledge > Australia
+[ ] Language = Egyptian Simple Arabic
+[ ] Medium or Hard
+[ ] MC / 4 options
+[ ] Coverage shows QZMAX Knowledge matches
+[ ] Questions are added instantly from Australia GK before AI
+[ ] Repeating the same scope does not reuse existing duplicateKeys
+
+AUSTRALIA ENGLISH
+[ ] General Knowledge > Australia > English
+[ ] Only existing English QZMAX Verified records count locally
+[ ] Egyptian Arabic Australia Knowledge is NOT silently translated
+[ ] AI/search fills any remaining English shortfall
+
+EGYPT
+[ ] Film & Television > Egyptian Cinema
+[ ] Egyptian Simple Arabic > Medium > MC
+[ ] Egypt 2000–2026 records are available as QZMAX Knowledge • Review
+[ ] Records with copyright review flags are excluded from automatic selection
+
+ORTHODOX STUDY BIBLE
+[ ] Bible & Christianity category appears
+[ ] English + Gospels loads Simple English OSB pack
+[ ] Modern Standard Arabic + Gospels loads Arabic OSB pack
+[ ] Badge reads Study Bible Grounded
+[ ] Verification metadata retains Source-Grounded Review
+[ ] Egyptian Simple Arabic does not silently use/translate the Arabic OSB pack
+
+SHORTFALL
+[ ] Request more questions than local matching coverage
+[ ] Verified is selected first
+[ ] Knowledge / Study Bible is selected second
+[ ] Only remaining count is sent to fresh AI/search verification
+
+REGRESSION
+[ ] Puzzle Mode still instant
+[ ] School mode unchanged
+[ ] Document mode unchanged
+[ ] Source Link unchanged
+[ ] 3.15.1 bounded AI verification still active
+
+
+============================================================
+3.18.1 AI GENERATOR + QZMAX LIBRARY
+============================================================
+
+A. CREATE MODE SEPARATION
+1. Open Quiz Studio.
+2. Confirm separate tabs exist for AI Generator and QZMAX Library.
+3. Confirm AI Generator does not display local Verified/Knowledge availability counts.
+4. Confirm QZMAX Library hides the shared AI generation controls.
+
+B. QZMAX LIBRARY CASCADE
+1. Open QZMAX Library and wait for the stored record count to load.
+2. Choose Film & Television.
+3. Confirm Topic shows only topics actually stored for that category.
+4. Confirm Egyptian Film & TV Quotes is NOT offered because the copyright-review rows are not runtime eligible.
+5. Change Category and Topic several times. Confirm Language, Difficulty, Region, Time Period and Format update and never leave a zero-result combination selected.
+6. Find Egypt 2000–2026 records and confirm their difficulty is displayed as Unrated where difficultyUnrated=true.
+7. Add questions and confirm the queue retains QZMAX Verified / QZMAX Knowledge / Study Bible Grounded badges.
+8. Confirm no Netlify AI request is made when adding from Library.
+
+C. AI GENERATOR — HISTORICAL 3.18.1 BEHAVIOUR, SUPERSEDED BY 3.18.3
+1. Choose a specific factual topic and generate 5 questions.
+2. Confirm the progress text refers to research / generation / independent QA, not local-bank lookup.
+3. Confirm generated factual questions use the AI Grounded + Reviewed badge when the backend QA succeeds.
+4. Confirm the success message reports the generator provider.
+5. Generate the same topic again; confirm duplicate protection still prevents repeats.
+6. Temporarily invalidate the primary provider key in a safe test environment and confirm QZMAX falls back to the next configured free provider.
+
+D. BACKEND STATUS
+GET /.netlify/functions/generate
+Confirm version 3.18.1, aiGeneratorOrder, aiReviewerOrder and configured provider flags are returned.
+
+============================================================
+3.18.1 REGRESSION TESTS
+============================================================
+
+A. QZMAX LIBRARY — BILINGUAL STUDY BIBLE
+1. Open QZMAX Library.
+2. Category: Bible & Christianity.
+3. Topic: Bible People.
+4. Open Language.
+Expected: Any available language, English, Modern Standard Arabic.
+Expected coverage with no later filters: 128 Study Bible records (64 English + 64 Arabic).
+5. Repeat for OSB Introduction, Orthodox Canon, Orthodox Church and Reading the Bible.
+Expected: both languages are available for each topic.
+
+B. PUZZLE MODE — EMOJI REBUS
+1. Puzzle Type: Emoji Rebus.
+2. Topic: All Topics.
+3. Difficulty: Hard / Challenging.
+4. Language: English.
+5. Questions: 10.
+6. Click Add Puzzles Instantly.
+Expected: 10 puzzles are added when at least 10 unused puzzleKeys remain.
+Expected: no "Puzzle duplicate checks left only 2 of 10" error.
+7. Add another batch.
+Expected: puzzleKeys already in the current queue are not selected again.
+
+
+============================================================
+3.18.2 LIVE ANSWER RELIABILITY TESTS
+============================================================
+
+1. Start a live 20-second multiple-choice question with at least two player devices.
+2. On a player, tap an answer and confirm the status first says "Saving your answer…".
+3. Confirm it changes to "Answer locked in" only after the Firebase write completes.
+4. Answer very close to time-up. Confirm the host briefly shows "Finalising responses…" and the in-time answer receives its points after reveal/reconciliation.
+5. Continue to the leaderboard and confirm the player's score matches the reveal.
+6. Repeat with Select Multiple and Typed Answer question types.
+7. Simulate weak connectivity/offline if possible. Confirm QZMAX does not falsely claim an unconfirmed answer was recorded.
+
+============================================================
+3.18.2 AI GENERATOR RELIABILITY TESTS — HISTORICAL, SUPERSEDED BY 3.18.3
+============================================================
+
+1. AI Generator: request 5 factual questions on a clear topic.
+2. Confirm the request is allowed to run longer than the old 30-second browser limit.
+3. Confirm a successful batch displays AI Grounded + Reviewed provenance.
+4. Repeat with 10 questions and confirm a partial QA rejection does not discard already-approved questions.
+5. If some candidates fail QA, confirm QZMAX repairs only the missing count and/or the frontend accumulates the verified partial on the next pass.
+6. GET /.netlify/functions/generate and confirm version 3.18.2 plus configured provider flags.
+
+============================================================
+QZMAX 3.18.8 — FULL-SCREEN PLAYER + PLAYER REMOVAL
+============================================================
+
+1. MOBILE FIT — NORMAL PHONE
+- Join from a 390x844-class phone.
+- Start a normal 4-option question with short answer labels.
+EXPECTED: timer, question, all four answers, answer status and footer/rank are visible without page scrolling. Answers are 2x2.
+
+2. MOBILE FIT — SHORT PHONE
+- Join from a shorter screen (~360x640 to 375x667).
+EXPECTED: compact header/timer, reduced text/card sizes, no normal page scrolling; non-essential footer information may collapse.
+
+3. LONG ANSWER FALLBACK
+- Use a question with one answer >34 characters or total choices >118 characters.
+EXPECTED: answers switch to a compact single-column layout. Emergency scrolling is confined to the question panel only if content still cannot fit.
+
+4. HOST REMOVE IN LOBBY
+- Join two players. In Setup, click × beside one player and confirm.
+EXPECTED: player disappears from roster/count; removed phone shows “You were removed from this session”; other player remains.
+
+5. HOST REMOVE DURING QUESTION
+- Start a question with two players. Open Players from the host question screen, remove one player.
+EXPECTED: player count drops; removed player's answer no longer contributes to “answered” count or reveal statistics.
+
+6. HOST REMOVE AFTER ANSWER / REVEAL
+- Let a player answer, reach Reveal, then remove them from Players.
+EXPECTED: their player/answer is removed, reveal stats reconcile, and Leaderboard excludes them.
+
+7. REJOIN AFTER REMOVAL
+- On removed phone, Return home and rejoin using same room code/name.
+EXPECTED: join succeeds as a fresh player with a new player ID.
+
+
+QZMAX 3.18.9 — PLAYER REMOVAL RELIABILITY
+--------------------------------------------
+1. Join one player in lobby.
+2. Host removes player from lobby roster.
+3. Player must immediately leave lobby and show removed-from-session screen.
+4. Host starts quiz immediately after removal.
+5. Removed device must not receive the question.
+6. Host Players manager must show zero players if no one else joined.
+7. Removed player may Return home and rejoin; new join must work as a fresh player.
+8. Repeat removal during a live question and during leaderboard.
+9. Reset/end room should show normal ended-session behavior, not a false removed message.
+
+============================================================
+QZMAX 4.0.0 — COMMERCIAL FOUNDATION PHASE 1
+============================================================
+1. HOST DASHBOARD / PERFORMANCE
+- Sign in as host.
+- Open ⚡ Performance.
+- Confirm Firebase connection status is visible.
+- Confirm architecture says Event-driven and 1-second player polling is OFF.
+- Export JSON and verify the file downloads.
+
+2. LOBBY REALTIME ROSTER
+- Create a room.
+- Join from two phones/tabs.
+- Confirm each player appears without waiting for a timed refresh.
+- Remove one player; confirm 3.18.9 eviction behaviour remains correct.
+
+3. LIVE QUESTION REALTIME COUNTS
+- Start a normal live quiz.
+- Submit answers one at a time.
+- Confirm host answered count increments immediately.
+- Confirm Everyone answered still triggers reveal.
+- Confirm no duplicate reveal occurs.
+
+4. PLAYER STATE REALTIME
+- From a player phone, verify Question → Reveal → Leaderboard → Next Question transitions.
+- Confirm timer remains local/smooth.
+- Confirm reveal-card stability from 3.18.5 remains intact.
+- Confirm removed player does not receive later questions.
+
+5. EXAM REALTIME
+- Start Exam mode with at least two players.
+- Save answers from both devices.
+- Confirm host saved-answer/submitted counters update.
+- Submit both exams and confirm automatic finalisation still occurs.
+
+6. ASSET DELIVERY
+- Verify Home, Host, Player, marketing feature/audience artwork in Dark and Bright modes.
+- In browser Network tools, confirm main artwork is served as .webp.
+
+7. PERFORMANCE CAPTURE
+- After several questions, open ⚡ Performance.
+- Confirm realtime callback count is > 0.
+- Confirm answer propagation samples/p95 are populated after player answers.
+- Record/export JSON for 10 / 25 / 50 / 100-player tests later.

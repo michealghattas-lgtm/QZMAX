@@ -1,0 +1,27 @@
+QZMAX 4.0.0 static / package verification
+Date: 2026-09-15
+
+PASS - APP_VERSION reports 4.0.0.
+PASS - Player 1-second state polling loop removed.
+PASS - Player state is subscribed through Firebase onValue().
+PASS - Host Setup recurring player/state polling removed.
+PASS - Host live-question recurring answers/players polling removed.
+PASS - Host Exam recurring players/answers/state polling removed.
+PASS - Dedicated 3.18.9 player membership/removal listener remains present.
+PASS - Host Performance Diagnostics screen and JSON export present.
+PASS - Production HTML references WebP for all major QZMAX artwork; Google G remains PNG.
+PASS - All referenced local asset files exist and are non-zero.
+PASS - Every generated WebP validates and matches its corresponding PNG dimensions.
+PASS - 13 principal artwork assets reduced from 9,315,161 bytes to 1,639,818 bytes (82.4% reduction).
+PASS - index.html module JavaScript passed node --check after static imports were stripped for parser compatibility.
+PASS - netlify/functions/generate.js passed node --check.
+PASS - generate.js GET status returned 200 and version 4.0.0.
+PASS - generate.js functional diff from 3.18.9 is version/comment only; AI generation architecture unchanged.
+PASS - All JSON files parsed successfully.
+PASS - Local HTTP smoke returned index.html and WebP backgrounds with HTTP 200 and image/webp MIME type.
+
+NOT RUN - Live multi-device Firebase browser test. This requires the deployed Firebase project and real browser/device connections.
+NOT RUN - 10/25/50/100 concurrent-player load test. This is the next commercial performance phase.
+
+Important remaining scaling item:
+rooms/{code}/state still carries the complete questions array. Realtime listeners remove repeated unchanged reads, but future 4.0 work should split the large question payload from the lightweight live state before a commercial capacity limit is published.

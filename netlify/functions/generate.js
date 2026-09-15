@@ -1,6 +1,6 @@
 'use strict';
 
-// QZMAX 3.18.8 — Fast AI Generator + Conditional Web Grounding
+// QZMAX 4.0.0 — Fast AI Generator + Conditional Web Grounding
 //
 // The QZMAX Library is stored content and never enters this function.
 // Normal AI Generator requests use ONE free AI provider plus deterministic
@@ -1174,7 +1174,7 @@ function attachAndValidateEvidence(items, evidence) {
   return accepted;
 }
 
-// QZMAX 3.18.8 keeps Tavily only for current/recent AI requests. Standard AI
+// QZMAX 4.0.0 keeps Tavily only for current/recent AI requests. Standard AI
 // generation is one provider plus deterministic QZMAX validation; fallbacks run
 // only when the selected provider fails or returns no usable questions.
 
@@ -1373,7 +1373,7 @@ exports.handler = async function handler(event) {
   // Lightweight status endpoint — does not spend AI quota.
   if (event.httpMethod === 'GET') {
     return jsonResponse(200, {
-      version:'3.18.8',
+      version:'4.0.0',
       freeOnly:true,
       standardAI:'One free AI provider + deterministic QZMAX structural validation',
       factualRetrieval:'Tavily only for current/recent AI requests + Tavily Extract for host-selected Source Links',

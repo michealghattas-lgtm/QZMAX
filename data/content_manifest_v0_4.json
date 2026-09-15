@@ -1,7 +1,7 @@
 {
   "schemaVersion": "0.4",
-  "generatedAt": "2026-09-14",
-  "engineName": "QZMAX Content Architecture 3.18.4",
+  "generatedAt": "2026-09-15",
+  "engineName": "QZMAX Content Architecture 4.0.0",
   "layers": [
     {
       "priority": 1,
@@ -11,7 +11,7 @@
       "trust": "Reviewed verified records",
       "libraryGroup": "QZMAX Library",
       "activeInCreate": false,
-      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 3.18.4 Create UI."
+      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 4.0.0 Create UI."
     },
     {
       "priority": 1,
@@ -22,7 +22,7 @@
       "runtimeEligibleCount": 11160,
       "libraryGroup": "QZMAX Library",
       "activeInCreate": false,
-      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 3.18.4 Create UI."
+      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 4.0.0 Create UI."
     },
     {
       "priority": 2,
@@ -31,7 +31,7 @@
       "file": "qzmax_puzzle_bank_v0_1.json",
       "trust": "Curated puzzle quality gate",
       "activeInCreate": false,
-      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 3.18.4 Create UI."
+      "statusNote": "Retained as dormant legacy content; not exposed in QZMAX 4.0.0 Create UI."
     },
     {
       "priority": 3,

@@ -1,0 +1,10 @@
+QZMAX 4.0.0 — GitHub Update Only
+
+1. Extract this ZIP.
+2. Copy the complete extracted contents into your fresh local QZMAX GitHub repository folder.
+3. Allow the new assets/*.webp files to be added.
+4. Commit all changed/new files and push to GitHub.
+5. Let the current Netlify deployment complete.
+6. Test with at least two real player devices before using the build at an event.
+
+Important: index.html now references the new WebP files. Do not copy index.html without also copying the assets folder from this update.
